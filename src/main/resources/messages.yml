@@ -1,0 +1,20 @@
+placeholders:
+  - name: prefix
+    text: "<dark_gray>[<light_purple>FluffyCombat</light_purple>]</dark_gray>"
+  - name: break
+    text: "<dark_aqua>-<aqua>-</aqua>-<aqua>-</aqua>-<aqua>-</aqua>-<aqua>-</aqua>-<aqua>-</aqua>-<aqua>-</aqua>-<aqua>-</aqua>-<aqua>-</aqua>-<aqua>-</aqua>-<aqua>-</aqua>-<aqua>-</aqua>-<aqua>-</aqua>-<aqua>-</aqua>-<aqua>-</aqua>-<aqua>-</aqua>-<aqua>-</aqua>-<aqua>-</aqua>-<aqua>-</aqua>-<aqua>-</aqua>-<aqua>-</aqua>-<aqua>-</aqua>-<aqua>-</aqua>-<aqua>-</aqua>-"
+  - name: usage
+    text: "<red>Wrong Usage!</red>"
+
+command-parse:
+  incorrect-format: "%prefix% %usage% <click:suggest_command:/%command%><hover:show_text:'<green>Click here to suggest the correct format!'><gray>/%command%</gray></hover>"
+  player-only: "%prefix% <red>You cannot execute <white>%command%.</white>"
+  console-only: "%prefix% <red>You cannot execute <white>%command%.</white>"
+  no-tab:
+    player: "< No players found >"
+
+combat-end: "%prefix% <green>You are no longer in combat!"
+
+combat-enter:
+  victim: "%prefix% <red>You are now in combat! Do not log out!"
+  attacker: "%prefix% <red>You are now in combat! Do not log out!"
