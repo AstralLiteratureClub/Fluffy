@@ -80,7 +80,7 @@ public class Configuration extends YamlConfiguration {
 		this.save(file);
 	}
 
-	public void load() throws IOException, InvalidConfigurationException {
+	public void load() {
 		reload();
 	}
 

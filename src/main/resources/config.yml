@@ -1,0 +1,17 @@
+# Milliseconds
+time: 15000
+
+kill-on-log: true
+
+hooks:
+  wormhole: true
+
+# Commands which can't be executed without
+# fluffy.commandbypass
+disabled-commands:
+  - "fixall"
+  - "fix"
+  - "repair"
+  - "repairall"
+  - "spawn"
+  - "warp"

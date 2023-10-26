@@ -1,6 +1,7 @@
 package me.antritus.astral.fluffycombat.api;
 
 import me.antritus.astral.fluffycombat.FluffyCombat;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * @author Antritus
@@ -11,6 +12,8 @@ public class CombatTag {
 	private final CombatUser victim;
 	private final CombatUser attacker;
 	private int ticksLeft = 300;
+	private boolean isDeadVictim = false;
+	private boolean isDeadAttacker = false;
 
 	/**
 	 * Creates new instance of the class.
@@ -75,5 +78,30 @@ public class CombatTag {
 	 */
 	public void resetTicks() {
 		this.ticksLeft = 300;
+	}
+
+
+	@ApiStatus.Internal
+	@ApiStatus.NonExtendable
+	public boolean isDeadVictim() {
+		return isDeadVictim;
+	}
+
+	@ApiStatus.Internal
+	@ApiStatus.NonExtendable
+	public boolean isDeadAttacker() {
+		return isDeadAttacker;
+	}
+
+	@ApiStatus.Internal
+	@ApiStatus.NonExtendable
+	public void setDeadVictim(boolean deadVictim) {
+		isDeadVictim = deadVictim;
+	}
+
+	@ApiStatus.Internal
+	@ApiStatus.NonExtendable
+	public void setDeadAttacker(boolean deadAttacker) {
+		isDeadAttacker = deadAttacker;
 	}
 }

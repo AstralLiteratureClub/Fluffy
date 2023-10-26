@@ -6,9 +6,9 @@ import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * CombatEnterEvent is triggered when the player's
- *  combat ends.
- *
+ * When a player's combat tag ends, it will fire this.
+ * When a player is no longer in combat, it fires CombatFullEndEvent
+ * @see CombatFullEndEvent
  * @author Antritus
  * @since 1.0-SNAPSHOT
  */

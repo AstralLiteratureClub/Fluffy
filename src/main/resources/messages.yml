@@ -13,8 +13,16 @@ command-parse:
   no-tab:
     player: "< No players found >"
 
+combat-command: "%prefix% <green>You cannot use <gray>%command%</gray> while in combat!"
+
 combat-end: "%prefix% <green>You are no longer in combat!"
 
 combat-enter:
   victim: "%prefix% <red>You are now in combat! Do not log out!"
   attacker: "%prefix% <red>You are now in combat! Do not log out!"
+
+
+# Wormhole plugin made by antritus can be hooked
+wormhole:
+  request: "%prefix% <red>You cannot send teleport requests while in combat!"
+  accept: "%prefix% <red>You cannot accept teleport requests while in combat!"

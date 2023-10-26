@@ -5,15 +5,18 @@ import me.antritus.astral.fluffycombat.api.CombatTag;
 import me.antritus.astral.fluffycombat.api.CombatUser;
 import me.antritus.astral.fluffycombat.api.events.CombatEndEvent;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Tag;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Antritus
@@ -32,7 +35,8 @@ public final class CombatManager {
 
 	private final FluffyCombat main;
 	private BukkitTask task;
-	private final HashMap<String, CombatTag> tags = new LinkedHashMap<>();
+	private final Map<String, CombatTag> tags = new LinkedHashMap<>();
+	private final Map<UUID, CombatTag> latest = new LinkedHashMap<>();
 
 	/**
 	 * Creates new CombatManager instance.
@@ -65,14 +69,27 @@ public final class CombatManager {
 			public void run() {
 				List<String> deleteList = new ArrayList<>();
 				List<String> nullList = new ArrayList<>();
-				tags.forEach((key, tag)->{
+				latest.clear();
+ 				tags.forEach((key, tag)->{
 					if (tag == null){
 						nullList.add(key);
-						return;
-					}
-					tag.setTicksLeft(tag.getTicksLeft()-1);
-					if (tag.getTicksLeft()<0){
-						deleteList.add(key);
+					} else {
+						latest.putIfAbsent(tag.getVictim().getUniqueId(), tag);
+						latest.putIfAbsent(tag.getAttacker().getUniqueId(), tag);
+						tag.setTicksLeft(tag.getTicksLeft() - 1);
+						if (tag.getTicksLeft() < 0) {
+							deleteList.add(key);
+						}
+						{
+							int ticksLeft = tag.getTicksLeft();
+							if (latest.get(tag.getVictim().getUniqueId()).getTicksLeft()<ticksLeft){
+								latest.put(tag.getVictim().getUniqueId(), tag);
+							}
+							if (latest.get(tag.getAttacker().getUniqueId()).getTicksLeft()<ticksLeft){
+								latest.put(tag.getAttacker().getUniqueId(), tag);
+							}
+
+						}
 					}
 				});
 				nullList.forEach(tags::remove);
@@ -97,6 +114,7 @@ public final class CombatManager {
 					CombatEndEvent event = new CombatEndEvent(main, tag);
 					event.callEvent();
 				});
+
 			}
 		}.runTaskTimerAsynchronously(main, 20, 1);
 	}
@@ -111,6 +129,11 @@ public final class CombatManager {
 		tags.clear();
 	}
 
+	@Nullable
+	public CombatTag getLatest(OfflinePlayer player){
+		return latest.get(player.getUniqueId());
+	}
+
 	/**
 	 * Returns true if the given players have no combat tag.
 	 * This is check by using getTag(..., ...)
@@ -121,6 +144,21 @@ public final class CombatManager {
 	 */
 	public boolean hasTag(OfflinePlayer player, OfflinePlayer player2){
 		return getTag(player, player2) != null;
+	}
+
+	public boolean isActive(CombatTag tag, OfflinePlayer player){
+		if (tag.getAttacker().getUniqueId().equals(player.getUniqueId())){
+			return !tag.isDeadAttacker();
+		} else {
+			return !tag.isDeadVictim();
+		}
+	}
+	public boolean isActive(CombatTag tag, UUID playerId){
+		if (tag.getAttacker().getUniqueId().equals(playerId)){
+			return !tag.isDeadAttacker();
+		} else {
+			return !tag.isDeadVictim();
+		}
 	}
 
 
@@ -167,7 +205,7 @@ public final class CombatManager {
 	 * @param player player
 	 * @return empty list if none found, else all tags where player is in the key
 	 */
-	private List<CombatTag> getCombatTags(OfflinePlayer player){
+	public List<CombatTag> getTags(OfflinePlayer player){
 		List<CombatTag> returnList = new ArrayList<>();
 		tags.forEach((key, tag)->{
 			if (key.contains(player.getUniqueId().toString())){
@@ -183,7 +221,15 @@ public final class CombatManager {
 	 * @return found tags
 	 */
 	public boolean hasTags(OfflinePlayer player){
-		return tags.keySet().stream().anyMatch(key->key.contains(player.getUniqueId().toString()));
+		List<String> keys = tags.keySet().stream().filter(key->key.contains(player.getUniqueId().toString())).toList();
+		List<CombatTag> tags = new ArrayList<>();
+		for (String key : keys){
+			CombatTag tag = this.tags.get(key);
+			if (isActive(tag, player)){
+				tags.add(this.tags.get(key));
+			}
+		}
+		return tags.size()>0;
 	}
 
 	/**
@@ -220,6 +266,8 @@ public final class CombatManager {
 	 * Triggered when player joins the server
 	 * @param player player
 	 */
+	@ApiStatus.Internal
+	@ApiStatus.NonExtendable
 	public void onJoin(Player player) {
 		if (hasTags(player)){
 			main.getMessageManager().broadcast("log-join", "%player%="+player.getUniqueId());

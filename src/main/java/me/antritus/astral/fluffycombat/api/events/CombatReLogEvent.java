@@ -1,27 +1,16 @@
 package me.antritus.astral.fluffycombat.api.events;
 
-import me.antritus.astral.fluffycombat.FluffyCombat;
-import me.antritus.astral.fluffycombat.api.CombatTag;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
+import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * CombatEnterEvent is triggered when the player
- *  enters combat and the event is not canceled.
- *
- * @author Antritus
- * @since 1.0-SNAPSHOT
- */
-public class CombatEnterEvent extends AbstractCombatEvent implements Cancellable {
+public class CombatReLogEvent extends Event implements Cancellable {
+	private final Player player;
 	private boolean cancel = false;
-	/**
-	 *
-	 * @param fluffyCombat main
-	 * @param combatTag tag
-	 */
-	public CombatEnterEvent(FluffyCombat fluffyCombat, CombatTag combatTag) {
-		super(fluffyCombat, combatTag);
+	public CombatReLogEvent(Player player){
+		this.player = player;
 	}
 
 	private static final HandlerList HANDLERS = new HandlerList();
