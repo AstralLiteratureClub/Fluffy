@@ -21,7 +21,7 @@ public class ColorUtils {
 		return MiniMessage.miniMessage().deserialize(msg).decoration(TextDecoration.ITALIC, false);
 	}
 	public static Component translateCompLegacy(String msg){
-		return LegacyComponentSerializer.legacy('§').deserialize(msg);
+		return LegacyComponentSerializer.legacy('\u00a7').deserialize(msg);
 	}
 	public static String deserialize(Component component){
 		return PlainTextComponentSerializer.plainText().serialize(component);

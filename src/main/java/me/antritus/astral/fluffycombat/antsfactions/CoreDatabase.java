@@ -9,6 +9,8 @@ import java.sql.SQLException;
  * @since 1.1-SNAPSHOT
  */
 
+@SuppressWarnings("removal")
+@Deprecated(forRemoval = true)
 public class CoreDatabase {
 	private final FactionsPlugin main;
 

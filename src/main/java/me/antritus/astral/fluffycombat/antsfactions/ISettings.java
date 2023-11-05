@@ -8,6 +8,8 @@ import org.jetbrains.annotations.Nullable;
  * @author Antritus
  * @since 1.1-SNAPSHOT
  */
+@SuppressWarnings("removal")
+@Deprecated(forRemoval = true)
 public interface ISettings {
 	@NotNull
 	String name();

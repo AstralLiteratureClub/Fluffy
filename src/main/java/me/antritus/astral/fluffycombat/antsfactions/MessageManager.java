@@ -26,6 +26,8 @@ import java.util.*;
  * @author Antritus
  * @since 1.1-SNAPSHOT
  */
+@SuppressWarnings("removal")
+@Deprecated(forRemoval = true)
 public class MessageManager {
 	private final MiniMessage miniMessage = MiniMessage.miniMessage();
 	private final FactionsPlugin main;

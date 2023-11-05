@@ -1,7 +1,9 @@
 package me.antritus.astral.fluffycombat.api.events;
 
 import me.antritus.astral.fluffycombat.FluffyCombat;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerEvent;
 import org.jetbrains.annotations.NotNull;
@@ -10,24 +12,27 @@ import org.jetbrains.annotations.NotNull;
  * When a player is no longer in combat, this event fires.
  * @see CombatEndEvent
  */
-public class CombatFullEndEvent extends PlayerEvent {
+public class CombatFullEndEvent extends Event {
 	private final FluffyCombat fluffyCombat;
+	private final OfflinePlayer player;
 
 	/**
 	 * @param fluffyCombat main
 	 * @param player player whose tags ended
 	 */
-	public CombatFullEndEvent(FluffyCombat fluffyCombat, Player player) {
-		super(player);
+	public CombatFullEndEvent(FluffyCombat fluffyCombat, OfflinePlayer player) {
+		super();
 		this.fluffyCombat = fluffyCombat;
+		this.player = player;
 	}
 	/**
 	 * @param fluffyCombat main
 	 * @param player player whose tags ended
 	 */
-	public CombatFullEndEvent(boolean async, FluffyCombat fluffyCombat, Player player) {
-		super(player, async);
+	public CombatFullEndEvent(boolean async, FluffyCombat fluffyCombat, OfflinePlayer player) {
+		super(async);
 		this.fluffyCombat = fluffyCombat;
+		this.player = player;
 	}
 
 	/**
@@ -48,5 +53,7 @@ public class CombatFullEndEvent extends PlayerEvent {
 		return HANDLERS;
 	}
 
-
+	public OfflinePlayer player() {
+		return player;
+	}
 }

@@ -1,17 +1,182 @@
-# Milliseconds
-time: 15000
-
-kill-on-log: true
+# How long should combat last for?
+# TICKS; 1 second = 20 ticks
+time: 300
+# Enables debugging features, as self combat tagging
+debug: false
 
 hooks:
-  wormhole: true
+  # Wormhole Teleport plugin
+  wormhole:
+    # True/False
+    enabled: true
+    # What kind of action in wormhole should be disabled in combat
+    disable-effects:
+      # /tpa
+      # True/False
+      tpa: true
+      # /tpahere
+      # True/False
+      tpahere: true
+      # /tpaccept
+      tpaccept:
+        # /tpaccept // /tpaccept here [name]
+        # True/False
+        here: true
+        # /tpaccept // /tpaccept to [name]
+        # True/False
+        to: true
+
+elytra:
+  # Denies use of elytra in combat
+  # True/False
+  # Bypass permission: fluffy.bypass.combat-elytra
+  allow-in-combat: false
+  message: true
+  # True/False
+  rocket-boost:
+    # Denies use of rocket boosting with elytra in combat
+    # Bypass permission: fluffy.bypass.combat-elytra
+    # True/False
+    allow-in-combat: false
+    message: true
+
+trident:
+  # Denies use of riptide enchantment in combat.
+  # Bypass permission: fluffy.bypass.combat-trident-riptide
+  # True/False
+  riptide:
+    allow-in-combat: false
+    message: true
+
+
+combat-log:
+  # Bypass permission: fluffy.bypass.combat-log
+  # Enabled combat log management
+  # True/False
+  enabled: false
+  # Kill the player when they quit in combat
+  kill:
+    # Enabled
+    # True/False
+    enabled: true
+    # Broadcast to the server about the combat log
+    # True/False
+    broadcast: true
+  rejoin:
+    # Send player a private message about combat logging
+    # True/False
+    player-message: true
+    # Broadcast the server that given player had combat logged
+    # True/False
+    broadcast: true
+
 
 # Commands which can't be executed without
 # fluffy.commandbypass
-disabled-commands:
-  - "fixall"
-  - "fix"
-  - "repair"
-  - "repairall"
-  - "spawn"
-  - "warp"
+commands:
+  combat:
+    enabled: true
+    #
+    # Denies permissions to given commands in combat.
+    # Bypass permission: fluffy.bypass.combat-commands
+    #
+    disabled-list:
+      - "fixall"
+      - "fix"
+      - "repair"
+      - "repairall"
+      - "spawn"
+      - "warp"
+
+#
+anchors:
+  # Allows players with respawn anchors to damage other players
+  # And start combat with players
+  # Note: This doesn't disable respawn anchor damage
+  # True/False
+  begin-combat: false
+
+crystals:
+  # Allows players using ender crystals to damage other players
+  # And start combat with other players
+  # Note: This doesn't disable ender crystal damage
+  # True/False
+  begin-combat: false
+
+tnt:
+  # Allows players using tnt to damage other players
+  # And start combat with other players
+  # Note: This doesn't disable tnt damage
+  # Note: This check is chained with other TNTs and looks for the first explosion cause
+  # True/False
+  begin-combat: false
+
+beds:
+  # Allows players to use beds to damage other players.
+  # Beds explode only in the end and nether
+  # Note: This doesn't disable tnt damage
+  # True/False
+  begin-combat: false
+
+potions:
+  # Potions to enable combat
+  begin-combat:
+    # Allows players using splash potions and lingering potions enable combat to other players
+    # True/False
+    enabled: true
+    # Check for splash potions
+    splash: true
+    # Check for lingering potions
+    lingering: true
+
+    # What sources can tag players
+    block-sources:
+      # Dispenser block
+      dispenser:
+        # Requires potions.begin-combat.lingering to be true
+        # Lingering potions trigger combat from given source
+        # True/False
+        lingering: true
+        # Requires potions.begin-combat.splash to be true
+        # Splash potions trigger combat from given source
+        # True/False
+        splash: true
+
+    # What potion effects enable combat tag?
+    # Potion effects
+    # namespace:key
+    # Vanilla effects don't require "minecraft:"
+    types:
+      - "minecraft:slowness"
+      - "minecraft:mining_fatigue"
+      - "minecraft:instant_damage"
+      - "minecraft:nausea"
+      - "minecraft:blindness"
+      - "minecraft:hunger"
+      - "minecraft:weakness"
+      - "minecraft:wither"
+      - "minecraft:unlock"
+      - "minecraft:bad_omen"
+      - "minecraft:darkness"
+
+
+# Cooldowns. What items should be in cooldown in combat
+cooldowns:
+  # Enabled?
+  # True/False
+  enabled: false
+  reset-on-combat-end: true
+  # Bypass: fluffy.bypass.combat-cooldown.%material%
+  cooldowns:
+    - material: ENDER_PEARL # Required
+      cooldown: 10.5 # seconds # Required
+      message: false # Not required
+      sounds: # Required if using sounds
+        use: "minecraft:entity.enderman.hurt" # Maybe add on click: playsound # Not required
+    - material: ENCHANTED_GOLDEN_APPLE
+      cooldown: 95 # seconds
+      message: true
+    - material: GOLDEN_APPLE
+      cooldown: 2.5 # seconds
+    - material: CHORUS_FRUIT
+      cooldown: 10.0

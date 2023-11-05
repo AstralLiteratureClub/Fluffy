@@ -19,6 +19,7 @@ public class HookManager {
 		hookWormhole();
 	}
 
+	// Todo: Make this shit automatic
 	private void hookWormhole(){
 		try {
 			Class<?> clazzWormhole = Class.forName("me.antritus.minecraft_server.wormhole.Wormhole");
@@ -29,7 +30,7 @@ public class HookManager {
 			} else if (!javaPlugin.isEnabled()){
 				state=HookState.UNKNOWN;
 			} else {
-				if (getFluffyCombat().getConfig().getBoolean("hooks.wormhole", false)){
+				if (getFluffyCombat().getConfig().getBoolean("hooks.wormhole.hook", false)){
 					state=HookState.HOOKED;
 				}else{
 					state=HookState.NOT_HOOKED;

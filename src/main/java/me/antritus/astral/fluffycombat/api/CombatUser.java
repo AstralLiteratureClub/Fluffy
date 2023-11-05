@@ -26,7 +26,7 @@ public class CombatUser implements IUser {
 	 * @param combat main instance
 	 * @param uniqueId id
 	 */
-	private CombatUser(FluffyCombat combat, UUID uniqueId) {
+	protected CombatUser(FluffyCombat combat, UUID uniqueId) {
 		this.uniqueId = uniqueId;
 		this.fluffyCombat = combat;
 	}

@@ -1,11 +1,13 @@
 package me.antritus.astral.fluffycombat.manager;
 
 import me.antritus.astral.fluffycombat.FluffyCombat;
+import me.antritus.astral.fluffycombat.api.BlockCombatTag;
+import me.antritus.astral.fluffycombat.api.BlockCombatUser;
 import me.antritus.astral.fluffycombat.api.CombatTag;
 import me.antritus.astral.fluffycombat.api.CombatUser;
 import me.antritus.astral.fluffycombat.api.events.CombatEndEvent;
+import me.antritus.astral.fluffycombat.api.events.CombatFullEndEvent;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.Tag;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -16,7 +18,6 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author Antritus
@@ -24,10 +25,13 @@ import java.util.stream.Collectors;
  */
 public final class CombatManager {
 	private final Constructor<?> combatTagConstructor;
+	private final Constructor<BlockCombatTag> blockCombatTagConstructor;
 	{
 		try {
 			combatTagConstructor = CombatTag.class.getDeclaredConstructor(FluffyCombat.class, CombatUser.class, CombatUser.class);
 			combatTagConstructor.setAccessible(true);
+			blockCombatTagConstructor = BlockCombatTag.class.getDeclaredConstructor(FluffyCombat.class, CombatUser.class, BlockCombatUser.class);
+			blockCombatTagConstructor.setAccessible(true);
 		} catch (NoSuchMethodException e) {
 			throw new RuntimeException(e);
 		}
@@ -54,41 +58,44 @@ public final class CombatManager {
 	 */
 	public void onEnable(){
 		task = new BukkitRunnable() {
-			/**
-			 * When an object implementing interface {@code Runnable} is used
-			 * to create a thread, starting the thread causes the object's
-			 * {@code run} method to be called in that separately executing
-			 * thread.
-			 * <p>
-			 * The general contract of the method {@code run} is that it may
-			 * take any action whatsoever.
-			 *
-			 * @see Thread#run()
-			 */
 			@Override
 			public void run() {
 				List<String> deleteList = new ArrayList<>();
 				List<String> nullList = new ArrayList<>();
 				latest.clear();
+				Map<String, List<CombatTag>> userTags = new HashMap<>();
  				tags.forEach((key, tag)->{
 					if (tag == null){
 						nullList.add(key);
 					} else {
-						latest.putIfAbsent(tag.getVictim().getUniqueId(), tag);
-						latest.putIfAbsent(tag.getAttacker().getUniqueId(), tag);
+						String[] ids = splitId(key);
+						userTags.putIfAbsent(ids[0], new ArrayList<>());
+						userTags.putIfAbsent(ids[1], new ArrayList<>());
+
 						tag.setTicksLeft(tag.getTicksLeft() - 1);
 						if (tag.getTicksLeft() < 0) {
 							deleteList.add(key);
+						} else {
+							userTags.get(ids[0]).add(tag);
+							userTags.get(ids[1]).add(tag);
 						}
-						{
-							int ticksLeft = tag.getTicksLeft();
-							if (latest.get(tag.getVictim().getUniqueId()).getTicksLeft()<ticksLeft){
-								latest.put(tag.getVictim().getUniqueId(), tag);
-							}
-							if (latest.get(tag.getAttacker().getUniqueId()).getTicksLeft()<ticksLeft){
-								latest.put(tag.getAttacker().getUniqueId(), tag);
-							}
+						latest.putIfAbsent(tag.getVictim().getUniqueId(), tag);
+						int ticksLeft = tag.getTicksLeft();
+						if (latest.get(tag.getVictim().getUniqueId()).getTicksLeft() < ticksLeft) {
+							latest.put(tag.getVictim().getUniqueId(), tag);
+						}
 
+						if (!(tag.getAttacker() instanceof BlockCombatUser blockCombatUser)) {
+							latest.putIfAbsent(tag.getAttacker().getUniqueId(), tag);
+							{
+								if (latest.get(tag.getAttacker().getUniqueId()).getTicksLeft() < ticksLeft) {
+									latest.put(tag.getAttacker().getUniqueId(), tag);
+								}
+							}
+						} else {
+							if (!blockCombatUser.isAlive()){
+								deleteList.add(key);
+							}
 						}
 					}
 				});
@@ -99,25 +106,40 @@ public final class CombatManager {
 					CombatUser attacker = tag.getAttacker();
 					tags.remove(key);
 					OfflinePlayer victimPlayer = victim.getPlayer();
-					OfflinePlayer attackerPlayer = attacker.getPlayer();
 					Set<String> keys = tags.keySet();
 					if (victimPlayer.isOnline()) {
 						if (keys.isEmpty() || keys.stream().noneMatch(id -> id.contains(victimPlayer.getUniqueId().toString()))) {
 							main.getMessageManager().message((Player) victimPlayer, "combat-end");
 						}
 					}
-					if (attackerPlayer.isOnline()) {
-						if (keys.isEmpty() || keys.stream().noneMatch(id -> id.contains(attackerPlayer.getUniqueId().toString()))) {
-							main.getMessageManager().message((Player) attackerPlayer, "combat-end");
+					if (!(attacker instanceof BlockCombatUser blockCombatUser)) {
+						OfflinePlayer attackerPlayer = attacker.getPlayer();
+						if (attackerPlayer.isOnline()) {
+							if (keys.isEmpty() || keys.stream().noneMatch(id -> id.contains(attackerPlayer.getUniqueId().toString()))) {
+								main.getMessageManager().message((Player) attackerPlayer, "combat-end");
+							}
 						}
 					}
 					CombatEndEvent event = new CombatEndEvent(main, tag);
 					event.callEvent();
 				});
 
+				userTags.forEach((idString, tagList)->{
+					if (tagList.size()==0){
+						try {
+							UUID id = UUID.fromString(idString);
+							OfflinePlayer player = main.getServer().getOfflinePlayer(id);
+							CombatFullEndEvent event = new CombatFullEndEvent(true, main, player);
+							event.callEvent();
+						} catch (IllegalArgumentException ignore){
+						}
+					}
+				});
 			}
 		}.runTaskTimerAsynchronously(main, 20, 1);
 	}
+
+
 	/**
 	 * Called from FluffyCommand enable() method
 	 * @see FluffyCombat#disable()
@@ -146,19 +168,26 @@ public final class CombatManager {
 		return getTag(player, player2) != null;
 	}
 
+	/**
+	 * Returns true if the given players have no combat tag.
+	 * This is check by using getTag(..., ...)
+	 * @see #getTag(OfflinePlayer, OfflinePlayer)
+	 * @param player player
+	 * @param block block
+	 * @return is tag from getTag() null or not
+	 */
+	public boolean hasTag(OfflinePlayer player, BlockCombatUser block){
+		return getTag(player, block) != null;
+	}
 	public boolean isActive(CombatTag tag, OfflinePlayer player){
-		if (tag.getAttacker().getUniqueId().equals(player.getUniqueId())){
-			return !tag.isDeadAttacker();
-		} else {
-			return !tag.isDeadVictim();
-		}
+		return isActive(tag, player.getUniqueId());
 	}
 	public boolean isActive(CombatTag tag, UUID playerId){
-		if (tag.getAttacker().getUniqueId().equals(playerId)){
-			return !tag.isDeadAttacker();
-		} else {
-			return !tag.isDeadVictim();
-		}
+		return tag.isActive(playerId);
+	}
+
+	public boolean isActive(BlockCombatTag tag, BlockCombatUser block){
+		return tag.isActive(block);
 	}
 
 
@@ -180,15 +209,27 @@ public final class CombatManager {
 	}
 
 	/**
+	 * Checks using player-block.hashCode() if tag exists,
+	 * If no tag is found will return null.
+	 * @param player player
+	 * @param block block
+	 * @return combat tag, null if no tag is found.
+	 */
+	@Nullable
+	public CombatTag getTag(OfflinePlayer player, BlockCombatUser block){
+		return tags.get(toId(player, block));
+	}
+
+	/**
 	 * Creates a new instance of combat tag and stores it to the combat tags map.
 	 * @param playerVictim victim
 	 * @param playerAttacker attacker
 	 * @return instance of the tag
 	 */
 	@NotNull
-	public CombatTag create(Player playerVictim, Player playerAttacker){
+	public CombatTag create(Player playerVictim, OfflinePlayer playerAttacker){
 		CombatUser combatUserVictim = main.getUserManager().getUser(playerVictim);
-		CombatUser combatUserAttacker = main.getUserManager().getUser(playerAttacker);
+		CombatUser combatUserAttacker = main.getUserManager().getUser(playerAttacker.getUniqueId());
 		try {
 			CombatTag tag = (CombatTag) combatTagConstructor.newInstance(main, combatUserVictim, combatUserAttacker);
 			tags.remove(toId(playerAttacker, playerVictim));
@@ -198,6 +239,26 @@ public final class CombatManager {
 			throw new RuntimeException(e);
 		}
 	}
+
+	/**
+	 * Creates a new instance of combat tag and stores it to the combat tags map.
+	 * @param playerVictim victim
+	 * @param block attacker
+	 * @return instance of the tag
+	 */
+	@NotNull
+	public CombatTag create(Player playerVictim, BlockCombatUser block){
+		CombatUser combatUserVictim = main.getUserManager().getUser(playerVictim);
+		try {
+			BlockCombatTag tag = blockCombatTagConstructor.newInstance(main, combatUserVictim, block);
+			tags.remove(toId(playerVictim, block));
+			tags.put(toId(playerVictim, block), tag);
+			return tag;
+		} catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 
 
 	/**
@@ -222,14 +283,24 @@ public final class CombatManager {
 	 */
 	public boolean hasTags(OfflinePlayer player){
 		List<String> keys = tags.keySet().stream().filter(key->key.contains(player.getUniqueId().toString())).toList();
-		List<CombatTag> tags = new ArrayList<>();
 		for (String key : keys){
 			CombatTag tag = this.tags.get(key);
 			if (isActive(tag, player)){
-				tags.add(this.tags.get(key));
+				return true;
 			}
 		}
-		return tags.size()>0;
+		return false;
+	}
+
+	public boolean hasTags(BlockCombatUser user){
+		List<String> keys = tags.keySet().stream().filter(key->key.contains(String.valueOf(user.hashCode()))).toList();
+		for (String key : keys){
+			BlockCombatTag tag = (BlockCombatTag) this.tags.get(key);
+			if (isActive(tag, user)){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -251,6 +322,33 @@ public final class CombatManager {
 		return "{"+uuid+"}-{"+uuid2+"}";
 	}
 
+
+	/**
+	 * Generates players uniqueIds to new the format of tags string id.
+	 * @param player player
+	 * @param block block
+	 * @return id format
+	 */
+	private String toId(OfflinePlayer player, BlockCombatUser block){
+		return toId(player.getUniqueId(), block);
+	}
+	/**
+	 * Generates uniqueIds to new the format of tags string id.
+	 * @param uuid unique id
+	 * @param blockCombatUser combatUser
+	 * @return id format
+	 */
+	private String toId(UUID uuid, BlockCombatUser blockCombatUser){
+		return "{"+uuid+"}-{"+blockCombatUser.hashCode()+"}";
+	}
+
+	private String[] splitId(String key) {
+		key = key.replace("{", "");
+		String[] ids = key.split("}-");
+		ids[0] = ids[0].replace("}", "").replace("{", "");
+		ids[1] = ids[1].replace("}", "").replace("{", "");
+		return ids;
+	}
 
 
 	/**

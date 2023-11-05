@@ -1,5 +1,6 @@
 package me.antritus.astral.fluffycombat;
 
+import me.antritus.astral.fluffycombat.api.CombatTag;
 import me.antritus.astral.fluffycombat.astrolminiapi.CoreCommand;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -8,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 public class CMDDebug extends CoreCommand {
 	private final FluffyCombat combat;
 	protected CMDDebug(FluffyCombat main) {
-		super(main, "db-combat-me");
+		super(main, "fluffy-debug");
 		this.combat = main;
 	}
 
@@ -23,15 +24,22 @@ public class CMDDebug extends CoreCommand {
 	@Override
 	public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
 		if (!(sender instanceof Player player)){
-			sender.sendMessage("This command only works with players");
+			sender.sendRichMessage("This command only works with players");
 			return true;
 		}
 		if (combat.getCombatManager().hasTags(player)){
-			sender.sendMessage("You already are in combat.");
-			return true;
+			player.sendRichMessage("<red>You are currently in combat!");
+			CombatTag tag = combat.getCombatManager().getLatest(player);
+			assert tag != null;
+			int ticks = tag.getTicksLeft();
+			double seconds = (double) ticks /20;
+			long millis = (long) (seconds* 1000L);
+			player.sendRichMessage("<red>Ticks: <white>"+ticks);
+			player.sendRichMessage("<red>Seconds: <white>"+seconds);
+			player.sendRichMessage("<red>Millis: <white>"+millis);
+		} else {
+			player.sendRichMessage("<green>Does not have tags!");
 		}
-		combat.getCombatManager().create(player, player);
-		sender.sendMessage("There you go!");
 		return true;
 	}
 }

@@ -9,6 +9,8 @@ import java.util.Map;
  * @author Antritus
  * @since 1.1-SNAPSHOT
  */
+@SuppressWarnings("removal")
+@Deprecated(forRemoval = true)
 public interface IUser {
 	@Nullable
 	Property<String, ?> get(@NotNull String key);

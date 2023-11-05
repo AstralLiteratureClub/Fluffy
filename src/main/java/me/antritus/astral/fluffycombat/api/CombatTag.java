@@ -1,17 +1,27 @@
 package me.antritus.astral.fluffycombat.api;
 
 import me.antritus.astral.fluffycombat.FluffyCombat;
+import me.antritus.astral.fluffycombat.astrolminiapi.Configuration;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.ApiStatus;
+
+import java.util.UUID;
 
 /**
  * @author Antritus
  * @since 1.0-SNAPSHOT
  */
 public class CombatTag {
+	private static final int ticks;
+	static {
+		FluffyCombat fluffy = FluffyCombat.getPlugin(FluffyCombat.class);
+		Configuration configuration = fluffy.getConfig();
+		ticks = configuration.getInt("time", 300);
+	}
 	private final FluffyCombat fluffyCombat;
 	private final CombatUser victim;
 	private final CombatUser attacker;
-	private int ticksLeft = 300;
+	private int ticksLeft = ticks;
 	private boolean isDeadVictim = false;
 	private boolean isDeadAttacker = false;
 
@@ -22,7 +32,7 @@ public class CombatTag {
 	 * @param victim who was attacked
 	 * @param attacker who attacked
 	 */
-	private CombatTag(FluffyCombat combat, CombatUser victim, CombatUser attacker) {
+	protected CombatTag(FluffyCombat combat, CombatUser victim, CombatUser attacker) {
 		this.fluffyCombat = combat;
 		this.victim = victim;
 		this.attacker = attacker;
@@ -77,7 +87,7 @@ public class CombatTag {
 	 * Resets the ticks to the default amount.
 	 */
 	public void resetTicks() {
-		this.ticksLeft = 300;
+		this.ticksLeft = CombatTag.ticks;
 	}
 
 
@@ -103,5 +113,27 @@ public class CombatTag {
 	@ApiStatus.NonExtendable
 	public void setDeadAttacker(boolean deadAttacker) {
 		isDeadAttacker = deadAttacker;
+	}
+
+	/**
+	 * Returns true if given player is in combat and not dead
+	 * @param playerId player
+	 * @return true if dead after tag
+	 */
+	public boolean isActive(UUID playerId) {
+		if (victim.getUniqueId().equals(playerId)){
+			return !isDeadVictim;
+		} else if (attacker.getUniqueId().equals(playerId)){
+			return !isDeadAttacker;
+		}
+		return false;
+	}
+	/**
+	 * Returns true if given player is in combat and not dead
+	 * @param player player
+	 * @return true if dead after tag
+	 */
+	public boolean isActive(Player player) {
+		return isActive(player.getUniqueId());
 	}
 }

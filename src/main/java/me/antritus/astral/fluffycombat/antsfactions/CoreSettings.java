@@ -11,6 +11,8 @@ import java.util.HashMap;
  * @since 1.1-SNAPSHOT
  */
 
+@SuppressWarnings("removal")
+@Deprecated(forRemoval = true)
 public class CoreSettings implements ISettings {
 	private final HashMap<String, SimpleProperty<?>> properties = new HashMap<>();
 	private final Configuration config;

@@ -11,6 +11,8 @@ import java.io.IOException;
  * @author Antritus
  * @since 1.1-SNAPSHOT
  */
+@SuppressWarnings("removal")
+@Deprecated(forRemoval = true)
 public abstract class FactionsPlugin extends JavaPlugin {
 	private CoreSettings coreSettings;
 	private final MessageManager messageManager;

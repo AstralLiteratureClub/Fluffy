@@ -13,8 +13,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Antritus
  * @since 1.0-SNAPSHOT
  */
-public class CombatEnterEvent extends AbstractCombatEvent implements Cancellable {
-	private boolean cancel = false;
+public class CombatEnterEvent extends AbstractCombatEvent {
 	/**
 	 *
 	 * @param fluffyCombat main
@@ -34,13 +33,4 @@ public class CombatEnterEvent extends AbstractCombatEvent implements Cancellable
 		return HANDLERS;
 	}
 
-	@Override
-	public boolean isCancelled() {
-		return cancel;
-	}
-
-	@Override
-	public void setCancelled(boolean cancel) {
-		this.cancel = cancel;
-	}
 }

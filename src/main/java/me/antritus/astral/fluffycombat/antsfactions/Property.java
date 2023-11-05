@@ -4,6 +4,8 @@ package me.antritus.astral.fluffycombat.antsfactions;
  * @author Antritus
  * @since 1.1-SNAPSHOT
  */
+@SuppressWarnings("removal")
+@Deprecated(forRemoval = true)
 public class Property<Z, T> {
 	private T value;
 	private final Z name;

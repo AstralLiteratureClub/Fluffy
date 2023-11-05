@@ -21,6 +21,13 @@ combat-enter:
   victim: "%prefix% <red>You are now in combat! Do not log out!"
   attacker: "%prefix% <red>You are now in combat! Do not log out!"
 
+elytra:
+  glide: "%prefix% <red>You are not allowed to use elytra in combat."
+  rocket-boost: "%prefix% <red>You are not allowed to use rocket boosters in combat."
+
+trident:
+  riptide: "%prefix% <red>You are not allowed to use riptide tridents in combat!"
+
 
 # Wormhole plugin made by antritus can be hooked
 wormhole:
