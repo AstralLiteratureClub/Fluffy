@@ -4,11 +4,13 @@ main: me.antritus.astral.fluffycombat.FluffyCombat
 api-version: '1.20'
 authors: [antritus]
 
-load-after:
-  - name: Wormhole
-    bootstrap: false
-
 dependencies:
-  - name: Wormhole
-    required: true
-    bootstrap: false
+  server:
+    Citizens:
+      load: BEFORE
+      required: false
+      join-classpath: true
+    Wormhole:
+      load: AFTER
+      required: false
+      join-classpath: true

@@ -1,7 +1,8 @@
 package me.antritus.astral.fluffycombat.hooks;
 
+import bet.astral.messagemanager.MessageManager;
+import bet.astral.messagemanager.placeholder.LegacyPlaceholder;
 import me.antritus.astral.fluffycombat.FluffyCombat;
-import me.antritus.astral.fluffycombat.antsfactions.MessageManager;
 import me.antritus.astral.fluffycombat.manager.CombatManager;
 import me.antritus.minecraft_server.wormhole.Wormhole;
 import me.antritus.minecraft_server.wormhole.events.request.TpRequestAcceptEvent;
@@ -104,8 +105,9 @@ public class WormholeHook implements Hook{
 				return;
 			}
 			event.setCancelled(true);
-			MessageManager mM = fluffyCombat.getMessageManager();
-			mM.message(event.getPlayer(), "wormhole.request", "%who%="+event.getRequested().getName());
+			MessageManager<?, ?, ?> mM = fluffyCombat.getMessageManager();
+			mM.message(event.getPlayer(), "wormhole.request",
+					new LegacyPlaceholder("who", event.getRequested().getName()));
 		}
 
 		@EventHandler
@@ -118,8 +120,9 @@ public class WormholeHook implements Hook{
 				return;
 			}
 			event.setCancelled(true);
-			MessageManager mM = fluffyCombat.getMessageManager();
-			mM.message(event.getPlayer(), "wormhole.accept", "%who%="+event.getRequested().getName());
+			MessageManager<?, ?, ?> mM = fluffyCombat.getMessageManager();
+			mM.message(event.getPlayer(), "wormhole.accept",
+					new LegacyPlaceholder("who", event.getRequested().getName()));
 		}
 	}
 }

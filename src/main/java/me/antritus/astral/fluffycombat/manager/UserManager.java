@@ -2,38 +2,42 @@ package me.antritus.astral.fluffycombat.manager;
 
 import me.antritus.astral.fluffycombat.FluffyCombat;
 import me.antritus.astral.fluffycombat.api.CombatUser;
+import me.antritus.astral.fluffycombat.database.StatisticDatabase;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class UserManager {
 	private final FluffyCombat fluffyCombat;
 	private final Map<UUID, CombatUser> users = new LinkedHashMap<>();
-	private final Constructor<?> constructorCombatUser;
-
-	{
-		try {
-			constructorCombatUser = CombatUser.class.getDeclaredConstructor(FluffyCombat.class, UUID.class);
-			constructorCombatUser.setAccessible(true);
-		} catch (NoSuchMethodException e) {
-			throw new RuntimeException(e);
-		}
-	}
 
 	/**
 	 * Creates new instance of user manager.
 	 * @see FluffyCombat#
-	 * @param fluffyCombat main class instance
+	 * @param fluffyCombat the fluffy combat main plugin class instance.
 	 */
 	public UserManager(FluffyCombat fluffyCombat) {
 		this.fluffyCombat = fluffyCombat;
+		fluffyCombat.getServer().getScheduler().runTaskTimerAsynchronously(fluffyCombat,
+				(x)->{
+					List<UUID> removeList = new LinkedList<>();
+					for (CombatUser user : users.values()){
+						// Might be null in testing. Database isn't working atm so this fixes it
+						StatisticDatabase database = fluffyCombat.getStatisticDatabase();
+						if (database != null) {
+							fluffyCombat.getStatisticDatabase().updateDatabase(user);
+						}
+						if (!user.getPlayer().isOnline()){
+							removeList.add(user.getUniqueId());
+						}
+					}
+					for (UUID uuid : removeList){
+						users.remove(uuid);
+					}
+				}, 20, 300);
 	}
 
 
@@ -82,12 +86,16 @@ public class UserManager {
 	 */
 	public void onJoin(Player player) {
 		if (users.get(player.getUniqueId()) == null){
-			try {
-				CombatUser user = (CombatUser) constructorCombatUser.newInstance(fluffyCombat, player.getUniqueId());
+			fluffyCombat.getServer().getAsyncScheduler().runNow(fluffyCombat, (x)->{
+				StatisticDatabase database = fluffyCombat.getStatisticDatabase();
+				// Might be null in testing. Database isn't working atm so this fixes it
+				if (database == null){
+					users.put(player.getUniqueId(), new CombatUser(fluffyCombat, player.getUniqueId()));
+					return;
+				}
+				CombatUser user = database.loadFromDatabase(player.getUniqueId());
 				users.put(player.getUniqueId(), user);
-			} catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
-				throw new RuntimeException(e);
-			}
+			});
 		}
 	}
 

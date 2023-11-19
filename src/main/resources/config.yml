@@ -4,6 +4,23 @@ time: 300
 # Enables debugging features, as self combat tagging
 debug: false
 
+database:
+  stats:
+    table: "fluffy_users"
+    url: "connection..."
+    user: "root"
+    password: "!(#Nus3_B3tt3r_P4ssw0rds!"
+
+glowing:
+  # Should any of the glowing be enabled?
+  # True/False
+  enabled: true
+  latest:
+    # True/False
+    enabled: true
+    default-color: RED
+
+
 hooks:
   # Wormhole Teleport plugin
   wormhole:
@@ -50,18 +67,72 @@ trident:
 
 
 combat-log:
-  # Bypass permission: fluffy.bypass.combat-log
-  # Enabled combat log management
-  # True/False
-  enabled: false
-  # Kill the player when they quit in combat
-  kill:
-    # Enabled
+  # Configurations for players logging out in combat
+  quit:
+    # Bypass permission: fluffy.bypass.combat-log
+    # Enabled combat log management
     # True/False
-    enabled: true
+    enabled: false
+    discord-dms:
+      # Allow players to link their account to minecraft and receive a private message of the player combat logging.
+      # True/False
+      enabled: true
+      # The json is custom, so you can create custom messages in dc-gen.astral.bet
+      # TODO make the website
+      npc:
+        # JSON STRING
+        spawn: {"type": "EMBED", "title": "You have quit in combat in ASTRAL!", "color": "#b40000", "description": "You have left **astral** in combat. Leaving the server in combat will spawn a NPC at your position and it can be killed! Log back in and defend yourself or risk yourself dying!", "footer": {"footer":  "Astral", "imageURL": "https://cdn.discordapp.com/attachments/1096866323314774028/1147850032956047391/astral.png"}, "timestamp": "%%HH:mm:ss DD:MM:yyyy"}
+        death: {"type": "EMBED", "title": "You have quit in combat in ASTRAL!", "color": "#2b0000", "description": "You have left **astral** in combat. Your NPC was killed! Your items have dropped to the ground!", "footer": {"footer":  "Astral", "imageURL": "https://cdn.discordapp.com/attachments/1096866323314774028/1147850032956047391/astral.png"}, "timestamp": "%%HH:mm:ss DD:MM:yyyy"}
+        safe: {"type": "EMBED", "title": "You have quit in combat in ASTRAL!", "color": "#13a100", "description": "You have left **astral** in combat. Your NPC was lucky and was not killed in the combat timer!!", "footer": {"footer":  "Astral", "imageURL": "https://cdn.discordapp.com/attachments/1096866323314774028/1147850032956047391/astral.png"}, "timestamp": "%%HH:mm:ss DD:MM:yyyy"}
+      death:
+        # JSON STRING
+        death: {"type": "EMBED", "title": "You have quit in combat in ASTRAL!", "color": "#b20000", "description": "You have left **astral** in combat. You were instantly killed! Next time do not log out in combat!", "footer": {"footer":  "Astral", "imageURL": "https://cdn.discordapp.com/attachments/1096866323314774028/1147850032956047391/astral.png"}, "timestamp": "%%HH:mm:ss DD:MM:yyyy"}
+      # JSON STRING
+      none: {"type": "EMBED", "title": "You have quit in combat in ASTRAL!", "color": "#b20000", "description": "You have left **astral** in combat. Remember combat logging is ruining the fun for everyone!", "footer": {"footer":  "Astral", "imageURL": "https://cdn.discordapp.com/attachments/1096866323314774028/1147850032956047391/astral.png"}, "timestamp": "%%HH:mm:ss DD:MM:yyyy"}
+    # What should happen when player combat logs?
+    # SPAWN_NPC <- Requires citizens
+    # NOTHING, KILL, SPAWN_NPC
+    action: KILL
     # Broadcast to the server about the combat log
     # True/False
     broadcast: true
+    # Configuration for killing the player when they log out.
+    # combat-log.action.value = KILL
+    kill:
+      # Should the items be dropped when killed?
+      # Checks keep inventory flag
+      # True/False
+      drop-items: true
+      # Should the experience be dropped or be saved?
+      # True/False
+      drop-experience: false
+      # Percentage amount of experience to keep
+      # double (decimal) (OVER 1 = MORE EXPERIENCE)
+      keep-experience-percentage: 0.5
+    # Called when the npc is killed by players
+    npc:
+      # Give armor of the player to the npc
+      give-armor: true
+      # Does the NPC attack the players that attack the player?
+      # TODO needs work and implementation
+      attack-others: false
+      # Does the npc have knockback?
+      knockback: true
+
+      damage:
+        # Punching the npc will restart the combat timer
+        restart-combat: true
+
+      death:
+        # Broadcast the death of the npc
+        broadcast: true
+        # check comments on: combat-log.kill.*
+        drop-items: true
+        # check comments on: combat-log.kill.*
+        drop-experience: false
+        # check comments on: combat-log.kill.*
+        keep-experience-percentage: 0.5
+
   rejoin:
     # Send player a private message about combat logging
     # True/False
@@ -147,20 +218,14 @@ potions:
     # namespace:key
     # Vanilla effects don't require "minecraft:"
     types:
-      - "minecraft:slowness"
-      - "minecraft:mining_fatigue"
+      - "minecraft:poison"
       - "minecraft:instant_damage"
-      - "minecraft:nausea"
-      - "minecraft:blindness"
-      - "minecraft:hunger"
       - "minecraft:weakness"
       - "minecraft:wither"
-      - "minecraft:unlock"
-      - "minecraft:bad_omen"
-      - "minecraft:darkness"
 
 
 # Cooldowns. What items should be in cooldown in combat
+#TODO fix cooldowns
 cooldowns:
   # Enabled?
   # True/False
@@ -172,6 +237,7 @@ cooldowns:
       cooldown: 10.5 # seconds # Required
       message: false # Not required
       sounds: # Required if using sounds
+        #TODO
         use: "minecraft:entity.enderman.hurt" # Maybe add on click: playsound # Not required
     - material: ENCHANTED_GOLDEN_APPLE
       cooldown: 95 # seconds

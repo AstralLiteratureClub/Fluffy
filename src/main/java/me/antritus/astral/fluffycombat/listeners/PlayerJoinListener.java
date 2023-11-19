@@ -8,15 +8,14 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class PlayerJoinListener implements Listener {
-	private final FluffyCombat combat;
+	private final FluffyCombat fluffy;
 
 	public PlayerJoinListener(FluffyCombat combat) {
-		this.combat = combat;
+		this.fluffy = combat;
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void onJoin(@NotNull PlayerJoinEvent event){
-		combat.getUserManager().onJoin(event.getPlayer());
-		combat.getCombatManager().onJoin(event.getPlayer());
+		fluffy.getUserManager().onJoin(event.getPlayer());
 	}
 }

@@ -1,12 +1,15 @@
 package me.antritus.astral.fluffycombat.listeners;
 
+import bet.astral.messagemanager.fluffy.Placeholders;
+import bet.astral.messagemanager.placeholder.Placeholder;
 import me.antritus.astral.fluffycombat.FluffyCombat;
-import me.antritus.astral.fluffycombat.antsfactions.Property;
 import me.antritus.astral.fluffycombat.api.CombatUser;
 import me.antritus.astral.fluffycombat.api.events.CombatLogEvent;
 import me.antritus.astral.fluffycombat.configs.CombatConfig;
+import me.antritus.astral.fluffycombat.hooks.CitizensHook;
 import me.antritus.astral.fluffycombat.manager.CombatManager;
 import me.antritus.astral.fluffycombat.manager.UserManager;
+import net.citizensnpcs.api.npc.NPC;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,44 +21,34 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.LinkedList;
 import java.util.List;
 
-public class PlayerQuitListener implements Listener {
+public class CombatLogListener implements Listener {
 	private final MiniMessage miniMessage = MiniMessage.miniMessage();
 	private final FluffyCombat fluffy;
-	private final List<String> loggers = new LinkedList<>();
 
-	public PlayerQuitListener(FluffyCombat fluffy) {
+	public CombatLogListener(FluffyCombat fluffy) {
 		this.fluffy = fluffy;
 	}
 
 	@EventHandler
 	public void onJoin(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
-		if (loggers.stream().anyMatch(id->id.contentEquals(player.getUniqueId().toString()))){
-			loggers.remove(player.getUniqueId().toString());
+		boolean logged = fluffy.getCombatLogManager().hasCombatLogged(player); // Automatically deleted
+		if (logged){
 			CombatConfig combatConfig = fluffy.getCombatConfig();
 			if (!combatConfig.isCombatLogRejoinEnabled()){
 				return;
 			}
-			if (combatConfig.isCombatLogRejoinBroadcast()){
-				fluffy.getMessageManager().broadcast(
-						"combat-log.rejoin.broadcast",
-						"%player%="+event.getPlayer().getName(),
-						"%uniqueId%="+event.getPlayer().getUniqueId(),
-						"%displayname%="+miniMessage.serialize(event.getPlayer().displayName()));
-			}
-			if (combatConfig.isCombatLogRejoinPrivateMessage()){
-				fluffy.getMessageManager().message(player,
-						"combat-log.rejoin.broadcast",
-						"%player%="+event.getPlayer().getName(),
-						"%uniqueId%="+event.getPlayer().getUniqueId(),
-						"%displayname%="+miniMessage.serialize(event.getPlayer().displayName()));
-			}
+			Placeholder[] placeholders = Placeholders.playerPlaceholders("player", player).toArray(Placeholder[]::new);
+			if (combatConfig.isCombatLogRejoinBroadcast())
+				fluffy.getMessageManager().broadcast("combat-log.join.broadcast", placeholders);
+			if (combatConfig.isCombatLogRejoinPrivateMessage())
+				fluffy.getMessageManager().message(player, "combat-log.join.broadcast", placeholders);
 		}
 	}
 
+	@EventHandler
 	public void onQuit(@NotNull PlayerQuitEvent event) {
 		if (FluffyCombat.isStopping) {
 			return;
@@ -76,18 +69,28 @@ public class PlayerQuitListener implements Listener {
 				return;
 			}
 			if (fluffy.getCombatConfig().isCombatLogBroadcast()){
-				fluffy.getMessageManager().broadcast("combat-log.broadcast",
-						"%player%="+event.getPlayer().getName(),
-						"%uniqueId%="+event.getPlayer().getUniqueId(),
-						"%displayname%="+miniMessage.serialize(event.getPlayer().displayName()));
+				List<Placeholder> placeholders = Placeholders.playerPlaceholders("player", player);
+				Placeholder[] placeholderArray = placeholders.toArray(Placeholder[]::new);
+				fluffy.getMessageManager().broadcast("combat-log.quit.broadcast",
+						placeholderArray);
 			}
-			if (!fluffy.getCombatConfig().isCombatLogKill()){
+			if (fluffy.getCombatConfig().getCombatLogAction() == CombatConfig.CombatLogAction.NOTHING){
 				return;
+			} else if (fluffy.getCombatConfig().getCombatLogAction() == CombatConfig.CombatLogAction.SPAWN_NPC){
+				CitizensHook hook = fluffy.getCitizensHook();
+				if (hook == null){
+					return;
+				}
+				NPC npc;
+				hook.spawnNPC(player, player.getLocation(), player.customName() != null ? player.customName() : player.displayName());
+				//TODO
+				return;
+			} else if (fluffy.getCombatConfig().getCombatLogAction() == CombatConfig.CombatLogAction.KILL) {
+				assert user != null;
+				user.setting("logged", true);
+				user.setting("combat-log", true);
+				player.setHealth(0);
 			}
-			assert user != null;
-			user.setting("logged", true);
-			user.setting("combat-log", true);
-			player.setHealth(0);
 		}
 	}
 
@@ -97,7 +100,7 @@ public class PlayerQuitListener implements Listener {
 		if (FluffyCombat.isStopping){
 			return;
 		}
-		if (!fluffy.getCombatConfig().isCombatLog() || !fluffy.getCombatConfig().isCombatLogKill()) {
+		if (!fluffy.getCombatConfig().isCombatLog() || fluffy.getCombatConfig().getCombatLogAction() != CombatConfig.CombatLogAction.KILL) {
 			return;
 		}
 		if (event.getEntity() instanceof Player player){
@@ -107,12 +110,10 @@ public class PlayerQuitListener implements Listener {
 			UserManager uM = fluffy.getUserManager();
 			CombatUser user = uM.getUser(player.getUniqueId());
 			assert user != null;
-			Property<String, ?> property = user.get("logged");
+			Object property = user.get("logged");
 			if (property != null){
-				if (property.getValue() != null){
-					if (property.getValue()==Boolean.TRUE){
-						player.setHealth(0);
-					}
+				if (property instanceof Boolean && (boolean) property) {
+					player.setHealth(0);
 				}
 			}
 		}
@@ -120,27 +121,25 @@ public class PlayerQuitListener implements Listener {
 
 	@SuppressWarnings("removal")
 	@EventHandler(priority = EventPriority.NORMAL)
-	public void onDeath(PlayerDeathEvent event){
-		if (FluffyCombat.isStopping){
+	public void onDeath(PlayerDeathEvent event) {
+		if (FluffyCombat.isStopping) {
 			return;
 		}
-		if (!fluffy.getCombatConfig().isCombatLog() || !fluffy.getCombatConfig().isCombatLogKill()) {
+		if (!fluffy.getCombatConfig().isCombatLog() || fluffy.getCombatConfig().getCombatLogAction() != CombatConfig.CombatLogAction.KILL) {
 			return;
 		}
 
 		Player player = event.getEntity();
-		if (player.hasPermission("fluffy.bypass.combat-log")){
+		if (player.hasPermission("fluffy.bypass.combat-log")) {
 			return;
 		}
 		UserManager uM = fluffy.getUserManager();
 		CombatUser user = uM.getUser(player);
 		assert user != null;
-		Property<String, ?> property = user.get("logged");
-		if (property != null){
-			if (property.getValue() != null){
-				if (property.getValue()==Boolean.TRUE){
-					user.setting("logged", false);
-				}
+		Object property = user.get("logged");
+		if (property != null) {
+			if (property instanceof Boolean && (boolean) property) {
+				user.setting("logged", false);
 			}
 		}
 	}

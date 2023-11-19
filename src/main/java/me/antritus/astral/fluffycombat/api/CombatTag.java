@@ -1,9 +1,13 @@
 package me.antritus.astral.fluffycombat.api;
 
+import lombok.Getter;
+import lombok.Setter;
 import me.antritus.astral.fluffycombat.FluffyCombat;
-import me.antritus.astral.fluffycombat.astrolminiapi.Configuration;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
@@ -15,16 +19,33 @@ public class CombatTag {
 	private static final int ticks;
 	static {
 		FluffyCombat fluffy = FluffyCombat.getPlugin(FluffyCombat.class);
-		Configuration configuration = fluffy.getConfig();
+		FileConfiguration configuration = fluffy.getConfig();
 		ticks = configuration.getInt("time", 300);
 	}
 	private final FluffyCombat fluffyCombat;
 	private final CombatUser victim;
+	@NotNull
 	private final CombatUser attacker;
-	private int ticksLeft = ticks;
+	@Getter
+	@Setter
+	private int victimTicksLeft = ticks;
+	@Getter
+	@Setter
+	private int attackerTicksLeft = ticks;
 	private boolean isDeadVictim = false;
 	private boolean isDeadAttacker = false;
-
+	@Getter
+	@Setter
+	private CombatCause victimCombatCause;
+	@Getter
+	@Setter
+	private CombatCause attackerCombatCause;
+	@Setter
+	@Getter
+	private ItemStack victimWeapon;
+	@Setter
+	@Getter
+	private ItemStack attackerWeapon;
 	/**
 	 * Creates new instance of the class.
 	 * This should not be initialized outside the combat manager.
@@ -32,7 +53,7 @@ public class CombatTag {
 	 * @param victim who was attacked
 	 * @param attacker who attacked
 	 */
-	protected CombatTag(FluffyCombat combat, CombatUser victim, CombatUser attacker) {
+	protected CombatTag(FluffyCombat combat, CombatUser victim, @NotNull CombatUser attacker) {
 		this.fluffyCombat = combat;
 		this.victim = victim;
 		this.attacker = attacker;
@@ -52,6 +73,7 @@ public class CombatTag {
 	 * Attacker is just a label and doesn't get changed even that the victim might attack back.
 	 * @return attacker's combat user
 	 */
+	@NotNull
 	public CombatUser getAttacker() {
 		return attacker;
 	}
@@ -66,28 +88,24 @@ public class CombatTag {
 		return victim;
 	}
 
-	/**
-	 * Returns how many ticks they have left of this combat tag.
-	 * When hits negative, it deletes this CombatTag from the managers.
-	 * @return tag
-	 */
-	public int getTicksLeft() {
-		return ticksLeft;
-	}
 
 	/**
-	 * Updates the combat tags ticks if ticksLeft < 0 it deletes it in the next server tick.
-	 * @param ticksLeft ticks
+	 * Returns the ticks left for given user.
+	 * @param user user
+	 * @return ticks
 	 */
-	public void setTicksLeft(int ticksLeft) {
-		this.ticksLeft = ticksLeft;
+	public int getTicksLeft(CombatUser user){
+		if (attacker==user){
+			return attackerTicksLeft;
+		}
+		return victimTicksLeft;
 	}
-
 	/**
 	 * Resets the ticks to the default amount.
 	 */
 	public void resetTicks() {
-		this.ticksLeft = CombatTag.ticks;
+		this.attackerTicksLeft = CombatTag.ticks;
+		this.victimTicksLeft = CombatTag.ticks;
 	}
 
 

@@ -22,7 +22,8 @@ import java.util.concurrent.TimeUnit;
 
 public class BedDetection implements Listener {
 	private final FluffyCombat fluffy;
-	protected final Map<Location, UUID> detectionMap = new HashMap<>();
+	public final Map<Location, UUID> detectionMap = new HashMap<>();
+	private final Map<Location, ItemStack> itemsMap = new HashMap<>();
 	protected final Map<Location, Location> partMap = new HashMap<>();
 
 	public BedDetection(FluffyCombat fluffy) {
@@ -72,9 +73,6 @@ public class BedDetection implements Listener {
 		Bed.Part part = bed.getPart();
 		Block headBed = part == Bed.Part.HEAD ? block : getOppositePart(block);
 		Block footBed = part == Bed.Part.FOOT ? block : getOppositePart(block);
-		if (headBed==null){
-		}
-
 		Location[] locations = {
 				headBed != null ? headBed.getLocation().toBlockLocation() : null,
 				footBed != null ? footBed.getLocation().toBlockLocation() : null
@@ -82,15 +80,23 @@ public class BedDetection implements Listener {
 		if (locations[0] != null && locations[1] != null) {
 			detectionMap.put(locations[0], player.getUniqueId());
 			partMap.put(locations[0], locations[1]);
+			itemsMap.put(locations[0], itemStack);
 		} else if (locations[0] != null){
 			detectionMap.put(locations[0], player.getUniqueId());
+			itemsMap.put(locations[0], itemStack);
 		} else if (locations[1] != null){
 			detectionMap.put(locations[1], player.getUniqueId());
+			itemsMap.put(locations[1], itemStack);
+		} else {
+			return;
 		}
 		fluffy.getServer().getAsyncScheduler().runDelayed(fluffy,
 				(x) -> {
 					detectionMap.remove(locations[0]);
 					detectionMap.remove(locations[1]);
+
+					itemsMap.remove(locations[0]);
+					itemsMap.remove(locations[1]);
 
 					partMap.remove(locations[0]);
 					partMap.remove(locations[1]);
@@ -105,28 +111,32 @@ public class BedDetection implements Listener {
 		if (!(event.getEntity() instanceof Player victim)){
 			return;
 		}
-		victim.sendMessage("1");
 		if (!(event.getDamagerBlockState() instanceof org.bukkit.block.Bed bed)){
 			return;
 		}
-		victim.sendMessage("2");
 		Location location = bed.getLocation().toBlockLocation();
 		location.setWorld(victim.getWorld());
 		UUID owner = detectionMap.get(location);
 		if (owner == null){
+			location = partMap.get(location);
+			if (location == null){
+				return;
+			}
+			owner = detectionMap.get(location);
+		}
+		if (owner == null){
 			return;
 		}
-		victim.sendMessage("3");
 		OfflinePlayer attacker = fluffy.getServer().getOfflinePlayer(owner);
 		if (!attacker.hasPlayedBefore() && !attacker.isOnline()){
 			return;
 		}
-		victim.sendMessage("4");
+		ItemStack itemStack = itemsMap.get(location.toBlockLocation());
 
 		EntityDamageEntityByBedEvent newDamageEvent =
 				new EntityDamageEntityByBedEvent(victim,
 						attacker,
-						event.getDamager(), bed);
+						event.getDamager(), bed, itemStack);
 		newDamageEvent.callEvent();
 		if (newDamageEvent.isCancelled()){
 			event.setCancelled(true);

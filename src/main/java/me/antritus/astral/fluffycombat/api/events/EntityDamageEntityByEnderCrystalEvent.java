@@ -1,35 +1,35 @@
 package me.antritus.astral.fluffycombat.api.events;
 
+import lombok.Getter;
 import org.bukkit.entity.EnderCrystal;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.EntityEvent;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class EntityDamageEntityByEnderCrystalEvent extends EntityEvent implements Cancellable {
+	@Getter
+	@NotNull
 	private final EnderCrystal enderCrystal;
-	private final Entity attacker;
+	@NotNull
+	@Getter
+	private final Entity damager;
+	@Getter
 	private final double damage;
+	@Nullable
+	@Getter
+	private final ItemStack item;
 	private boolean cancel;
 
-	public EntityDamageEntityByEnderCrystalEvent(@NotNull final Entity damagee, @NotNull final Entity attacker, @NotNull final EnderCrystal enderCrystal, final double damage) {
+	public EntityDamageEntityByEnderCrystalEvent(@NotNull final Entity damagee, @NotNull final Entity attacker, @NotNull final EnderCrystal enderCrystal, final double damage, ItemStack itemStack) {
 		super(damagee);
 		this.enderCrystal = enderCrystal;
-		this.attacker = attacker;
+		this.damager = attacker;
 		this.damage = damage;
-	}
-
-	public EnderCrystal enderCrystal() {
-		return enderCrystal;
-	}
-
-	public Entity attacker() {
-		return attacker;
-	}
-
-	public double damage() {
-		return damage;
+		this.item = itemStack;
 	}
 
 	private static final HandlerList HANDLERS = new HandlerList();

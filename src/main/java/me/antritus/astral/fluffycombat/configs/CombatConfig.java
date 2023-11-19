@@ -1,9 +1,10 @@
 package me.antritus.astral.fluffycombat.configs;
 
 import lombok.Getter;
+import me.antritus.astral.fluffycombat.EnumUtils;
 import me.antritus.astral.fluffycombat.FluffyCombat;
-import me.antritus.astral.fluffycombat.astrolminiapi.Configuration;
 import org.bukkit.NamespacedKey;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,7 +28,7 @@ public class CombatConfig {
 	private boolean isResetCooldownsOnDeath;
 
 	private boolean isCombatLog;
-	private boolean isCombatLogKill;
+	private CombatLogAction combatLogAction;
 	private boolean isCombatLogBroadcast;
 	private boolean isCombatLogRejoinEnabled;
 	private boolean isCombatLogRejoinBroadcast;
@@ -56,13 +57,13 @@ public class CombatConfig {
 		reload(fluffy.getConfig());
 	}
 
-	public void reload(@NotNull Configuration configuration){
+	public void reload(@NotNull FileConfiguration configuration){
 		isCustomCooldowns = configuration.getBoolean("cooldowns.enabled", true);
 		isResetCooldownsOnDeath = configuration.getBoolean("cooldowns.reset-on-combat-end", true);
 
 		isCombatLog = configuration.getBoolean("combat-log.enabled", true);
-		isCombatLogKill = configuration.getBoolean("combat-log.kill.enabled", true);
-		isCombatLogBroadcast = configuration.getBoolean("combat-log.kill.broadcast");
+		combatLogAction = EnumUtils.valueOf(configuration.getString("combat-log.action.value"), CombatLogAction.NOTHING);
+		isCombatLogBroadcast = configuration.getBoolean("combat-log.action.broadcast");
 		isCombatLogRejoinEnabled = configuration.getBoolean("combat-log.rejoin.enabled");
 		isCombatLogRejoinBroadcast = configuration.getBoolean("combat-log.rejoin.broadcast");
 		isCombatLogRejoinPrivateMessage = configuration.getBoolean("combat-log.rejoin.message");
@@ -120,5 +121,13 @@ public class CombatConfig {
 
 	public FluffyCombat fluffy() {
 		return fluffy;
+	}
+
+	public enum CombatLogAction {
+		KILL,
+		NOTHING,
+		SPAWN_NPC
+		;
+
 	}
 }

@@ -1,6 +1,8 @@
 package me.antritus.astral.fluffycombat.api;
 
 import me.antritus.astral.fluffycombat.FluffyCombat;
+import org.jetbrains.annotations.NotNull;
+
 public class BlockCombatTag extends CombatTag{
 
 	/**
@@ -17,6 +19,7 @@ public class BlockCombatTag extends CombatTag{
 
 
 	@Override
+	@NotNull
 	public BlockCombatUser getAttacker() {
 		return (BlockCombatUser) super.getAttacker();
 	}

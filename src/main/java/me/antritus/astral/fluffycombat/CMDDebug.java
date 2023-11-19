@@ -1,15 +1,22 @@
 package me.antritus.astral.fluffycombat;
 
+import me.antritus.astral.fluffycombat.api.BlockCombatTag;
 import me.antritus.astral.fluffycombat.api.CombatTag;
+import me.antritus.astral.fluffycombat.api.CombatUser;
+import me.antritus.astral.fluffycombat.astrolminiapi.ColorUtils;
 import me.antritus.astral.fluffycombat.astrolminiapi.CoreCommand;
+import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Comparator;
+import java.util.List;
+
 public class CMDDebug extends CoreCommand {
 	private final FluffyCombat combat;
 	protected CMDDebug(FluffyCombat main) {
-		super(main, "fluffy-debug");
+		super(main, "fluffy-tag");
 		this.combat = main;
 	}
 
@@ -29,14 +36,40 @@ public class CMDDebug extends CoreCommand {
 		}
 		if (combat.getCombatManager().hasTags(player)){
 			player.sendRichMessage("<red>You are currently in combat!");
-			CombatTag tag = combat.getCombatManager().getLatest(player);
-			assert tag != null;
-			int ticks = tag.getTicksLeft();
-			double seconds = (double) ticks /20;
-			long millis = (long) (seconds* 1000L);
-			player.sendRichMessage("<red>Ticks: <white>"+ticks);
-			player.sendRichMessage("<red>Seconds: <white>"+seconds);
-			player.sendRichMessage("<red>Millis: <white>"+millis);
+			CombatUser combatUser = combat.getUserManager().getUser(player);
+			List<CombatTag> tags = combat.getCombatManager().getTags(player).stream().sorted(Comparator.comparingInt(o -> o.getTicksLeft(combatUser))).toList();;
+
+			Component component = null;
+			for (CombatTag tag : tags){
+				if (tag==null){
+					continue;
+				}
+				int ticks = tag.getTicksLeft(combatUser);
+				double seconds = (double) ticks /20;
+				long millis = (long) (seconds* 1000L);
+				if (component != null){
+					component = component.appendNewline();
+				} else {
+					component = Component.text().build();
+				}
+				component = component.append(ColorUtils.translateComp("<gray> - <white>"));
+				if (tag instanceof BlockCombatTag combatTag){
+					component = component
+							.append(
+									ColorUtils.translateComp(
+											combatTag.getAttacker().getBlock().getType().name().toUpperCase()))
+							.append(ColorUtils.translateComp("<gray> (<red>BLOCK</red>) | <green>Millis: <white>"+millis+" <green>Ticks: <white>"+ticks+" <green>Seconds: <white>"+seconds));
+				} else {
+					component = component
+							.append(
+									ColorUtils.translateComp(
+											tag.getAttacker().getPlayer().getName()))
+							.append(ColorUtils.translateComp("<gray> | <green>Millis: <white>"+millis+" <green>Ticks: <white>"+ticks+" <green>Seconds: <white>"+seconds));
+				}
+			}
+			if (component != null){
+				player.sendMessage(component);
+			}
 		} else {
 			player.sendRichMessage("<green>Does not have tags!");
 		}

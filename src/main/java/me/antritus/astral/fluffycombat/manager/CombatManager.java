@@ -1,5 +1,9 @@
 package me.antritus.astral.fluffycombat.manager;
 
+import bet.astral.messagemanager.fluffy.Placeholders;
+import bet.astral.messagemanager.placeholder.Placeholder;
+import fr.skytasul.glowingentities.GlowingBlocks;
+import fr.skytasul.glowingentities.GlowingEntities;
 import me.antritus.astral.fluffycombat.FluffyCombat;
 import me.antritus.astral.fluffycombat.api.BlockCombatTag;
 import me.antritus.astral.fluffycombat.api.BlockCombatUser;
@@ -8,6 +12,7 @@ import me.antritus.astral.fluffycombat.api.CombatUser;
 import me.antritus.astral.fluffycombat.api.events.CombatEndEvent;
 import me.antritus.astral.fluffycombat.api.events.CombatFullEndEvent;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -54,12 +59,14 @@ public final class CombatManager {
 
 	/**
 	 * Called from FluffyCommand enable() method
-	 * @see FluffyCombat#enable()
+	 * @see FluffyCombat#onEnable()
 	 */
 	public void onEnable(){
 		task = new BukkitRunnable() {
 			@Override
 			public void run() {
+				GlowingEntities glowingEntities = main.getGlowingEntities();
+				GlowingBlocks glowingBlocks = main.getGlowingBlocks();
 				List<String> deleteList = new ArrayList<>();
 				List<String> nullList = new ArrayList<>();
 				latest.clear();
@@ -72,29 +79,66 @@ public final class CombatManager {
 						userTags.putIfAbsent(ids[0], new ArrayList<>());
 						userTags.putIfAbsent(ids[1], new ArrayList<>());
 
-						tag.setTicksLeft(tag.getTicksLeft() - 1);
-						if (tag.getTicksLeft() < 0) {
+						tag.setVictimTicksLeft(tag.getVictimTicksLeft() - 1);
+						tag.setAttackerTicksLeft(tag.getAttackerTicksLeft() - 1);
+						if (tag.getVictimTicksLeft() < 0 && tag.getAttackerTicksLeft() < 0) {
 							deleteList.add(key);
+							return;
 						} else {
 							userTags.get(ids[0]).add(tag);
 							userTags.get(ids[1]).add(tag);
 						}
-						latest.putIfAbsent(tag.getVictim().getUniqueId(), tag);
-						int ticksLeft = tag.getTicksLeft();
-						if (latest.get(tag.getVictim().getUniqueId()).getTicksLeft() < ticksLeft) {
-							latest.put(tag.getVictim().getUniqueId(), tag);
+						CombatUser combatUser = tag.getVictim();
+						if (combatUser == null){
+							nullList.add(key);
+							return;
+						}
+						UUID uniqueId = combatUser.getUniqueId();
+						latest.putIfAbsent(uniqueId, tag);
+						int ticksLeft = tag.getVictimTicksLeft();
+						if (latest.get(uniqueId).getTicksLeft(combatUser) < ticksLeft) {
+							latest.put(uniqueId, tag);
 						}
 
 						if (!(tag.getAttacker() instanceof BlockCombatUser blockCombatUser)) {
-							latest.putIfAbsent(tag.getAttacker().getUniqueId(), tag);
+							combatUser = tag.getAttacker();
+							uniqueId = combatUser.getUniqueId();
+							latest.putIfAbsent(uniqueId, tag);
 							{
-								if (latest.get(tag.getAttacker().getUniqueId()).getTicksLeft() < ticksLeft) {
-									latest.put(tag.getAttacker().getUniqueId(), tag);
+								if (latest.get(uniqueId).getTicksLeft(combatUser) < ticksLeft) {
+									latest.put(uniqueId, tag);
 								}
 							}
 						} else {
 							if (!blockCombatUser.isAlive()){
-								deleteList.add(key);
+								tag.setAttackerTicksLeft(-1);
+								tag.setVictimTicksLeft(-1);
+							}
+						}
+					}
+				});
+				deleteList.forEach(key->{
+					CombatTag tag = tags.get(key);
+					if (tag.getAttacker() instanceof BlockCombatUser blockCombatUser){
+						OfflinePlayer victimOP = tag.getVictim().getPlayer();
+						if (victimOP.isOnline()){
+							Player victim = victimOP.getPlayer();
+							Block block = blockCombatUser.getBlock();
+							try {
+								glowingBlocks.unsetGlowing(block, victim);
+							} catch (ReflectiveOperationException e) {
+								throw new RuntimeException(e);
+							}
+						}
+					} else {
+						OfflinePlayer victimOP = tag.getVictim().getPlayer();
+						OfflinePlayer attackerOP = tag.getAttacker().getPlayer();
+						if (victimOP.isOnline() && attackerOP.isOnline()){
+							try {
+								glowingEntities.unsetGlowing(attackerOP.getPlayer(), victimOP.getPlayer());
+								glowingEntities.unsetGlowing(victimOP.getPlayer(), attackerOP.getPlayer());
+							} catch (ReflectiveOperationException e) {
+								throw new RuntimeException(e);
 							}
 						}
 					}
@@ -135,6 +179,33 @@ public final class CombatManager {
 						}
 					}
 				});
+
+
+				latest.forEach((key, tag)->{
+					if (tag.getAttacker() instanceof BlockCombatUser blockCombatUser){
+						OfflinePlayer victimOP = tag.getVictim().getPlayer();
+						if (victimOP.isOnline()){
+							Player victim = victimOP.getPlayer();
+							Block block = blockCombatUser.getBlock();
+							try {
+								glowingBlocks.setGlowing(block, victim, tag.getVictim().getGlowingLatestColorEnum());
+							} catch (ReflectiveOperationException e) {
+								throw new RuntimeException(e);
+							}
+						}
+					} else {
+						OfflinePlayer victimOP = tag.getVictim().getPlayer();
+						OfflinePlayer attackerOP = tag.getAttacker().getPlayer();
+						if (victimOP.isOnline() && attackerOP.isOnline()){
+							try {
+								glowingEntities.setGlowing(attackerOP.getPlayer(), victimOP.getPlayer(), tag.getVictim().getGlowingLatestColorEnum());
+								glowingEntities.setGlowing(victimOP.getPlayer(), attackerOP.getPlayer(), tag.getAttacker().getGlowingLatestColorEnum());
+							} catch (ReflectiveOperationException e) {
+								throw new RuntimeException(e);
+							}
+						}
+					}
+				});
 			}
 		}.runTaskTimerAsynchronously(main, 20, 1);
 	}
@@ -142,7 +213,7 @@ public final class CombatManager {
 
 	/**
 	 * Called from FluffyCommand enable() method
-	 * @see FluffyCombat#disable()
+	 * @see FluffyCombat#onDisable()
 	 */
 	public void onDisable(){
 		if (task != null){
@@ -360,15 +431,4 @@ public final class CombatManager {
 		return main;
 	}
 
-	/**
-	 * Triggered when player joins the server
-	 * @param player player
-	 */
-	@ApiStatus.Internal
-	@ApiStatus.NonExtendable
-	public void onJoin(Player player) {
-		if (hasTags(player)){
-			main.getMessageManager().broadcast("log-join", "%player%="+player.getUniqueId());
-		}
-	}
 }

@@ -1,10 +1,10 @@
 package me.antritus.astral.fluffycombat.astrolminiapi;
 
 
-import me.antritus.astral.fluffycombat.antsfactions.FactionsPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.defaults.BukkitCommand;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
@@ -25,9 +25,9 @@ public abstract class CoreCommand extends BukkitCommand {
 			e.printStackTrace();
 		}
 	}
-	protected final FactionsPlugin main;
+	protected final JavaPlugin main;
 
-	protected CoreCommand(FactionsPlugin main, @NotNull String name) {
+	protected CoreCommand(JavaPlugin main, @NotNull String name) {
 		super(name);
 		this.main = main;
 	}

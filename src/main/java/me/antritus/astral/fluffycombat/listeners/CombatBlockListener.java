@@ -1,5 +1,6 @@
 package me.antritus.astral.fluffycombat.listeners;
 
+import fr.skytasul.glowingentities.GlowingBlocks;
 import me.antritus.astral.fluffycombat.FluffyCombat;
 import me.antritus.astral.fluffycombat.api.BlockCombatUser;
 import me.antritus.astral.fluffycombat.manager.BlockUserManager;
@@ -15,7 +16,7 @@ public class CombatBlockListener implements Listener {
 		this.fluffy = fluffyCombat;
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onBlockBreak(BlockBreakEvent event){
 		BlockUserManager blockUserManager = fluffy.getBlockUserManager();
 		BlockCombatUser blockCombatUser = blockUserManager.getUser(event.getBlock().getLocation());
@@ -23,5 +24,11 @@ public class CombatBlockListener implements Listener {
 			return;
 		}
 		blockCombatUser.setAlive(event.isCancelled());
+		GlowingBlocks glowingBlocks = fluffy.getGlowingBlocks();
+		try {
+			glowingBlocks.unsetGlowing(event.getBlock(), event.getPlayer());
+		} catch (ReflectiveOperationException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

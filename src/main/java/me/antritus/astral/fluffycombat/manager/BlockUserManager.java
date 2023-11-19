@@ -10,7 +10,6 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 public class BlockUserManager {
 	private final FluffyCombat fluffyCombat;
@@ -35,7 +34,7 @@ public class BlockUserManager {
 	public BlockUserManager(FluffyCombat fluffyCombat) {
 		this.fluffyCombat = fluffyCombat;
 
-		fluffyCombat.getServer().getAsyncScheduler().runAtFixedRate(fluffyCombat,
+		fluffyCombat.getServer().getScheduler().runTaskTimerAsynchronously(fluffyCombat,
 				(x) -> {
 
 					if (users.size() == 0) {
@@ -52,9 +51,8 @@ public class BlockUserManager {
 					deleteHash.forEach(usersByHash::remove);
 					deleteLocations.forEach(users::remove);
 				},
-				1,
-				1,
-				TimeUnit.SECONDS);
+				20, 20
+		);
 	}
 
 

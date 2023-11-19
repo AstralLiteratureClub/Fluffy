@@ -21,10 +21,10 @@ import org.bukkit.inventory.ItemStack;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 public class AnchorDetection implements Listener {
-	protected final Map<String, UUID> attackers = new HashMap<>();
+	public final Map<Location, UUID> attackers = new HashMap<>();
+	public final Map<Location, ItemStack> itemsMap = new HashMap<>();
 	private final FluffyCombat fluffyCombat;
 
 	public AnchorDetection(FluffyCombat fluffyCombat) {
@@ -63,20 +63,22 @@ public class AnchorDetection implements Listener {
 		Location location = block.getLocation().toBlockLocation();
 		if (itemStack.getType()==Material.GLOWSTONE){
 			if (charges==anchor.getMaximumCharges()) {
-				attackers.put(location.toString(), player.getUniqueId());
+				attackers.put(location, player.getUniqueId());
+				itemsMap.put(location, itemStack);
 			}
 		} else {
 			if (charges>0){
-				attackers.put(location.toString(), player.getUniqueId());
+				attackers.put(location, player.getUniqueId());
+				itemsMap.put(location, itemStack);
 			}
 		}
-		if (attackers.get(location.toString()) != null) {
-			fluffyCombat.getServer().getAsyncScheduler().runDelayed(fluffyCombat,
+		if (attackers.get(location) != null) {
+			fluffyCombat.getServer().getScheduler().runTaskLaterAsynchronously(fluffyCombat,
 					(x) -> {
-						attackers.remove(location.toString());
+						attackers.remove(location);
+						itemsMap.remove(location);
 					},
-					2,
-					TimeUnit.SECONDS
+					40
 			);
 		}
 	}
@@ -95,7 +97,7 @@ public class AnchorDetection implements Listener {
 		}
 		Location location = blockState.getLocation().toBlockLocation();
 		location.setWorld(victim.getWorld());
-		UUID ownerId = attackers.get(location.toString());
+		UUID ownerId = attackers.get(location);
 		if (ownerId == null){
 			return;
 		}
@@ -104,11 +106,13 @@ public class AnchorDetection implements Listener {
 			return;
 		}
 
+		ItemStack itemStack = itemsMap.get(location);
+
 
 		EntityDamageEntityByRespawnAnchorEvent newDamageEvent =
 				new EntityDamageEntityByRespawnAnchorEvent(victim,
 						attacker,
-						event.getDamager(), blockState);
+						event.getDamager(), blockState, itemStack);
 		newDamageEvent.callEvent();
 		if (newDamageEvent.isCancelled()){
 			event.setCancelled(true);

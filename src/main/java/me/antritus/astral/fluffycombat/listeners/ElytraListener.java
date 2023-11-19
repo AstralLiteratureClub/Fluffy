@@ -3,45 +3,68 @@ package me.antritus.astral.fluffycombat.listeners;
 import com.destroystokyo.paper.event.player.PlayerElytraBoostEvent;
 import me.antritus.astral.fluffycombat.FluffyCombat;
 import me.antritus.astral.fluffycombat.manager.CombatManager;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityToggleGlideEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ElytraListener implements Listener {
+	private final Map<Player, ItemStack> elytras = new HashMap<>();
 	private final FluffyCombat fluffy;
 
 	public ElytraListener(FluffyCombat fluffy) {
 		this.fluffy = fluffy;
-		/*
-		fluffy.getServer().getScheduler().runTaskTimer(fluffy, () -> {
-			CombatManager combatManager = fluffy.getCombatManager();
-			for (Player player : Bukkit.getOnlinePlayers()){
-				if (combatManager.hasTags(player)) {
-					if (fluffy.combatConfig().isElytraAllowed()){
-						return;
-					}
-					if (player.isGliding()) {
-						player.setVelocity(player.getVelocity().multiply(0));
-						player.setGliding(false);
-						if (fluffy.combatConfig().isElytraMessage()) {
-							fluffy.getMessageManager().message(player, "elytra.glide");
-						}
-					}
-				}
-			}
-		}, 20, 1);
+	}
 
-		 */
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	public void onDeath(PlayerDeathEvent event){
+		if (elytras.get(event.getEntity()) != null){
+			ItemStack itemStack = elytras.get(event.getEntity());
+			if (itemStack.getEnchantmentLevel(Enchantment.VANISHING_CURSE)>0){
+				return;
+			}
+			if (event.getKeepInventory()){
+				return;
+			}
+			event.getDrops().add(itemStack);
+			if (true)
+				return;
+
+			Location location = event.getEntity().getLocation();
+			World world = location.getWorld();
+			world.dropItemNaturally(location, itemStack);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void onQuit(PlayerQuitEvent event){
+		if (elytras.get(event.getPlayer()) != null){
+			ItemStack itemStack = elytras.get(event.getPlayer());
+			event.getPlayer().getInventory().setChestplate(itemStack);
+		}
 	}
 
 	@EventHandler
 	public void onEntityToggleGlide(EntityToggleGlideEvent e) {
+		if (!(e.getEntity() instanceof Player player)) return;
+		ItemStack itemStack = player.getInventory().getChestplate();
+		if (itemStack == null || itemStack.getType() != Material.ELYTRA){
+			return;
+		}
 		if (fluffy.getCombatConfig().isElytraAllowed()){
 			return;
 		}
-		if (!(e.getEntity() instanceof Player player)) return;
 		CombatManager combatManager = fluffy.getCombatManager();
 		if (!combatManager.hasTags(player)) {
 			return;
@@ -50,12 +73,21 @@ public class ElytraListener implements Listener {
 				fluffy.getCombatConfig().isElytraMessage()) {
 			fluffy.getMessageManager().message(player, "elytra.glide");
 		}
+
 		e.setCancelled(true);
 		player.setGliding(false);
+		fluffy.getServer().getScheduler().runTaskLater(fluffy,
+				() -> player.setGliding(false), 2);
+		elytras.put(player, itemStack);
+		player.getInventory().setChestplate(FluffyCombat.convertElytraWithReplacer(itemStack));
 
-		ItemStack itemStack = player.getInventory().getChestplate();
-		player.getInventory().setChestplate(null);
-		fluffy.getServer().getScheduler().runTaskLater(fluffy, () -> player.getInventory().setChestplate(itemStack), 20);
+		fluffy.getServer().getScheduler().runTaskLater(fluffy, () -> {
+			if (!elytras.containsKey(player)){
+				return;
+			}
+			player.getInventory().setChestplate(itemStack);
+			elytras.remove(player);
+		}, 25);
 	}
 
 	@EventHandler

@@ -4,18 +4,21 @@ import me.antritus.astral.fluffycombat.FluffyCombat;
 import me.antritus.astral.fluffycombat.api.events.EntityDamageEntityByEnderCrystalEvent;
 import org.bukkit.entity.EnderCrystal;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.projectiles.BlockProjectileSource;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class CrystalDetection implements Listener {
-	protected final Map<EnderCrystal, Entity> detectionMap = new HashMap<>();
+	public final Map<EnderCrystal, Entity> detectionMap = new HashMap<>();
+	public final Map<EnderCrystal, ItemStack> itemMap = new HashMap<>();
 	private final FluffyCombat fluffy;
 
 	public CrystalDetection(FluffyCombat fluffy) {
@@ -29,10 +32,17 @@ public class CrystalDetection implements Listener {
 			return;
 		}
 		detectionMap.put(enderCrystal, event.getDamager());
+		if (event.getEntity() instanceof LivingEntity entity){
+			if (entity.getEquipment() != null) {
+				ItemStack itemStack = entity.getEquipment().getItemInMainHand();
+				itemMap.put(enderCrystal, itemStack);
+			}
+		}
 		fluffy.getServer().getScheduler().runTaskLaterAsynchronously(fluffy, new Runnable() {
 			@Override
 			public void run() {
 				detectionMap.remove(enderCrystal);
+				itemMap.remove(enderCrystal);
 			}
 		}, 3);
 	}
@@ -60,7 +70,7 @@ public class CrystalDetection implements Listener {
 				event.getEntity(),
 				entity,
 				crystal,
-				event.getFinalDamage()
+				event.getFinalDamage(), itemMap.get(crystal)
 		);
 		enderCrystalEvent.callEvent();
 		if (enderCrystalEvent.isCancelled()){

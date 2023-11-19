@@ -1,9 +1,13 @@
 package me.antritus.astral.fluffycombat.api;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 import me.antritus.astral.fluffycombat.FluffyCombat;
-import me.antritus.astral.fluffycombat.antsfactions.IUser;
-import me.antritus.astral.fluffycombat.antsfactions.Property;
-import me.antritus.astral.fluffycombat.antsfactions.SimpleProperty;
+import me.antritus.astral.fluffycombat.api.stats.StatisticsField;
+import me.antritus.astral.fluffycombat.database.DatabaseField;
+import net.citizensnpcs.api.npc.NPC;
+import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,19 +20,140 @@ import java.util.UUID;
  * @author Antritus
  * @since 1.0-SNAPSHOT
  */
-public class CombatUser implements IUser {
-	private final Map<String, SimpleProperty<?>> data = new LinkedHashMap<>();
-	private final UUID uniqueId;
-	private final FluffyCombat fluffyCombat;
+@Getter
+@Setter
+public class CombatUser {
+	@StatisticsField(category = "globals", fieldName = "total-kills")
+	@DatabaseField private int totalKills;
+	@StatisticsField(category = "globals", fieldName = "combat-kills")
+	@DatabaseField private int combatKills;
+
+	@StatisticsField(category = "globals", fieldName = "void-kills")
+	@DatabaseField private int voidKills;
+	@StatisticsField(category = "globals", fieldName = "fall-damage-kills")
+	@DatabaseField private int fallDamageKills;
+
+	@StatisticsField(category = "melee", fieldName = "melee-kills")
+	@DatabaseField private int meleeKills;
+
+	@StatisticsField(category = "explosions", fieldName = "respawn-anchor-kills")
+	@DatabaseField private int anchorKills;
+	@StatisticsField(category = "explosions", fieldName = "tnt-kills")
+	@DatabaseField private int tntKills;
+	@StatisticsField(category = "explosions", fieldName = "ender-crystal-kills")
+	@DatabaseField private int crystalKills;
+	@StatisticsField(category = "explosions", fieldName = "bed-kills")
+	@DatabaseField private int bedKills;
+	@StatisticsField(category = "explosions", fieldName = "firework-kills")
+	@DatabaseField private int fireworkKills;
+
+	@StatisticsField(category = "environment", fieldName = "fire-kills")
+	@DatabaseField private int fireKills;
+	@StatisticsField(category = "environment", fieldName = "lava-kills")
+	@DatabaseField private int lavaKills;
+
+	@StatisticsField(category = "globals", fieldName = "total-enchantment-kills")
+	@DatabaseField private int enchantmentKills;
+
+	@StatisticsField(category = "enchantments", fieldName = "thorns-kills")
+	@DatabaseField private int thornsKills;
+	@StatisticsField(category = "enchantments", fieldName = "sweeping-edge-kills")
+	@DatabaseField private int sweepingEdgeKills;
+
+	@StatisticsField(category = "globals", fieldName = "total-kills")
+	@DatabaseField private int projectileKills;
+
+	@StatisticsField(category = "magic", fieldName = "magic-kills")
+	@DatabaseField private int potionKills;
+	@StatisticsField(category = "magic", fieldName = "splash-potion-kills")
+	@DatabaseField private int splashPotionKills;
+	@StatisticsField(category = "magic", fieldName = "lingering-potion-kills")
+	@DatabaseField private int lingeringPotionKills;
+
+	@StatisticsField(category = "projectiles", fieldName = "arrow-kills")
+	@DatabaseField private int arrowKills;
+	@StatisticsField(category = "projectiles", fieldName = "tipped-arrow-kills")
+	@DatabaseField private int tippedArrowKills;
+	@StatisticsField(category = "projectiles", fieldName = "fireball-kills")
+	@DatabaseField private int fireballKills;
+	@StatisticsField(category = "projectiles", fieldName = "ender-pearl-kills")
+	@DatabaseField private int enderPearlKills;
+	@StatisticsField(category = "projectiles", fieldName = "snowball-kills")
+	@DatabaseField private int snowballKills;
+	@StatisticsField(category = "projectiles", fieldName = "egg-kills")
+	@DatabaseField private int eggKills;
+	@StatisticsField(category = "projectiles", fieldName = "wither-skull-kills")
+	@DatabaseField private int witherSkullKills;
+	@StatisticsField(category = "projectiles", fieldName = "thrown-trident-kills")
+	@DatabaseField private int thrownTridentKills;
+	@StatisticsField(category = "projectiles", fieldName = "shulker-bullet-kills")
+	@DatabaseField private int shulkerBulletKills;
+
+	@StatisticsField(category = "globals", fieldName = "killstreak")
+	@DatabaseField private int killstreak;
+
+	@StatisticsField(category = "globals", fieldName = "total-deaths")
+	@DatabaseField private int totalDeaths;
+	@StatisticsField(category = "globals", fieldName = "total-deaths")
+	@DatabaseField private int combatDeaths;
+
+	@StatisticsField(category = "globals", fieldName = "total-totems-used")
+	@DatabaseField private int totemsUsed;
+	@StatisticsField(category = "globals", fieldName = "total-totems-popped")
+	@DatabaseField private int totemsPooped;
+
+	@DatabaseField private boolean showGlowingLatest;
+	@DatabaseField private boolean showGlowingTagged;
+	@Setter(AccessLevel.NONE)
+	@Getter(AccessLevel.NONE)
+	@DatabaseField private String glowingLatestColor;
+	@Setter(AccessLevel.NONE)
+	private ChatColor glowingLatestColorEnum;
+	@Setter(AccessLevel.NONE)
+	@Getter(AccessLevel.NONE)
+	@DatabaseField private String glowingTaggedColor;
+	@Setter(AccessLevel.NONE)
+	private ChatColor glowingTaggedColorEnum;
+
+	@Getter
+	@Setter
+	private boolean isOffline = false;
+
+	@Getter
+	@Setter
+	private NPC npc;
+
+	private final Map<String, Object> data = new LinkedHashMap<>();
+	private UUID uniqueId;
+	private FluffyCombat fluffyCombat;
 
 	/**
 	 * Generates new user lol
 	 * @param combat main instance
 	 * @param uniqueId id
 	 */
-	protected CombatUser(FluffyCombat combat, UUID uniqueId) {
+	public CombatUser(FluffyCombat combat, UUID uniqueId) {
 		this.uniqueId = uniqueId;
 		this.fluffyCombat = combat;
+		setGlowingLatestColor(ChatColor.RED);
+		setGlowingLatestColor(ChatColor.YELLOW);
+	}
+
+	public CombatUser() {
+		this.uniqueId = null;
+		this.fluffyCombat = null;
+		setGlowingLatestColor(ChatColor.RED);
+		setGlowingLatestColor(ChatColor.YELLOW);
+	}
+
+	public void setGlowingLatestColor(ChatColor glowingLatestColorEnum) {
+		this.glowingLatestColorEnum = glowingLatestColorEnum;
+		this.glowingLatestColor = glowingLatestColorEnum.name();
+	}
+
+	public void setGlowingTaggedColor(ChatColor glowingTaggedColorEnum) {
+		this.glowingTaggedColorEnum = glowingTaggedColorEnum;
+		this.glowingTaggedColor = glowingTaggedColorEnum.name();
 	}
 
 	/**
@@ -55,8 +180,7 @@ public class CombatUser implements IUser {
 	 * @param key key
 	 * @return data property if found
 	 */
-	@Override
-	public @Nullable Property<String, ?> get(@NotNull String key) {
+	public @Nullable Object get(@NotNull String key) {
 		return data.get(key);
 	}
 
@@ -65,8 +189,7 @@ public class CombatUser implements IUser {
 	 * This is not saved data
 	 * @return data map
 	 */
-	@Override
-	public @NotNull Map<String, SimpleProperty<?>> get() {
+	public @NotNull Map<String, Object> get() {
 		return data;
 	}
 
@@ -76,9 +199,7 @@ public class CombatUser implements IUser {
 	 * @param key key
 	 * @param value value
 	 */
-	@Override
 	public void setting(@NotNull String key, @Nullable Object value) {
-		data.putIfAbsent(key, new SimpleProperty<>(key, value));
-		data.get(key).setValueObj(value);
+		data.put(key, value);
 	}
 }

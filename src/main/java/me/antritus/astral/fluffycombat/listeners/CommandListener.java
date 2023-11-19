@@ -1,5 +1,6 @@
 package me.antritus.astral.fluffycombat.listeners;
 
+import bet.astral.messagemanager.placeholder.LegacyPlaceholder;
 import me.antritus.astral.fluffycombat.FluffyCombat;
 import me.antritus.astral.fluffycombat.manager.CombatManager;
 import org.bukkit.entity.Player;
@@ -37,7 +38,7 @@ public class CommandListener implements Listener {
 					)
 			) {
 				event.setCancelled(true);
-				fluffy.getMessageManager().message(player, "combat-command", "%command%="+event.getMessage());
+				fluffy.getMessageManager().message(player, "combat-command", new LegacyPlaceholder("command", event.getMessage()));
 			}
 		}
 	}

@@ -10,16 +10,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerRiptideEvent;
 import org.bukkit.util.Vector;
 
-import java.awt.*;
-
 public class TridentListener implements Listener {
 	private final FluffyCombat fluffy;
 	public TridentListener(FluffyCombat fluffy){
 		this.fluffy = fluffy;
 	}
 
-	// An interesting approach offered by one of the paper devs.
-	// Import from classic dupe plugin, reworked to stop the riptide movement
 	@EventHandler
 	public void onPlayerRiptide(PlayerRiptideEvent e) {
 		CombatManager combatManager =  fluffy.getCombatManager();

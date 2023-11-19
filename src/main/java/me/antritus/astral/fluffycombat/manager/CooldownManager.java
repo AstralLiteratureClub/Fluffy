@@ -1,5 +1,6 @@
 package me.antritus.astral.fluffycombat.manager;
 
+import bet.astral.messagemanager.placeholder.LegacyPlaceholder;
 import me.antritus.astral.fluffycombat.FluffyCombat;
 import me.antritus.astral.fluffycombat.api.events.CombatFullEndEvent;
 import me.antritus.astral.fluffycombat.cooldowns.Cooldown;
@@ -156,8 +157,7 @@ public class CooldownManager implements Listener {
 									.message(player, "cooldown."+material.toString()
 											.replace("_", "-")
 											.toLowerCase(),
-											"%cooldown%="+cooldown.seconds()
-											);
+											new LegacyPlaceholder("cooldown", String.valueOf(cooldown.seconds())));
 						}
 					} else {
 						event.setCancelled(true);
@@ -166,6 +166,4 @@ public class CooldownManager implements Listener {
 			}
 		}
 	}
-
-
 }

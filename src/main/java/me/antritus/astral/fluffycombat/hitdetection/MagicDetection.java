@@ -2,9 +2,12 @@ package me.antritus.astral.fluffycombat.hitdetection;
 
 import me.antritus.astral.fluffycombat.FluffyCombat;
 import me.antritus.astral.fluffycombat.api.BlockCombatUser;
+import me.antritus.astral.fluffycombat.api.CombatCause;
 import me.antritus.astral.fluffycombat.configs.CombatConfig;
 import me.antritus.astral.fluffycombat.listeners.CombatEnterListener;
 import me.antritus.astral.fluffycombat.manager.BlockUserManager;
+import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.Dispenser;
@@ -12,6 +15,7 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.potion.PotionEffect;
@@ -50,6 +54,98 @@ public class MagicDetection implements Listener {
 		});
 	}
 
+	private static void handleEffectCloud(AreaEffectCloud areaEffectCloud, LivingEntity entity) {
+		Player player = (Player) entity;
+		CombatConfig combatConfig = FluffyCombat.getPlugin(FluffyCombat.class).getCombatConfig();
+		if (!combatConfig.isLingeringPotionDetection()) {
+			return;
+		}
+		ProjectileSource source = areaEffectCloud.getSource();
+		if (source == null) {
+			return;
+		}
+
+		List<PotionEffectType> types = effects(areaEffectCloud);
+		List<PotionEffectType> combat = combatConfig.getPotionsToBeginCombat();;
+		boolean isCombatEnabling = isCombat(types, combat);
+		if (!isCombatEnabling) {
+			return;
+		}
+		if (source instanceof BlockProjectileSource blockProjectileSource) {
+			Block block = blockProjectileSource.getBlock();
+			if (block.getType() == Material.DISPENSER) {
+				if (!combatConfig.isDispenserLingeringPotionCombat()) {
+					return;
+				}
+				CombatEnterListener.handle(player, block, CombatCause.LINGERING_POTION); // Creates combat user for the block
+				BlockCombatUser blockCombatUser = FluffyCombat.getPlugin(FluffyCombat.class).getBlockUserManager().getUser(block.getLocation());
+				assert blockCombatUser != null;
+				handleEffects(blockCombatUser.hashCode(), player, types);
+			}
+			return;
+		}
+		LivingEntity livingEntity = (LivingEntity) source;
+		handleEffects(livingEntity, player, types);
+		if (source instanceof Player attacker) {
+			CombatEnterListener.handle(player, attacker, CombatCause.LINGERING_POTION);
+		}
+	}
+	private static boolean isCombat(List<PotionEffectType> types, List<PotionEffectType> combatPotions){
+		for (PotionEffectType type : types) {
+			for (PotionEffectType other : combatPotions){
+				if (other.getName().equals(type.getName())){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	private static List<PotionEffectType> effects(ThrownPotion potion) {
+		return combine(potion.getPotionMeta().getBasePotionType().getPotionEffects(),
+				potion.getPotionMeta().getCustomEffects());
+	}
+	private static List<PotionEffectType> effects(AreaEffectCloud potion) {
+		potion.getBasePotionType().getPotionEffects();
+		return combine(potion.getBasePotionType().getPotionEffects(),
+				potion.getCustomEffects());
+	}
+	private static List<PotionEffectType> combine(@NotNull List<@NotNull PotionEffect> effects, @NotNull List<@NotNull PotionEffect> effects2){
+		List<PotionEffectType> types = new LinkedList<>();
+		for (@NotNull PotionEffect type : effects) {
+			types.add(type.getType());
+		}
+		for (@NotNull PotionEffect type : effects2) {
+			if (types.contains(type.getType())){
+				continue;
+			}
+			types.add(type.getType());
+		}
+		return types;
+	}
+	private static void handleSplash(ThrownPotion potion, LivingEntity entity) {
+		Player player = (Player) entity;
+		CombatConfig combatConfig = FluffyCombat.getPlugin(FluffyCombat.class).getCombatConfig();
+		ProjectileSource source = potion.getShooter();
+		if (source instanceof BlockProjectileSource && !combatConfig.isDispenserSplashPotionCombat()) {
+			return;
+		}
+		List<PotionEffectType> types = effects(potion);
+		boolean isCombatEnabling = isCombat(types, FluffyCombat.getPlugin(FluffyCombat.class).getCombatConfig().getPotionsToBeginCombat());
+		if (!isCombatEnabling) {
+			return;
+		}
+		if (source instanceof BlockProjectileSource projectileSource) {
+			Block block = projectileSource.getBlock();
+			CombatEnterListener.handle(player, block, CombatCause.SPLASH_POTION);
+			BlockCombatUser blockCombatUser = FluffyCombat.getPlugin(FluffyCombat.class).getBlockUserManager().getUser(block.getLocation());
+			assert blockCombatUser != null;
+			handleEffects(blockCombatUser.hashCode(), player, types);
+		} else if (source instanceof Player attacker) {
+			CombatEnterListener.handle(player, attacker, CombatCause.SPLASH_POTION);
+			handleEffects(attacker, player, types);
+		}
+	}
+
 	@EventHandler
 	private void onPotionSplash(PotionSplashEvent event){
 		CombatConfig combatConfig = fluffy.getCombatConfig();
@@ -60,36 +156,19 @@ public class MagicDetection implements Listener {
 		if (event.getAffectedEntities().size()==0){
 			return;
 		}
-
-		ProjectileSource source = event.getPotion().getShooter();
-		if (source instanceof BlockProjectileSource && !combatConfig.isDispenserSplashPotionCombat()){
-			return;
+		for (LivingEntity livingEntity : event.getAffectedEntities().stream().filter(entity -> entity instanceof Player player && player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR ).toList()) {
+			handleSplash(event.getPotion(), livingEntity);
 		}
-		boolean isCombatEnabling = false;
-		List<PotionEffectType> types = new LinkedList<>();
-		for (PotionEffect potionEffect : event.getPotion().getEffects()){
-			types.add(potionEffect.getType());
-			if (combatConfig.getPotionsToBeginCombat().stream().anyMatch(potion->potion.getKey().equals(potionEffect.getType().getKey()))){
-				isCombatEnabling = true;
-			}
-		}
-		if (!isCombatEnabling){
-			return;
-		}
-		event.getAffectedEntities().stream().filter(entity->entity instanceof Player).forEach(entity->{
-			Player player = (Player) entity;
-			if (source instanceof BlockProjectileSource projectileSource){
-				Block block = projectileSource.getBlock();
-				CombatEnterListener.handle(player, block);
-				BlockCombatUser blockCombatUser = fluffy.getBlockUserManager().getUser(block.getLocation());
-				assert blockCombatUser != null;
-				handleEffects(blockCombatUser.hashCode(), player, types);
-			} else if (source instanceof Player attacker){
-				CombatEnterListener.handle(player, attacker);
-				handleEffects(attacker, player, types);
-			}
-		});
 	}
+
+	@EventHandler
+	private void onAreaEffect(AreaEffectCloudApplyEvent event){
+		AreaEffectCloud cloud = event.getEntity();
+		for (LivingEntity livingEntity : event.getAffectedEntities().stream().filter(entity -> entity instanceof Player player && player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR).toList()) {
+			handleEffectCloud(cloud, livingEntity);
+		}
+	}
+
 
 	@EventHandler(priority = EventPriority.HIGHEST)
 	private void onMagicDamageMore(EntityDamageByEntityEvent event) {
@@ -127,72 +206,20 @@ public class MagicDetection implements Listener {
 			if (!blockUser.isAlive()) {
 				return;
 			}
-			CombatEnterListener.handle(victim, blockUser);
+			CombatEnterListener.handle(victim, blockUser, CombatCause.EFFECT_STATUS);
 		} else if (whoGave instanceof UUID uuid) {
 			OfflinePlayer player = fluffy.getServer().getOfflinePlayer(uuid);
-			CombatEnterListener.handle(victim, player);
+			CombatEnterListener.handle(victim, player, CombatCause.EFFECT_STATUS);
 		}
 	}
 
-
-	@EventHandler(priority = EventPriority.NORMAL)
 	private void onMagicDamage(EntityDamageByEntityEvent event){
 		if (!(event.getEntity() instanceof Player player)){
 			return;
 		}
 		CombatConfig combatConfig = fluffy.getCombatConfig();
 		if (event.getDamager() instanceof AreaEffectCloud areaEffectCloud){
-			if (!combatConfig.isLingeringPotionDetection()){
-				return;
-			}
-			ProjectileSource source = areaEffectCloud.getSource();
-			if (source == null){
-				return;
-			}
-			boolean isCombatEnabling = false;
-			List<PotionEffectType> types = new LinkedList<>();
-			for (PotionEffect potionEffect : areaEffectCloud.getCustomEffects()){
-				types.add(potionEffect.getType());
-				if (combatConfig.getPotionsToBeginCombat().stream().anyMatch(potion->potion.getKey().equals(potionEffect.getType().getKey()))){
-					isCombatEnabling = true;
-				}
-			}
-			player.sendMessage("4");
-			if (!isCombatEnabling){
-				return;
-			}
-
-			player.sendMessage("5");
-			if (source instanceof BlockProjectileSource blockProjectileSource){
-				Block block = blockProjectileSource.getBlock();
-				if (block.getBlockData() instanceof Dispenser){
-					player.sendMessage("6");
-					if (!combatConfig.isDispenserLingeringPotionCombat()){
-						return;
-					}
-					player.sendMessage("7");
-					CombatEnterListener.handle(player, block); // Creates combat user for the block
-					BlockCombatUser blockCombatUser = fluffy.getBlockUserManager().getUser(block.getLocation());
-					assert blockCombatUser != null;
-
-					handleEffects(blockCombatUser.hashCode(), player, types);
-					player.sendMessage("8");
-					return;
-				} else {
-					return;
-				}
-			}
-			player.sendMessage("9");
-			LivingEntity livingEntity = (LivingEntity) source;
-			handleEffects(livingEntity, player, types);
-			if (source instanceof Player attacker){
-				player.sendMessage("10");
-				if (event.getEntity() instanceof Player victim) {
-					player.sendMessage("11");
-					CombatEnterListener.handle(victim, attacker);
-					return;
-				}
-			}
+			handleEffectCloud(areaEffectCloud, player);
 
 		}else if (event.getDamager() instanceof ThrownPotion potion){
 			if (!combatConfig.isSplashPotionDetection()){
@@ -216,7 +243,7 @@ public class MagicDetection implements Listener {
 					if (combatConfig.isDispenserSplashPotionCombat()){
 						return;
 					}
-					CombatEnterListener.handle(player, block); // Creates combat user for the block
+					CombatEnterListener.handle(player, block, CombatCause.SPLASH_POTION); // Creates combat user for the block
 					BlockCombatUser blockCombatUser = fluffy.getBlockUserManager().getUser(block.getLocation());
 					assert blockCombatUser != null;
 
@@ -228,7 +255,7 @@ public class MagicDetection implements Listener {
 			handleEffects(livingEntity, player, types);
 			if (source instanceof Player attacker){
 				if (event.getEntity() instanceof Player victim) {
-					CombatEnterListener.handle(victim, attacker);
+					CombatEnterListener.handle(victim, attacker, CombatCause.SPLASH_POTION);
 					return;
 				}
 			}

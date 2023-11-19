@@ -1,5 +1,6 @@
 package me.antritus.astral.fluffycombat.api.events;
 
+import lombok.Getter;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -7,30 +8,28 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.EntityEvent;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class EntityDamageEntityByBedEvent extends EntityEvent implements Cancellable {
-	private final OfflinePlayer attacker;
+	@Getter
+	private final OfflinePlayer damager;
+	@Getter
 	private final Block block;
+	@Getter
 	private final BlockState state;
+	@Getter
+	private final ItemStack item;
 	private boolean isCanceled = false;
 
-	public EntityDamageEntityByBedEvent(Player victim, OfflinePlayer attacker, Block block, BlockState state) {
+	public EntityDamageEntityByBedEvent(Player victim, OfflinePlayer attacker, Block block, BlockState state, ItemStack itemStack) {
 		super(victim);
-		this.attacker = attacker;
+		this.damager = attacker;
 		this.block = block;
 		this.state = state;
+		this.item = itemStack;
 	}
 
-
-	public @Nullable Block getBlock(){
-		return block;
-	}
-	public @Nullable BlockState getState(){return state;}
-	public @NotNull OfflinePlayer getDamager() {
-		return attacker;
-	}
 
 	private static final HandlerList HANDLERS = new HandlerList();
 	@NotNull

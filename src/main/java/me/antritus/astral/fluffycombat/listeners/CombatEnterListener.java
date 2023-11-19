@@ -1,22 +1,34 @@
 package me.antritus.astral.fluffycombat.listeners;
 
+import bet.astral.messagemanager.MessageManager;
+import bet.astral.messagemanager.fluffy.Placeholders;
+import bet.astral.messagemanager.placeholder.Placeholder;
+import fr.skytasul.glowingentities.GlowingBlocks;
+import fr.skytasul.glowingentities.GlowingEntities;
 import me.antritus.astral.fluffycombat.FluffyCombat;
-import me.antritus.astral.fluffycombat.antsfactions.MessageManager;
 import me.antritus.astral.fluffycombat.api.BlockCombatUser;
+import me.antritus.astral.fluffycombat.api.CombatCause;
 import me.antritus.astral.fluffycombat.api.CombatTag;
 import me.antritus.astral.fluffycombat.api.events.*;
 import me.antritus.astral.fluffycombat.manager.BlockUserManager;
 import me.antritus.astral.fluffycombat.manager.CombatManager;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Objects;
+import java.util.UUID;
 
 import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.*;
 
@@ -41,31 +53,60 @@ public class CombatEnterListener implements Listener {
 		return false;
 	}
 
-	public static void handle(Player victim, OfflinePlayer attacker) {
+	public static void handle(Player victim, OfflinePlayer attacker, CombatCause combatCause) {
+		handle(victim, attacker, combatCause, null);
+	}
+	public static void handle(Player victim, OfflinePlayer attacker, CombatCause combatCause, ItemStack itemStack) {
 		if (victim.getUniqueId() == attacker.getUniqueId() && !FluffyCombat.debug) {
 			return;
 		}
-		FluffyCombat combat = FluffyCombat.getPlugin(FluffyCombat.class);
-		CombatManager cM = combat.getCombatManager();
-		MessageManager mm = combat.getMessageManager();
+		FluffyCombat fluffy = FluffyCombat.getPlugin(FluffyCombat.class);
+		CombatManager cM = fluffy.getCombatManager();
+		MessageManager<?, ?, ?> mm = fluffy.getMessageManager();
 		if (!cM.hasTags(victim)) {
-			mm.message(victim, "combat-enter.victim", "%attacker%=" + attacker.getName());
+			Placeholder[] placeholders = Placeholders.combatPlaceholders(victim, attacker, combatCause, itemStack).toArray(Placeholder[]::new);
+			mm.message(victim, "combat-enter.victim", placeholders);
 		}
 		if (!cM.hasTags(attacker)) {
-			if (attacker instanceof Player attackerPlayer)
-				mm.message(attackerPlayer, "combat-enter.attacker", "%victim%=" + victim.getName());
+			if (attacker instanceof Player attackerPlayer) {
+				Placeholder[] placeholders = Placeholders.combatPlaceholders(victim, attackerPlayer, combatCause, itemStack).toArray(Placeholder[]::new);
+				mm.message(attackerPlayer, "combat-enter.attacker", placeholders);
+			}
 		}
 
 		CombatTag tag = cM.getTag(victim, attacker);
 		if (tag == null) {
-			tag = combat.getCombatManager().create(victim, attacker);
+			tag = fluffy.getCombatManager().create(victim, attacker);
+			CombatEnterEvent enterEvent = new CombatEnterEvent(fluffy, tag);
+			enterEvent.callEvent();
+		}
+		if (victim.getUniqueId().equals(tag.getVictim().getUniqueId())){
+			tag.setVictimCombatCause(combatCause);
+		} else {
+			tag.setAttackerCombatCause(combatCause);
 		}
 		tag.resetTicks();
-		CombatEnterEvent enterEvent = new CombatEnterEvent(combat, tag);
-		enterEvent.callEvent();
+		if (attacker.getUniqueId()==tag.getAttacker().getUniqueId()){
+			tag.setAttackerWeapon(itemStack);
+		} else {
+			tag.setVictimWeapon(itemStack);
+		}
+		GlowingEntities glowingEntities = fluffy.getGlowingEntities();
+		try {
+			if (attacker instanceof Player aPlayer){
+				glowingEntities.setGlowing(aPlayer, victim, tag.getVictim().getGlowingLatestColorEnum());
+				glowingEntities.setGlowing(victim, aPlayer, tag.getAttacker().getGlowingLatestColorEnum());
+			}
+		} catch (ReflectiveOperationException e) {
+			throw new RuntimeException(e);
+		}
+
+	}
+	public static void handle(Player victim, Block attacker, CombatCause combatCause) {
+		handle(victim, attacker, combatCause, null);
 	}
 
-	public static void handle(Player victim, Block attacker) {
+	public static void handle(Player victim, Block attacker, CombatCause combatCause, @Nullable ItemStack itemStack) {
 		FluffyCombat combat = FluffyCombat.getPlugin(FluffyCombat.class);
 		BlockUserManager blockUserManager = combat.getBlockUserManager();
 
@@ -74,38 +115,68 @@ public class CombatEnterListener implements Listener {
 			blockUserManager.create(attacker);
 		}
 		BlockCombatUser blockUser = blockUserManager.getUser(attacker.getLocation());
-
-
-		CombatManager cM = combat.getCombatManager();
-		MessageManager mm = combat.getMessageManager();
-		if (!cM.hasTags(victim)) {
-			mm.message(victim, "combat-enter.victim", "%attacker%=" + attacker.getType());
-		}
-		CombatTag tag = cM.getTag(victim, blockUser);
-		if (tag == null) {
-			tag = combat.getCombatManager().create(victim, blockUser);
-		}
-		tag.resetTicks();
-		CombatEnterEvent enterEvent = new CombatEnterEvent(combat, tag);
-		enterEvent.callEvent();
+		handle(victim, blockUser, combatCause, itemStack);
+	}
+	public static void handle(Player victim, BlockCombatUser attacker, CombatCause combatCause) {
+		handle(victim, attacker, combatCause, null);
 	}
 
-	public static void handle(Player victim, BlockCombatUser attacker) {
+	public static void handle(Player victim, BlockCombatUser attacker, CombatCause combatCause, @Nullable ItemStack itemStack) {
 		FluffyCombat combat = FluffyCombat.getPlugin(FluffyCombat.class);
-		BlockUserManager blockUserManager = combat.getBlockUserManager();
 
 		CombatManager cM = combat.getCombatManager();
-		MessageManager mm = combat.getMessageManager();
+		MessageManager<?, ?, ?> mm = combat.getMessageManager();
 		if (!cM.hasTags(victim)) {
-			mm.message(victim, "combat-enter.victim", "%attacker%=" + attacker.getBlock().getType());
+			Placeholder[] placeholders = Placeholders.combatPlaceholders(victim, null, combatCause, itemStack).toArray(Placeholder[]::new);
+			mm.message(victim, "combat-enter.victim", placeholders);
 		}
 		CombatTag tag = cM.getTag(victim, attacker);
 		if (tag == null) {
 			tag = combat.getCombatManager().create(victim, attacker);
 		}
+		tag.setVictimCombatCause(combatCause);
 		tag.resetTicks();
 		CombatEnterEvent enterEvent = new CombatEnterEvent(combat, tag);
 		enterEvent.callEvent();
+
+		GlowingBlocks glowingBlocks = combat.getGlowingBlocks();
+		try {
+			glowingBlocks.setGlowing(attacker.getBlock(), victim, tag.getVictim().getGlowingLatestColorEnum());
+		} catch (ReflectiveOperationException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	public void onEntityBlock(EntityDamageEvent event) {
+		if (!(event.getEntity() instanceof Player player)) {
+			return;
+		}
+		player.sendRichMessage("Oh no help!!!");
+		Block block = event.getEntity().getLocation().getBlock();
+		player.sendRichMessage(block.getType().name());
+		if (event.getCause() == FIRE) {
+			player.sendRichMessage("Hello!");
+			Material material = block.getType();
+			if (material == Material.FIRE || material == Material.SOUL_FIRE) {
+				@Nullable UUID owner = FluffyCombat.getBlockOwner(block);
+				if (owner == null) {
+					return;
+				}
+				player.sendRichMessage("Heyllo!");
+				OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(owner);
+				handle(player, offlinePlayer, CombatCause.FIRE);
+			}
+		} else if (event.getCause() == LAVA) {
+			player.sendRichMessage("Hi!");
+			@Nullable UUID owner = FluffyCombat.getBlockOwner(block);
+			if (owner == null) {
+				return;
+			}
+			player.sendRichMessage("Hiollo!");
+			OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(owner);
+			handle(player, offlinePlayer, CombatCause.FIRE);
+		}
 	}
 
 
@@ -126,7 +197,8 @@ public class CombatEnterListener implements Listener {
 			}
 			if (event.getDamager() instanceof Projectile projectile) {
 				if (projectile.getShooter() != null && projectile.getShooter() instanceof Player player) {
-					attacker = player;
+					handle(victim, player, CombatCause.PROJECTILE);
+					return;
 				} else {
 					return;
 				}
@@ -136,10 +208,9 @@ public class CombatEnterListener implements Listener {
 		} else {
 			attacker = player;
 		}
-		handle(victim, attacker);
+		handle(victim, attacker,  CombatCause.MELEE);
 	}
 
-	// TODO Test ALL methods of getting knocked in to combat
 	@EventHandler
 	public void onTnTHit(EntityDamageEntityByTNTEvent event){
 		if (!combat.getCombatConfig().isTNTDetection()){
@@ -151,10 +222,9 @@ public class CombatEnterListener implements Listener {
 		if (!(event.attacker() instanceof OfflinePlayer attacker)){
 			return;
 		}
-		handle(player, attacker);
+		handle(player, attacker, CombatCause.TNT);
 	}
 
-	// TODO Fix anchor hit detection
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void onAnchorHit(EntityDamageEntityByRespawnAnchorEvent event) {
 		if (!combat.getCombatConfig().isAnchorDetection()){
@@ -165,10 +235,9 @@ public class CombatEnterListener implements Listener {
 		}
 		// those entities are players as mobs can't click on anchors
 		Player attacker = (Player) event.getDamager();
-		handle(victim, attacker);
+		handle(victim, attacker, CombatCause.RESPAWN_ANCHOR, event.getItem());
 	}
 
-	// TODO Fix anchor hit detection
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void onBedHit(EntityDamageEntityByBedEvent event) {
 		if (!combat.getCombatConfig().isBedDetection()){
@@ -179,12 +248,11 @@ public class CombatEnterListener implements Listener {
 		}
 		// those entities are players as mobs can't click on anchors
 		Player attacker = (Player) event.getDamager();
-		handle(victim, attacker);
+		handle(victim, attacker, CombatCause.BED, event.getItem());
 	}
 
 
 
-	// TODO Fix anchor hit detection
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void onCrystalHit(EntityDamageEntityByEnderCrystalEvent event) {
 		if (!combat.getCombatConfig().isCrystalDetection()){
@@ -193,9 +261,9 @@ public class CombatEnterListener implements Listener {
 		if (!(event.getEntity() instanceof Player player)){
 			return;
 		}
-		if (!(event.attacker() instanceof Player attacker)){
+		if (!(event.getDamager() instanceof Player attacker)){
 			return;
 		}
-		handle(player, attacker);
+		handle(player, attacker, CombatCause.ENDER_CRYSTAL, event.getItem());
 	}
 }
