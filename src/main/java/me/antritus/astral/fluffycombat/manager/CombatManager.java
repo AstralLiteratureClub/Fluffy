@@ -1,7 +1,5 @@
 package me.antritus.astral.fluffycombat.manager;
 
-import bet.astral.messagemanager.fluffy.Placeholders;
-import bet.astral.messagemanager.placeholder.Placeholder;
 import fr.skytasul.glowingentities.GlowingBlocks;
 import fr.skytasul.glowingentities.GlowingEntities;
 import me.antritus.astral.fluffycombat.FluffyCombat;
@@ -11,12 +9,13 @@ import me.antritus.astral.fluffycombat.api.CombatTag;
 import me.antritus.astral.fluffycombat.api.CombatUser;
 import me.antritus.astral.fluffycombat.api.events.CombatEndEvent;
 import me.antritus.astral.fluffycombat.api.events.CombatFullEndEvent;
+import me.antritus.astral.fluffycombat.configs.CombatConfig;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -63,8 +62,12 @@ public final class CombatManager {
 	 */
 	public void onEnable(){
 		task = new BukkitRunnable() {
+			/**
+			 * Maybe switching to a thread per player would be possible, but it's not something in my mind currently.
+			 */
 			@Override
 			public void run() {
+				CombatConfig config = main.getCombatConfig();
 				GlowingEntities glowingEntities = main.getGlowingEntities();
 				GlowingBlocks glowingBlocks = main.getGlowingBlocks();
 				List<String> deleteList = new ArrayList<>();
@@ -122,7 +125,7 @@ public final class CombatManager {
 					if (tag.getAttacker() instanceof BlockCombatUser blockCombatUser){
 						OfflinePlayer victimOP = tag.getVictim().getPlayer();
 						if (victimOP.isOnline()){
-							Player victim = victimOP.getPlayer();
+							Player victim = (Player) victimOP;
 							Block block = blockCombatUser.getBlock();
 							try {
 								glowingBlocks.unsetGlowing(block, victim);
@@ -156,7 +159,7 @@ public final class CombatManager {
 							main.getMessageManager().message((Player) victimPlayer, "combat-end");
 						}
 					}
-					if (!(attacker instanceof BlockCombatUser blockCombatUser)) {
+					if (!(attacker instanceof BlockCombatUser)) {
 						OfflinePlayer attackerPlayer = attacker.getPlayer();
 						if (attackerPlayer.isOnline()) {
 							if (keys.isEmpty() || keys.stream().noneMatch(id -> id.contains(attackerPlayer.getUniqueId().toString()))) {
@@ -187,27 +190,79 @@ public final class CombatManager {
 						if (victimOP.isOnline()){
 							Player victim = victimOP.getPlayer();
 							Block block = blockCombatUser.getBlock();
-							try {
-								glowingBlocks.setGlowing(block, victim, tag.getVictim().getGlowingLatestColorEnum());
-							} catch (ReflectiveOperationException e) {
-								throw new RuntimeException(e);
+							if (victim != null) {
+								try {
+									glowingBlocks.setGlowing(block, victim, config.getCombatGlowLatest());
+								} catch (ReflectiveOperationException e) {
+									throw new RuntimeException(e);
+								}
 							}
 						}
 					} else {
 						OfflinePlayer victimOP = tag.getVictim().getPlayer();
 						OfflinePlayer attackerOP = tag.getAttacker().getPlayer();
-						if (victimOP.isOnline() && attackerOP.isOnline()){
+						if (config.isCombatGlow() && config.isCombatGlowLatest()
+								&& victimOP.isOnline() && attackerOP.isOnline()) {
 							try {
-								glowingEntities.setGlowing(attackerOP.getPlayer(), victimOP.getPlayer(), tag.getVictim().getGlowingLatestColorEnum());
-								glowingEntities.setGlowing(victimOP.getPlayer(), attackerOP.getPlayer(), tag.getAttacker().getGlowingLatestColorEnum());
+								glowingEntities.setGlowing(attackerOP.getPlayer(), victimOP.getPlayer(), config.getCombatGlowLatest());
+								glowingEntities.setGlowing(victimOP.getPlayer(), attackerOP.getPlayer(), config.getCombatGlowLatest());
 							} catch (ReflectiveOperationException e) {
 								throw new RuntimeException(e);
+							}
+						}
+
+						if (victimOP.isOnline() && config.isCombatGlow()
+								&& (config.isCombatGlowAllTagged() || config.isCombatGlowCombatLogRejoin())) {
+							List<CombatTag> tags = getTags(victimOP);
+							for (CombatTag cTag : tags) {
+								makeGlow(main, (Player) victimOP, attackerOP, cTag);
+							}
+						}
+
+						if (attackerOP.isOnline() && config.isCombatGlow()
+								&& (config.isCombatGlowAllTagged() || config.isCombatGlowCombatLogRejoin())) {
+							List<CombatTag> tags = getTags(attackerOP);
+							for (CombatTag cTag : tags) {
+								makeGlow(main, (Player) attackerOP, victimOP, cTag);
 							}
 						}
 					}
 				});
 			}
 		}.runTaskTimerAsynchronously(main, 20, 1);
+	}
+
+	public static void makeGlow(@NotNull FluffyCombat fluffy, @NotNull Player whoSees, @NotNull OfflinePlayer ignore, @NotNull CombatTag tag){
+		boolean isVictim = tag.getVictim().getUniqueId().equals(whoSees.getUniqueId());
+		CombatUser attacker = isVictim ? tag.getAttacker() : tag.getVictim();
+		if (attacker.getUniqueId().equals(ignore.getUniqueId())){
+			return;
+		}
+		if (tag instanceof BlockCombatTag){
+			Block block = ((BlockCombatUser) tag.getAttacker()).getBlock();
+			try {
+				fluffy.getGlowingBlocks().setGlowing(block, whoSees, fluffy.getCombatConfig().getCombatGlowAllTagged());
+			} catch (ReflectiveOperationException e) {
+				throw new RuntimeException(e);
+			}
+		} else {
+			OfflinePlayer p = attacker.getPlayer();
+			if (p instanceof Player online) {
+				NamedTextColor color = fluffy.getCombatConfig().getCombatGlowAllTagged();
+				boolean isTimer = attacker.getRejoinTimer() >= 0;
+				if (isTimer && fluffy.getCombatConfig().isCombatGlowCombatLogRejoin()){
+					color = fluffy.getCombatConfig().getCombatGlowTagRejoin();
+				}
+				if (!isTimer && !fluffy.getCombatConfig().isCombatGlowAllTagged()){
+					return;
+				}
+				try {
+					fluffy.getGlowingEntities().setGlowing(online, whoSees, color);
+				} catch (ReflectiveOperationException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}
 	}
 
 
@@ -247,17 +302,17 @@ public final class CombatManager {
 	 * @param block block
 	 * @return is tag from getTag() null or not
 	 */
-	public boolean hasTag(OfflinePlayer player, BlockCombatUser block){
+	public synchronized boolean hasTag(OfflinePlayer player, BlockCombatUser block){
 		return getTag(player, block) != null;
 	}
-	public boolean isActive(CombatTag tag, OfflinePlayer player){
+	public synchronized boolean isActive(CombatTag tag, OfflinePlayer player){
 		return isActive(tag, player.getUniqueId());
 	}
-	public boolean isActive(CombatTag tag, UUID playerId){
+	public synchronized boolean isActive(CombatTag tag, UUID playerId){
 		return tag.isActive(playerId);
 	}
 
-	public boolean isActive(BlockCombatTag tag, BlockCombatUser block){
+	public synchronized boolean isActive(BlockCombatTag tag, BlockCombatUser block){
 		return tag.isActive(block);
 	}
 
@@ -271,7 +326,7 @@ public final class CombatManager {
 	 * @return combat tag, null if no tag is found.
 	 */
 	@Nullable
-	public CombatTag getTag(OfflinePlayer player, OfflinePlayer player2){
+	public synchronized CombatTag getTag(OfflinePlayer player, OfflinePlayer player2){
 		CombatTag tag = tags.get(toId(player, player2));
 		if (tag == null){
 			tag = tags.get(toId(player2, player));
@@ -287,7 +342,7 @@ public final class CombatManager {
 	 * @return combat tag, null if no tag is found.
 	 */
 	@Nullable
-	public CombatTag getTag(OfflinePlayer player, BlockCombatUser block){
+	public synchronized CombatTag getTag(OfflinePlayer player, BlockCombatUser block){
 		return tags.get(toId(player, block));
 	}
 
@@ -298,7 +353,7 @@ public final class CombatManager {
 	 * @return instance of the tag
 	 */
 	@NotNull
-	public CombatTag create(Player playerVictim, OfflinePlayer playerAttacker){
+	public synchronized CombatTag create(Player playerVictim, OfflinePlayer playerAttacker){
 		CombatUser combatUserVictim = main.getUserManager().getUser(playerVictim);
 		CombatUser combatUserAttacker = main.getUserManager().getUser(playerAttacker.getUniqueId());
 		try {
@@ -318,7 +373,7 @@ public final class CombatManager {
 	 * @return instance of the tag
 	 */
 	@NotNull
-	public CombatTag create(Player playerVictim, BlockCombatUser block){
+	public synchronized CombatTag create(Player playerVictim, BlockCombatUser block){
 		CombatUser combatUserVictim = main.getUserManager().getUser(playerVictim);
 		try {
 			BlockCombatTag tag = blockCombatTagConstructor.newInstance(main, combatUserVictim, block);
@@ -337,7 +392,7 @@ public final class CombatManager {
 	 * @param player player
 	 * @return empty list if none found, else all tags where player is in the key
 	 */
-	public List<CombatTag> getTags(OfflinePlayer player){
+	public synchronized List<CombatTag> getTags(OfflinePlayer player){
 		List<CombatTag> returnList = new ArrayList<>();
 		tags.forEach((key, tag)->{
 			if (key.contains(player.getUniqueId().toString())){
@@ -352,7 +407,7 @@ public final class CombatManager {
 	 * @param player player
 	 * @return found tags
 	 */
-	public boolean hasTags(OfflinePlayer player){
+	public synchronized boolean hasTags(OfflinePlayer player){
 		List<String> keys = tags.keySet().stream().filter(key->key.contains(player.getUniqueId().toString())).toList();
 		for (String key : keys){
 			CombatTag tag = this.tags.get(key);
@@ -363,7 +418,7 @@ public final class CombatManager {
 		return false;
 	}
 
-	public boolean hasTags(BlockCombatUser user){
+	public synchronized boolean hasTags(BlockCombatUser user){
 		List<String> keys = tags.keySet().stream().filter(key->key.contains(String.valueOf(user.hashCode()))).toList();
 		for (String key : keys){
 			BlockCombatTag tag = (BlockCombatTag) this.tags.get(key);
@@ -380,7 +435,7 @@ public final class CombatManager {
 	 * @param player2 player 2
 	 * @return id format
 	 */
-	private String toId(OfflinePlayer player, OfflinePlayer player2){
+	private synchronized String toId(OfflinePlayer player, OfflinePlayer player2){
 		return "{"+player.getUniqueId()+"}-{"+player2.getUniqueId()+"}";
 	}
 	/**
@@ -389,7 +444,7 @@ public final class CombatManager {
 	 * @param uuid2 unique id 2
 	 * @return id format
 	 */
-	private String toId(UUID uuid, UUID uuid2){
+	private synchronized String toId(UUID uuid, UUID uuid2){
 		return "{"+uuid+"}-{"+uuid2+"}";
 	}
 
@@ -400,7 +455,7 @@ public final class CombatManager {
 	 * @param block block
 	 * @return id format
 	 */
-	private String toId(OfflinePlayer player, BlockCombatUser block){
+	private synchronized String toId(OfflinePlayer player, BlockCombatUser block){
 		return toId(player.getUniqueId(), block);
 	}
 	/**
@@ -409,11 +464,11 @@ public final class CombatManager {
 	 * @param blockCombatUser combatUser
 	 * @return id format
 	 */
-	private String toId(UUID uuid, BlockCombatUser blockCombatUser){
+	private synchronized String toId(UUID uuid, BlockCombatUser blockCombatUser){
 		return "{"+uuid+"}-{"+blockCombatUser.hashCode()+"}";
 	}
 
-	private String[] splitId(String key) {
+	private synchronized String[] splitId(String key) {
 		key = key.replace("{", "");
 		String[] ids = key.split("}-");
 		ids[0] = ids[0].replace("}", "").replace("{", "");

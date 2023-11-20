@@ -10,6 +10,7 @@ import me.antritus.astral.fluffycombat.api.BlockCombatUser;
 import me.antritus.astral.fluffycombat.api.CombatCause;
 import me.antritus.astral.fluffycombat.api.CombatTag;
 import me.antritus.astral.fluffycombat.api.events.*;
+import me.antritus.astral.fluffycombat.configs.CombatConfig;
 import me.antritus.astral.fluffycombat.manager.BlockUserManager;
 import me.antritus.astral.fluffycombat.manager.CombatManager;
 import org.bukkit.Bukkit;
@@ -80,27 +81,29 @@ public class CombatEnterListener implements Listener {
 			CombatEnterEvent enterEvent = new CombatEnterEvent(fluffy, tag);
 			enterEvent.callEvent();
 		}
-		if (victim.getUniqueId().equals(tag.getVictim().getUniqueId())){
+		if (victim.getUniqueId().equals(tag.getVictim().getUniqueId())) {
 			tag.setVictimCombatCause(combatCause);
 		} else {
 			tag.setAttackerCombatCause(combatCause);
 		}
 		tag.resetTicks();
-		if (attacker.getUniqueId()==tag.getAttacker().getUniqueId()){
+		if (attacker.getUniqueId() == tag.getAttacker().getUniqueId()) {
 			tag.setAttackerWeapon(itemStack);
 		} else {
 			tag.setVictimWeapon(itemStack);
 		}
-		GlowingEntities glowingEntities = fluffy.getGlowingEntities();
-		try {
-			if (attacker instanceof Player aPlayer){
-				glowingEntities.setGlowing(aPlayer, victim, tag.getVictim().getGlowingLatestColorEnum());
-				glowingEntities.setGlowing(victim, aPlayer, tag.getAttacker().getGlowingLatestColorEnum());
+		CombatConfig combatConfig = fluffy.getCombatConfig();
+		if (combatConfig.isCombatGlow() && combatConfig.isCombatGlowLatest()) {
+			GlowingEntities glowingEntities = fluffy.getGlowingEntities();
+			try {
+				if (attacker instanceof Player aPlayer) {
+					glowingEntities.setGlowing(aPlayer, victim, combatConfig.getCombatGlowLatest());
+					glowingEntities.setGlowing(victim, aPlayer, combatConfig.getCombatGlowLatest());
+				}
+			} catch (ReflectiveOperationException e) {
+				throw new RuntimeException(e);
 			}
-		} catch (ReflectiveOperationException e) {
-			throw new RuntimeException(e);
 		}
-
 	}
 	public static void handle(Player victim, Block attacker, CombatCause combatCause) {
 		handle(victim, attacker, combatCause, null);
@@ -122,28 +125,31 @@ public class CombatEnterListener implements Listener {
 	}
 
 	public static void handle(Player victim, BlockCombatUser attacker, CombatCause combatCause, @Nullable ItemStack itemStack) {
-		FluffyCombat combat = FluffyCombat.getPlugin(FluffyCombat.class);
+		FluffyCombat fluffy = FluffyCombat.getPlugin(FluffyCombat.class);
 
-		CombatManager cM = combat.getCombatManager();
-		MessageManager<?, ?, ?> mm = combat.getMessageManager();
+		CombatManager cM = fluffy.getCombatManager();
+		MessageManager<?, ?, ?> mm = fluffy.getMessageManager();
 		if (!cM.hasTags(victim)) {
 			Placeholder[] placeholders = Placeholders.combatPlaceholders(victim, null, combatCause, itemStack).toArray(Placeholder[]::new);
 			mm.message(victim, "combat-enter.victim", placeholders);
 		}
 		CombatTag tag = cM.getTag(victim, attacker);
 		if (tag == null) {
-			tag = combat.getCombatManager().create(victim, attacker);
+			tag = fluffy.getCombatManager().create(victim, attacker);
 		}
 		tag.setVictimCombatCause(combatCause);
 		tag.resetTicks();
-		CombatEnterEvent enterEvent = new CombatEnterEvent(combat, tag);
+		CombatEnterEvent enterEvent = new CombatEnterEvent(fluffy, tag);
 		enterEvent.callEvent();
 
-		GlowingBlocks glowingBlocks = combat.getGlowingBlocks();
-		try {
-			glowingBlocks.setGlowing(attacker.getBlock(), victim, tag.getVictim().getGlowingLatestColorEnum());
-		} catch (ReflectiveOperationException e) {
-			throw new RuntimeException(e);
+		CombatConfig combatConfig = fluffy.getCombatConfig();
+		if (combatConfig.isCombatGlow() && combatConfig.isCombatGlowLatest()) {
+			GlowingBlocks glowingBlocks = fluffy.getGlowingBlocks();
+			try {
+				glowingBlocks.setGlowing(attacker.getBlock(), victim, combatConfig.getCombatGlowLatest());
+			} catch (ReflectiveOperationException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 

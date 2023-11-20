@@ -24,11 +24,13 @@ public class CombatBlockListener implements Listener {
 			return;
 		}
 		blockCombatUser.setAlive(event.isCancelled());
-		GlowingBlocks glowingBlocks = fluffy.getGlowingBlocks();
-		try {
-			glowingBlocks.unsetGlowing(event.getBlock(), event.getPlayer());
-		} catch (ReflectiveOperationException e) {
-			throw new RuntimeException(e);
+		if (fluffy.getCombatConfig().isCombatGlow()) {
+			GlowingBlocks glowingBlocks = fluffy.getGlowingBlocks();
+			try {
+				glowingBlocks.unsetGlowing(event.getBlock(), event.getPlayer());
+			} catch (ReflectiveOperationException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 }

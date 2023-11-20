@@ -12,13 +12,31 @@ database:
     password: "!(#Nus3_B3tt3r_P4ssw0rds!"
 
 glowing:
+  # Use bukkit chat color names for these colors.
+  # Colors must be real glowing colors ex: ChatColor.RED = glowing red.
+  # ChatColor.DARK_RED does not have glowing color
+  # ... google "org.bukkit.ChatColor javadoc"
+  # ... google "minecraft glowing colors site:minecraft.wiki"
+
   # Should any of the glowing be enabled?
   # True/False
   enabled: true
+  regular:
+    # Should all players in your tags glow in x color?
+    enabled: true
+    color: YELLOW
   latest:
-    # True/False
+    # Should the latest-tagged person glow in their own color?
+    # If false, use the color of glowing.regular if it's enabled
     enabled: true
     default-color: RED
+  combat-log:
+    # Should players who left the server (and weren't killed via npc or instant kill)
+    # be glowing to the players who are in tag with given player?
+    enabled: true
+    # The color of a player who joined back and
+    color: BLUE
+
 
 
 hooks:
@@ -99,6 +117,13 @@ combat-log:
     # Configuration for killing the player when they log out.
     # combat-log.action.value = KILL
     kill:
+      # Trigger through totems. Kills the player x times until the player has no totems left
+      # True/False
+      totem-bypass: true
+      # How many totems should the kill count until it stops killing?
+      # -1 = unlimited..._ Suggested value: -1 to keep cheaters from abusing auto totem.
+      totems-to-bypass: -1
+
       # Should the items be dropped when killed?
       # Checks keep inventory flag
       # True/False
@@ -126,21 +151,20 @@ combat-log:
       death:
         # Broadcast the death of the npc
         broadcast: true
+        # Broadcast the death message for the npc?
+        death-message: true
         # check comments on: combat-log.kill.*
         drop-items: true
-        # check comments on: combat-log.kill.*
         drop-experience: false
-        # check comments on: combat-log.kill.*
         keep-experience-percentage: 0.5
-
-  rejoin:
+  join:
     # Send player a private message about combat logging
     # True/False
     player-message: true
     # Broadcast the server that given player had combat logged
     # True/False
     broadcast: true
-
+    # Is the player going to glow when they join back if the combat log is active still?
 
 # Commands which can't be executed without
 # fluffy.commandbypass

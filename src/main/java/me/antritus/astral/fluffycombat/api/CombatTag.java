@@ -46,6 +46,13 @@ public class CombatTag {
 	@Setter
 	@Getter
 	private ItemStack attackerWeapon;
+
+	@Getter
+	@Setter
+	private int victimRejoinTimer;
+	@Getter
+	@Setter
+	private int attackerRejoinTimer;
 	/**
 	 * Creates new instance of the class.
 	 * This should not be initialized outside the combat manager.

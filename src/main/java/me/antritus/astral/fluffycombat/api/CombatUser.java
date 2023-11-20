@@ -1,13 +1,11 @@
 package me.antritus.astral.fluffycombat.api;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import me.antritus.astral.fluffycombat.FluffyCombat;
 import me.antritus.astral.fluffycombat.api.stats.StatisticsField;
 import me.antritus.astral.fluffycombat.database.DatabaseField;
 import net.citizensnpcs.api.npc.NPC;
-import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -104,23 +102,11 @@ public class CombatUser {
 
 	@DatabaseField private boolean showGlowingLatest;
 	@DatabaseField private boolean showGlowingTagged;
-	@Setter(AccessLevel.NONE)
-	@Getter(AccessLevel.NONE)
-	@DatabaseField private String glowingLatestColor;
-	@Setter(AccessLevel.NONE)
-	private ChatColor glowingLatestColorEnum;
-	@Setter(AccessLevel.NONE)
-	@Getter(AccessLevel.NONE)
-	@DatabaseField private String glowingTaggedColor;
-	@Setter(AccessLevel.NONE)
-	private ChatColor glowingTaggedColorEnum;
+	@DatabaseField private boolean showGlowingTagReLogged;
 
-	@Getter
-	@Setter
 	private boolean isOffline = false;
+	private int rejoinTimer = -1;
 
-	@Getter
-	@Setter
 	private NPC npc;
 
 	private final Map<String, Object> data = new LinkedHashMap<>();
@@ -135,25 +121,11 @@ public class CombatUser {
 	public CombatUser(FluffyCombat combat, UUID uniqueId) {
 		this.uniqueId = uniqueId;
 		this.fluffyCombat = combat;
-		setGlowingLatestColor(ChatColor.RED);
-		setGlowingLatestColor(ChatColor.YELLOW);
 	}
 
 	public CombatUser() {
 		this.uniqueId = null;
 		this.fluffyCombat = null;
-		setGlowingLatestColor(ChatColor.RED);
-		setGlowingLatestColor(ChatColor.YELLOW);
-	}
-
-	public void setGlowingLatestColor(ChatColor glowingLatestColorEnum) {
-		this.glowingLatestColorEnum = glowingLatestColorEnum;
-		this.glowingLatestColor = glowingLatestColorEnum.name();
-	}
-
-	public void setGlowingTaggedColor(ChatColor glowingTaggedColorEnum) {
-		this.glowingTaggedColorEnum = glowingTaggedColorEnum;
-		this.glowingTaggedColor = glowingTaggedColorEnum.name();
 	}
 
 	/**
