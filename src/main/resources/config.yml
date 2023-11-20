@@ -29,7 +29,7 @@ glowing:
     # Should the latest-tagged person glow in their own color?
     # If false, use the color of glowing.regular if it's enabled
     enabled: true
-    default-color: RED
+    color: RED
   combat-log:
     # Should players who left the server (and weren't killed via npc or instant kill)
     # be glowing to the players who are in tag with given player?
@@ -97,15 +97,16 @@ combat-log:
       enabled: true
       # The json is custom, so you can create custom messages in dc-gen.astral.bet
       # TODO make the website
+      # action = SPAWN_NPC
       npc:
         # JSON STRING
         spawn: {"type": "EMBED", "title": "You have quit in combat in ASTRAL!", "color": "#b40000", "description": "You have left **astral** in combat. Leaving the server in combat will spawn a NPC at your position and it can be killed! Log back in and defend yourself or risk yourself dying!", "footer": {"footer":  "Astral", "imageURL": "https://cdn.discordapp.com/attachments/1096866323314774028/1147850032956047391/astral.png"}, "timestamp": "%%HH:mm:ss DD:MM:yyyy"}
         death: {"type": "EMBED", "title": "You have quit in combat in ASTRAL!", "color": "#2b0000", "description": "You have left **astral** in combat. Your NPC was killed! Your items have dropped to the ground!", "footer": {"footer":  "Astral", "imageURL": "https://cdn.discordapp.com/attachments/1096866323314774028/1147850032956047391/astral.png"}, "timestamp": "%%HH:mm:ss DD:MM:yyyy"}
         safe: {"type": "EMBED", "title": "You have quit in combat in ASTRAL!", "color": "#13a100", "description": "You have left **astral** in combat. Your NPC was lucky and was not killed in the combat timer!!", "footer": {"footer":  "Astral", "imageURL": "https://cdn.discordapp.com/attachments/1096866323314774028/1147850032956047391/astral.png"}, "timestamp": "%%HH:mm:ss DD:MM:yyyy"}
-      death:
-        # JSON STRING
-        death: {"type": "EMBED", "title": "You have quit in combat in ASTRAL!", "color": "#b20000", "description": "You have left **astral** in combat. You were instantly killed! Next time do not log out in combat!", "footer": {"footer":  "Astral", "imageURL": "https://cdn.discordapp.com/attachments/1096866323314774028/1147850032956047391/astral.png"}, "timestamp": "%%HH:mm:ss DD:MM:yyyy"}
-      # JSON STRING
+
+      # action = Kill
+      death: {"type": "EMBED", "title": "You have quit in combat in ASTRAL!", "color": "#b20000", "description": "You have left **astral** in combat. You were instantly killed! Next time do not log out in combat!", "footer": {"footer":  "Astral", "imageURL": "https://cdn.discordapp.com/attachments/1096866323314774028/1147850032956047391/astral.png"}, "timestamp": "%%HH:mm:ss DD:MM:yyyy"}
+      # action = NOTHING
       none: {"type": "EMBED", "title": "You have quit in combat in ASTRAL!", "color": "#b20000", "description": "You have left **astral** in combat. Remember combat logging is ruining the fun for everyone!", "footer": {"footer":  "Astral", "imageURL": "https://cdn.discordapp.com/attachments/1096866323314774028/1147850032956047391/astral.png"}, "timestamp": "%%HH:mm:ss DD:MM:yyyy"}
     # What should happen when player combat logs?
     # SPAWN_NPC <- Requires citizens
@@ -121,23 +122,24 @@ combat-log:
       # True/False
       totem-bypass: true
       # How many totems should the kill count until it stops killing?
-      # -1 = unlimited..._ Suggested value: -1 to keep cheaters from abusing auto totem.
+      # -1 = unlimited... Suggested value: -1 to keep cheaters from abusing auto totem.
       totems-to-bypass: -1
 
       # Should the items be dropped when killed?
       # Checks keep inventory flag
       # True/False
-      drop-items: true
+      keep-items: true
       # Should the experience be dropped or be saved?
       # True/False
-      drop-experience: false
+      keep-experience: false
       # Percentage amount of experience to keep
       # double (decimal) (OVER 1 = MORE EXPERIENCE)
-      keep-experience-percentage: 0.5
+      # -1 = minecraft system
+      keep-experience-percentage: -1
     # Called when the npc is killed by players
     npc:
       # Give armor of the player to the npc
-      give-armor: true
+      equip-armor: true
       # Does the NPC attack the players that attack the player?
       # TODO needs work and implementation
       attack-others: false
@@ -153,10 +155,11 @@ combat-log:
         broadcast: true
         # Broadcast the death message for the npc?
         death-message: true
-        # check comments on: combat-log.kill.*
+        # check comments on: combat-log.quit.kill.*
         drop-items: true
         drop-experience: false
-        keep-experience-percentage: 0.5
+        # -1 = minecraft system
+        keep-experience-percentage: -1
   join:
     # Send player a private message about combat logging
     # True/False

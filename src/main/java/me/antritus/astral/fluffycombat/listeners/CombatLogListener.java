@@ -34,9 +34,6 @@ public class CombatLogListener implements Listener {
 		boolean logged = fluffy.getCombatLogManager().hasCombatLogged(player); // Automatically deleted
 		if (logged){
 			CombatConfig combatConfig = fluffy.getCombatConfig();
-			if (!combatConfig.isCombatLogRejoinEnabled()){
-				return;
-			}
 			Placeholder[] placeholders = Placeholders.playerPlaceholders("player", player).toArray(Placeholder[]::new);
 			if (combatConfig.isCombatLogRejoinBroadcast())
 				fluffy.getMessageManager().broadcast("combat-log.join.broadcast", placeholders);

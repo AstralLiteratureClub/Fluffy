@@ -50,8 +50,8 @@ public final class Placeholders {
 	public static List<Placeholder> playerPlaceholders(String key, Player player){
 		// TODO add kills & shit
 		List<Placeholder> placeholders = entityPlaceholders(key, player);
-		placeholders.removeIf(placeholder -> placeholder.key().equalsIgnoreCase(key+"_displayname"));
 		// Not sure if it really matters, but whatever
+		placeholders.removeIf(placeholder -> placeholder.key().equalsIgnoreCase(key+"_displayname"));
 		placeholders.add(new Placeholder(key+"_displayname", player.customName() != null ? Objects.requireNonNull(player.customName()) : player.displayName()));
 		return entityPlaceholders(key, player);
 	}

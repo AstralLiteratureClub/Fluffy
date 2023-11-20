@@ -16,7 +16,6 @@ combat:
   end:
     action_bar: "%prefix% <gray>You are no longer in combat! You may now log out!"
     chat: "%prefix% <green>You are no longer in combat!"
-
   log:
     join:
       npc:
