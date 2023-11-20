@@ -1,9 +1,8 @@
 package me.antritus.astral.fluffycombat.configs;
 
 import lombok.Getter;
-import me.antritus.astral.fluffycombat.EnumUtils;
 import me.antritus.astral.fluffycombat.FluffyCombat;
-import net.kyori.adventure.text.format.NamedTextColor;
+import me.antritus.astral.fluffycombat.NamedTextColorUtils;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.potion.PotionEffectType;
@@ -31,24 +30,20 @@ public class CombatConfig {
 	private boolean isCombatLog;
 	private boolean isCombatLogBroadcast;
 	private CombatLogAction combatLogAction;
-
 	private boolean isCombatLogRejoinEnabled;
 	private boolean isCombatLogRejoinBroadcast;
 	private boolean isCombatLogRejoinPrivateMessage;
-
 	private boolean isCombatLogDiscordEnabled;
 	private String combatLogDiscordNPCSpawn;
 	private String combatLogDiscordNPCDeath;
 	private String combatLogDiscordNPCSurvive;
 	private String combatLogDiscordKillMessage;
 	private String combatLogDiscordNoneMessage;
-
 	private boolean isCombatLogKillTotemBypass;
 	private int combatLogKillTotemBypassAmount;
 	private boolean isCombatLogKillKeepItem;
 	private boolean isCombatLogKillKeepExp;
 	private double combatLogKillKeepExpPercentage;
-
 	private boolean isCombatLogNPCArmor;
 	private boolean isCombatLogNPCAttackAI;
 	private boolean isCombatLogNPCKnockback;
@@ -58,15 +53,13 @@ public class CombatConfig {
 	private boolean isCombatLogNPCDeathKeepItems;
 	private boolean isCombatLogNPCDeathKeepExperience;
 	private double combatLogNPCDeathKeepExperiencePercentage;
-
-
 	private boolean isCombatGlow;
 	private boolean isCombatGlowLatest;
 	private boolean isCombatGlowAllTagged;
 	private boolean isCombatGlowCombatLogRejoin;
-	private NamedTextColor combatGlowLatest;
-	private NamedTextColor combatGlowAllTagged;
-	private NamedTextColor combatGlowTagRejoin;
+	private NamedTextColorUtils combatGlowLatest;
+	private NamedTextColorUtils combatGlowAllTagged;
+	private NamedTextColorUtils combatGlowTagRejoin;
 
 
 
@@ -98,13 +91,6 @@ public class CombatConfig {
 	public void reload(@NotNull FileConfiguration configuration){
 		isCustomCooldowns = configuration.getBoolean("cooldowns.enabled", true);
 		isResetCooldownsOnDeath = configuration.getBoolean("cooldowns.reset-on-combat-end", true);
-
-		isCombatLog = configuration.getBoolean("combat-log.enabled", true);
-		combatLogAction = EnumUtils.valueOf(configuration.getString("combat-log.action.value"), CombatLogAction.NOTHING);
-		isCombatLogBroadcast = configuration.getBoolean("combat-log.action.broadcast");
-		isCombatLogRejoinEnabled = configuration.getBoolean("combat-log.rejoin.enabled");
-		isCombatLogRejoinBroadcast = configuration.getBoolean("combat-log.rejoin.broadcast");
-		isCombatLogRejoinPrivateMessage = configuration.getBoolean("combat-log.rejoin.message");
 
 
 		isCommandsDisabled = configuration.getBoolean("commands.combat.enabled", true);

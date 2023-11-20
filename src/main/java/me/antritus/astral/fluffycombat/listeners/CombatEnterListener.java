@@ -97,8 +97,8 @@ public class CombatEnterListener implements Listener {
 			GlowingEntities glowingEntities = fluffy.getGlowingEntities();
 			try {
 				if (attacker instanceof Player aPlayer) {
-					glowingEntities.setGlowing(aPlayer, victim, combatConfig.getCombatGlowLatest());
-					glowingEntities.setGlowing(victim, aPlayer, combatConfig.getCombatGlowLatest());
+					glowingEntities.setGlowing(aPlayer, victim, combatConfig.getCombatGlowLatest().getColor());
+					glowingEntities.setGlowing(victim, aPlayer, combatConfig.getCombatGlowLatest().getColor());
 				}
 			} catch (ReflectiveOperationException e) {
 				throw new RuntimeException(e);
@@ -146,7 +146,7 @@ public class CombatEnterListener implements Listener {
 		if (combatConfig.isCombatGlow() && combatConfig.isCombatGlowLatest()) {
 			GlowingBlocks glowingBlocks = fluffy.getGlowingBlocks();
 			try {
-				glowingBlocks.setGlowing(attacker.getBlock(), victim, combatConfig.getCombatGlowLatest());
+				glowingBlocks.setGlowing(attacker.getBlock(), victim, combatConfig.getCombatGlowLatest().getColor());
 			} catch (ReflectiveOperationException e) {
 				throw new RuntimeException(e);
 			}

@@ -9,8 +9,6 @@ import me.antritus.astral.fluffycombat.configs.CombatConfig;
 import me.antritus.astral.fluffycombat.hooks.CitizensHook;
 import me.antritus.astral.fluffycombat.manager.CombatManager;
 import me.antritus.astral.fluffycombat.manager.UserManager;
-import net.citizensnpcs.api.npc.NPC;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -24,7 +22,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public class CombatLogListener implements Listener {
-	private final MiniMessage miniMessage = MiniMessage.miniMessage();
 	private final FluffyCombat fluffy;
 
 	public CombatLogListener(FluffyCombat fluffy) {
@@ -59,9 +56,6 @@ public class CombatLogListener implements Listener {
 		}
 		CombatManager cM = fluffy.getCombatManager();
 		UserManager uM = fluffy.getUserManager();
-		if (!fluffy.getCombatConfig().isCombatLog()) {
-			return;
-		}
 		if (cM.hasTags(player)) {
 			CombatUser user = uM.getUser(event.getPlayer());
 			CombatLogEvent logEvent = new CombatLogEvent(fluffy, player, cM.getTags(player));
@@ -81,7 +75,6 @@ public class CombatLogListener implements Listener {
 				if (hook == null){
 					return;
 				}
-				NPC npc;
 				hook.spawnNPC(player, player.getLocation(), player.customName() != null ? player.customName() : player.displayName());
 				//TODO
 				return;
@@ -100,7 +93,7 @@ public class CombatLogListener implements Listener {
 		if (FluffyCombat.isStopping){
 			return;
 		}
-		if (!fluffy.getCombatConfig().isCombatLog() || fluffy.getCombatConfig().getCombatLogAction() != CombatConfig.CombatLogAction.KILL) {
+		if (fluffy.getCombatConfig().getCombatLogAction() != CombatConfig.CombatLogAction.KILL) {
 			return;
 		}
 		if (event.getEntity() instanceof Player player){
@@ -125,7 +118,7 @@ public class CombatLogListener implements Listener {
 		if (FluffyCombat.isStopping) {
 			return;
 		}
-		if (!fluffy.getCombatConfig().isCombatLog() || fluffy.getCombatConfig().getCombatLogAction() != CombatConfig.CombatLogAction.KILL) {
+		if (fluffy.getCombatConfig().getCombatLogAction() != CombatConfig.CombatLogAction.KILL) {
 			return;
 		}
 

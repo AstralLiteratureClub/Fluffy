@@ -192,7 +192,7 @@ public final class CombatManager {
 							Block block = blockCombatUser.getBlock();
 							if (victim != null) {
 								try {
-									glowingBlocks.setGlowing(block, victim, config.getCombatGlowLatest());
+									glowingBlocks.setGlowing(block, victim, config.getCombatGlowLatest().getColor());
 								} catch (ReflectiveOperationException e) {
 									throw new RuntimeException(e);
 								}
@@ -204,8 +204,8 @@ public final class CombatManager {
 						if (config.isCombatGlow() && config.isCombatGlowLatest()
 								&& victimOP.isOnline() && attackerOP.isOnline()) {
 							try {
-								glowingEntities.setGlowing(attackerOP.getPlayer(), victimOP.getPlayer(), config.getCombatGlowLatest());
-								glowingEntities.setGlowing(victimOP.getPlayer(), attackerOP.getPlayer(), config.getCombatGlowLatest());
+								glowingEntities.setGlowing(attackerOP.getPlayer(), victimOP.getPlayer(), config.getCombatGlowLatest().getColor());
+								glowingEntities.setGlowing(victimOP.getPlayer(), attackerOP.getPlayer(), config.getCombatGlowLatest().getColor());
 							} catch (ReflectiveOperationException e) {
 								throw new RuntimeException(e);
 							}
@@ -241,17 +241,17 @@ public final class CombatManager {
 		if (tag instanceof BlockCombatTag){
 			Block block = ((BlockCombatUser) tag.getAttacker()).getBlock();
 			try {
-				fluffy.getGlowingBlocks().setGlowing(block, whoSees, fluffy.getCombatConfig().getCombatGlowAllTagged());
+				fluffy.getGlowingBlocks().setGlowing(block, whoSees, fluffy.getCombatConfig().getCombatGlowAllTagged().getColor());
 			} catch (ReflectiveOperationException e) {
 				throw new RuntimeException(e);
 			}
 		} else {
 			OfflinePlayer p = attacker.getPlayer();
 			if (p instanceof Player online) {
-				NamedTextColor color = fluffy.getCombatConfig().getCombatGlowAllTagged();
+				NamedTextColor color = fluffy.getCombatConfig().getCombatGlowAllTagged().getColor();
 				boolean isTimer = attacker.getRejoinTimer() >= 0;
 				if (isTimer && fluffy.getCombatConfig().isCombatGlowCombatLogRejoin()){
-					color = fluffy.getCombatConfig().getCombatGlowTagRejoin();
+					color = fluffy.getCombatConfig().getCombatGlowTagRejoin().getColor();
 				}
 				if (!isTimer && !fluffy.getCombatConfig().isCombatGlowAllTagged()){
 					return;
