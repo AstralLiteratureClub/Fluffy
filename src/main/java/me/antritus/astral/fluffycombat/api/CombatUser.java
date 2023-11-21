@@ -7,6 +7,7 @@ import me.antritus.astral.fluffycombat.api.stats.StatisticsField;
 import me.antritus.astral.fluffycombat.database.DatabaseField;
 import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -103,6 +104,12 @@ public class CombatUser {
 	@DatabaseField private boolean showGlowingLatest;
 	@DatabaseField private boolean showGlowingTagged;
 	@DatabaseField private boolean showGlowingTagReLogged;
+
+	private BukkitTask taskTotemTimer;
+	private BukkitTask taskRejoinTimer;
+
+	private int totemCounter;
+	private int totemResetTimer;
 
 	private boolean isOffline = false;
 	private int rejoinTimer = -1;
