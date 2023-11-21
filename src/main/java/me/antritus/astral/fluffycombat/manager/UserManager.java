@@ -16,28 +16,29 @@ public class UserManager {
 
 	/**
 	 * Creates new instance of user manager.
-	 * @see FluffyCombat#
-	 * @param fluffyCombat the fluffy combat main plugin class instance.
+	 * @see FluffyCombat#getUserManager()
+	 * @param fluffyCombat fluffy
 	 */
 	public UserManager(FluffyCombat fluffyCombat) {
 		this.fluffyCombat = fluffyCombat;
 		fluffyCombat.getServer().getScheduler().runTaskTimerAsynchronously(fluffyCombat,
-				(x)->{
+				(x) -> {
 					List<UUID> removeList = new LinkedList<>();
-					for (CombatUser user : users.values()){
+					for (CombatUser user : users.values()) {
 						// Might be null in testing. Database isn't working atm so this fixes it
 						StatisticDatabase database = fluffyCombat.getStatisticDatabase();
 						if (database != null) {
 							fluffyCombat.getStatisticDatabase().updateDatabase(user);
 						}
-						if (!user.getPlayer().isOnline()){
+						if (!user.getPlayer().isOnline()) {
 							removeList.add(user.getUniqueId());
 						}
 					}
-					for (UUID uuid : removeList){
+					for (UUID uuid : removeList) {
 						users.remove(uuid);
 					}
 				}, 20, 300);
+
 	}
 
 
