@@ -167,7 +167,8 @@ combat-log:
     # Broadcast the server that given player had combat logged
     # True/False
     broadcast: true
-    # Is the player going to glow when they join back if the combat log is active still?
+    # How long does the rejoin period last
+    rejoin-ticks: 50 # 2.5 seconds
 
 # Commands which can't be executed without
 # fluffy.commandbypass

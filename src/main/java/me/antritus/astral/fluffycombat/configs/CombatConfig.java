@@ -30,14 +30,18 @@ public class CombatConfig {
 
 	private boolean isCombatLogBroadcast;
 	private CombatLogAction combatLogAction;
+
 	private boolean isCombatLogRejoinBroadcast;
 	private boolean isCombatLogRejoinPrivateMessage;
+	private int combatLogRejoinTicks;
+
 	private boolean isCombatLogDiscordEnabled;
 	private String combatLogDiscordNPCSpawn;
 	private String combatLogDiscordNPCDeath;
 	private String combatLogDiscordNPCSurvive;
 	private String combatLogDiscordKillMessage;
 	private String combatLogDiscordNoneMessage;
+
 	private boolean isCombatLogKillTotemBypass;
 	private int combatLogKillTotemBypassAmount;
 	private boolean isCombatLogKillKeepItem;
@@ -53,6 +57,7 @@ public class CombatConfig {
 	private boolean isCombatLogNPCDeathKeepItems;
 	private boolean isCombatLogNPCDeathKeepExperience;
 	private double combatLogNPCDeathKeepExperiencePercentage;
+
 	private boolean isCombatGlow;
 	private boolean isCombatGlowLatest;
 	private boolean isCombatGlowAllTagged;
@@ -88,8 +93,10 @@ public class CombatConfig {
 
 
 		combatLogAction = EnumUtils.valueOf(configuration.getString("combat-log.quit.action"), CombatLogAction.NOTHING);
+
 		isCombatLogRejoinBroadcast = configuration.getBoolean("combat-log.join.broadcast");
 		isCombatLogRejoinPrivateMessage = configuration.getBoolean("combat-log.join.player-message");
+		combatLogRejoinTicks = configuration.getInt("combat-log.join.rejoin-ticks");
 
 		isCombatLogBroadcast = configuration.getBoolean("combat-log.quit.broadcast");
 
