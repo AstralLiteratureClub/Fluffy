@@ -9,11 +9,15 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 
-public class CombatBlockListener implements Listener {
+public class BlockBreakListener implements Listener {
 	private final FluffyCombat fluffy;
 
-	public CombatBlockListener(FluffyCombat fluffyCombat) {
+	public BlockBreakListener(FluffyCombat fluffyCombat) {
 		this.fluffy = fluffyCombat;
+	}
+
+	public void onBlockExplodeEvent(){
+
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

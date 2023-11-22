@@ -19,11 +19,11 @@ import org.bukkit.inventory.ItemStack;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ElytraListener implements Listener {
+public class ElytraWhileInCombatListener implements Listener {
 	private final Map<Player, ItemStack> elytras = new HashMap<>();
 	private final FluffyCombat fluffy;
 
-	public ElytraListener(FluffyCombat fluffy) {
+	public ElytraWhileInCombatListener(FluffyCombat fluffy) {
 		this.fluffy = fluffy;
 	}
 

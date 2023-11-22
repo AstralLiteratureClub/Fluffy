@@ -21,10 +21,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class CombatLogListener implements Listener {
+public class PlayerExitWhileInCombatListener implements Listener {
 	private final FluffyCombat fluffy;
 
-	public CombatLogListener(FluffyCombat fluffy) {
+	public PlayerExitWhileInCombatListener(FluffyCombat fluffy) {
 		this.fluffy = fluffy;
 	}
 
@@ -90,6 +90,9 @@ public class CombatLogListener implements Listener {
 		if (FluffyCombat.isStopping){
 			return;
 		}
+		if (!fluffy.getCombatConfig().isCombatLogKillTotemBypass()){
+			event.setCancelled(true);
+		}
 		if (fluffy.getCombatConfig().getCombatLogAction() != CombatConfig.CombatLogAction.KILL) {
 			return;
 		}
@@ -100,6 +103,12 @@ public class CombatLogListener implements Listener {
 			UserManager uM = fluffy.getUserManager();
 			CombatUser user = uM.getUser(player.getUniqueId());
 			assert user != null;
+			if (user.getTotemCounter() == 0){
+				event.setCancelled(true);
+			}
+			if (user.getTotemCounter()>-1){
+				user.setTotemCounter(user.getTotemCounter());
+			}
 			Object property = user.get("logged");
 			if (property != null){
 				if (property instanceof Boolean && (boolean) property) {
@@ -130,6 +139,11 @@ public class CombatLogListener implements Listener {
 		if (property != null) {
 			if (property instanceof Boolean && (boolean) property) {
 				user.setting("logged", false);
+				CombatConfig config = fluffy.getCombatConfig();
+				if (!config.isCombatLogKillKeepExp())
+					event.setKeepLevel(false);
+				if (!config.isCombatLogKillKeepItem())
+					event.setKeepInventory(false);
 			}
 		}
 	}

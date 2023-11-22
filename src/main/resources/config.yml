@@ -118,7 +118,9 @@ combat-log:
     # Configuration for killing the player when they log out.
     # combat-log.action.value = KILL
     kill:
-      # Trigger through totems. Kills the player x times until the player has no totems left
+      # Trigger through totems. Kills the player x times until the player has no totems left.
+      # True = allows totems and doesn't kill the player 2nd time
+      # False = kills the player until the totems are no longer activated to protect the death
       # True/False
       totem-bypass: true
       # How many totems should the kill count until it stops killing?
@@ -132,10 +134,7 @@ combat-log:
       # Should the experience be dropped or be saved?
       # True/False
       keep-experience: false
-      # Percentage amount of experience to keep
-      # double (decimal) (OVER 1 = MORE EXPERIENCE)
-      # -1 = minecraft system
-      keep-experience-percentage: -1
+
     # Called when the npc is killed by players
     npc:
       # Give armor of the player to the npc
@@ -158,8 +157,6 @@ combat-log:
         # check comments on: combat-log.quit.kill.*
         drop-items: true
         drop-experience: false
-        # -1 = minecraft system
-        keep-experience-percentage: -1
   join:
     # Send player a private message about combat logging
     # True/False

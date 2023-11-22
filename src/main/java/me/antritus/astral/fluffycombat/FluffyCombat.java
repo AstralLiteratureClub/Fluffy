@@ -172,15 +172,15 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		new CMDDebug(this).registerCommand();
 		new CMDReload(this).registerCommand();
 		new CMDPotions(this).registerCommand();
-		registerListeners(new CombatEnterListener(this));
-		registerListeners(new CombatEndListener(this));
-		registerListeners(new CombatLogListener(this));
+		registerListeners(new PlayerBeginCombatListener(this));
+		registerListeners(new PlayerCombatEndListener(this));
+		registerListeners(new PlayerExitWhileInCombatListener(this));
 		registerListeners(new PlayerJoinListener(this));
 		registerListeners(this);
-		registerListeners(new DeathListener(this));
+		registerListeners(new DeathWhileInCombatListener(this));
 		registerListeners(cooldownManager);
-		registerListeners(new TridentListener(this));
-		registerListeners(new ElytraListener(this));
+		registerListeners(new TridentWhileInCombatListener(this));
+		registerListeners(new ElytraWhileInCombatListener(this));
 		if (Compatibility.RESPAWN_ANCHOR.isCompatible())
 			anchorDetection = new AnchorDetection(this);
 		if (Compatibility.ENDER_CRYSTAL.isCompatible())

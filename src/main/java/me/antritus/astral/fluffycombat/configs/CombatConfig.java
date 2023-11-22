@@ -46,7 +46,6 @@ public class CombatConfig {
 	private int combatLogKillTotemBypassAmount;
 	private boolean isCombatLogKillKeepItem;
 	private boolean isCombatLogKillKeepExp;
-	private double combatLogKillKeepExpPercentage;
 
 	private boolean isCombatLogNPCArmor;
 	private boolean isCombatLogNPCAttackAI;
@@ -56,7 +55,6 @@ public class CombatConfig {
 	private boolean isCombatLogNPCDeathUseMessage;
 	private boolean isCombatLogNPCDeathKeepItems;
 	private boolean isCombatLogNPCDeathKeepExperience;
-	private double combatLogNPCDeathKeepExperiencePercentage;
 
 	private boolean isCombatGlow;
 	private boolean isCombatGlowLatest;
@@ -111,7 +109,6 @@ public class CombatConfig {
 		combatLogKillTotemBypassAmount = configuration.getInt("combat-log.quit.kill.totems-to-bypass");
 		isCombatLogKillKeepItem = configuration.getBoolean("combat-log.quit.kill.keep-items");
 		isCombatLogKillKeepExp = configuration.getBoolean("combat-log.quit.kill.keep-experience");
-		combatLogKillKeepExpPercentage = configuration.getDouble("combat-log.quit.kill.keep-experience-percentage");
 
 		isCombatLogNPCArmor = configuration.getBoolean("combat-log.quit.npc.equip-armor");
 		isCombatLogNPCAttackAI = configuration.getBoolean("combat-log.quit.npc.attack-others");
@@ -121,7 +118,6 @@ public class CombatConfig {
 		isCombatLogNPCDeathUseMessage = configuration.getBoolean("combat-log.quit.npc.death.death-message");
 		isCombatLogNPCDeathKeepItems = configuration.getBoolean("combat-log.quit.npc.death.keep-items");
 		isCombatLogNPCDeathKeepExperience = configuration.getBoolean("combat-log.quit.npc.death.keep-experience");
-		combatLogNPCDeathKeepExperiencePercentage = configuration.getDouble("combat-log.quit.npc.death.keep-experience-percentage");
 
 		isCombatGlow = configuration.getBoolean("glowing.enabled");
 		isCombatGlowLatest = configuration.getBoolean("glowing.latest.enabled");

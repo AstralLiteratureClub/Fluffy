@@ -38,10 +38,10 @@ import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.*;
  * @since 1.0-SNAPSHOT
  */
 @SuppressWarnings("removal")
-public class CombatEnterListener implements Listener {
+public class PlayerBeginCombatListener implements Listener {
 	private final FluffyCombat combat;
 
-	public CombatEnterListener(FluffyCombat combat) {
+	public PlayerBeginCombatListener(FluffyCombat combat) {
 		this.combat = combat;
 	}
 

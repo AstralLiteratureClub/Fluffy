@@ -13,10 +13,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-public class CombatEndListener implements Listener {
+public class PlayerGlowDisableListener implements Listener {
 	private final FluffyCombat fluffy;
 
-	public CombatEndListener(FluffyCombat fluffy) {
+	public PlayerGlowDisableListener(FluffyCombat fluffy) {
 		this.fluffy = fluffy;
 	}
 

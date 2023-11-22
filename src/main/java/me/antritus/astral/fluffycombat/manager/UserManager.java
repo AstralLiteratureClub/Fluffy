@@ -38,7 +38,6 @@ public class UserManager {
 						users.remove(uuid);
 					}
 				}, 20, 300);
-
 	}
 
 

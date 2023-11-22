@@ -2,10 +2,7 @@ package me.antritus.astral.fluffycombat.hitdetection;
 
 import me.antritus.astral.fluffycombat.FluffyCombat;
 import me.antritus.astral.fluffycombat.api.events.EntityDamageEntityByEnderCrystalEvent;
-import org.bukkit.entity.EnderCrystal;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Projectile;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -17,7 +14,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CrystalDetection implements Listener {
-	public final Map<EnderCrystal, Entity> detectionMap = new HashMap<>();
+
+	public final Map<EnderCrystal, CrystalTag> detectionMap = new HashMap<>();
 	public final Map<EnderCrystal, ItemStack> itemMap = new HashMap<>();
 	private final FluffyCombat fluffy;
 
@@ -31,6 +29,7 @@ public class CrystalDetection implements Listener {
 		if (!(event.getEntity() instanceof EnderCrystal enderCrystal)){
 			return;
 		}
+
 		detectionMap.put(enderCrystal, event.getDamager());
 		if (event.getEntity() instanceof LivingEntity entity){
 			if (entity.getEquipment() != null) {
@@ -80,5 +79,8 @@ public class CrystalDetection implements Listener {
 
 	public FluffyCombat fluffy() {
 		return fluffy;
+	}
+
+	public record CrystalTag(EnderCrystal crystal, Player player, ItemStack itemStack) {
 	}
 }

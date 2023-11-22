@@ -9,9 +9,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
-public class CommandListener implements Listener {
+public class CommandWhileInCombatListener implements Listener {
 	private final FluffyCombat fluffy;
-	public CommandListener(FluffyCombat fluffy){
+	public CommandWhileInCombatListener(FluffyCombat fluffy){
 		this.fluffy = fluffy;
 	}
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

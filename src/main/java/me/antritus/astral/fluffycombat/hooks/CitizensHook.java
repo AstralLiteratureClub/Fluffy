@@ -3,6 +3,7 @@ package me.antritus.astral.fluffycombat.hooks;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
 import me.antritus.astral.fluffycombat.FluffyCombat;
+import me.antritus.astral.fluffycombat.hooks.citizens.CombatTrait;
 import net.citizensnpcs.Citizens;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.event.DespawnReason;
@@ -74,6 +75,8 @@ public class CitizensHook implements Hook, Listener {
 				signatures = profileProperty.getSignature();
 			}
 		}
+		npc.addTrait(new CombatTrait(fluffyCombat.getUserManager().getUser(player)));
+
 		npc.getOrAddTrait(SkinTrait.class).setTexture(textures, signatures);
 
 		PlayerInventory playerInventory = player.getInventory();

@@ -10,9 +10,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerRiptideEvent;
 import org.bukkit.util.Vector;
 
-public class TridentListener implements Listener {
+public class TridentWhileInCombatListener implements Listener {
 	private final FluffyCombat fluffy;
-	public TridentListener(FluffyCombat fluffy){
+	public TridentWhileInCombatListener(FluffyCombat fluffy){
 		this.fluffy = fluffy;
 	}
 

@@ -11,9 +11,9 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 
 import java.util.List;
 
-public class DeathListener implements Listener {
+public class DeathWhileInCombatListener implements Listener {
 	private final FluffyCombat fluffy;
-	public DeathListener(FluffyCombat fluffy){
+	public DeathWhileInCombatListener(FluffyCombat fluffy){
 		this.fluffy = fluffy;
 	}
 
