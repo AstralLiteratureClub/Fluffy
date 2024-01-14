@@ -5,6 +5,8 @@ plugins {
     //NMS
     id("io.papermc.paperweight.userdev") version "1.5.6"
 
+    id 'maven-publish'
+
     //LOMBOK
     id 'io.freefair.lombok' version '5.1.0'
 }
@@ -105,4 +107,13 @@ processResources {
 }
 
 configurations {
+}
+
+publishing {
+    publications {
+        //noinspection GroovyAssignabilityCheck
+        maven(MavenPublication) {
+            from(components.java)
+        }
+    }
 }
