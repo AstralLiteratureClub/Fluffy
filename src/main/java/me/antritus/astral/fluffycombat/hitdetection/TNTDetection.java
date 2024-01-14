@@ -157,7 +157,7 @@ public class TNTDetection implements Listener {
 				return tntDetection.tntOwners.get(tnt);
 			} else if (entity instanceof EnderCrystal enderCrystal && Compatibility.ENDER_CRYSTAL.isCompatible()) {
 				CrystalDetection crystalDetect = fluffy.getCrystalDetection();
-				Entity detected = crystalDetect.detectionMap.get(enderCrystal);
+				CrystalDetection.CrystalTag detected = crystalDetect.detectionMap.get(enderCrystal);
 				if (detected == null) {
 					Map<UUID, UUID> owners = fluffy.getTntDetection().crystalOwners;
 					UUID owner = owners.get(entity.getUniqueId());
@@ -174,13 +174,13 @@ public class TNTDetection implements Listener {
 					}
 					return null;
 				}
-				if (detected instanceof Projectile projectile) {
+				if (detected.entity() instanceof Projectile projectile) {
 					if (projectile.getShooter() instanceof BlockProjectileSource) {
 						return null;
 					}
 					return projectile.getShooter();
 				}
-				return detected;
+				return detected.entity();
 			}
 		}
 		return null;
@@ -253,8 +253,8 @@ public class TNTDetection implements Listener {
 				if (Compatibility.RESPAWN_ANCHOR.isCompatible()){
 					if (block.getBlockData() instanceof RespawnAnchor) {
 						AnchorDetection anchorDetection = fluffy.getAnchorDetection();
-						UUID owner = anchorDetection.attackers.get(mid);
-						anchorOwners.put(tnt, owner);
+						AnchorDetection.AnchorTag owner = anchorDetection.detectionMap.get(mid);
+						anchorOwners.put(tnt, owner.owner().getUniqueId());
 						fluffy.getServer().getAsyncScheduler().runDelayed(fluffy,
 								scheduledTask -> {
 									anchorOwners.remove(tnt);
@@ -264,8 +264,8 @@ public class TNTDetection implements Listener {
 					if (block.getBlockData() instanceof Bed) {
 						blockPrimers.put(mid, block);
 						BedDetection bedDetection = fluffy.getBedDetection();
-						UUID owner = bedDetection.detectionMap.get(mid);
-						bedOwners.put(tnt, owner);
+						BedDetection.BedTag owner = bedDetection.detectionMap.get(mid);
+						bedOwners.put(tnt, owner.owner().getUniqueId());
 						fluffy.getServer().getAsyncScheduler().runDelayed(fluffy,
 								scheduledTask -> {
 									bedOwners.remove(tnt);
@@ -292,8 +292,8 @@ public class TNTDetection implements Listener {
 					tntOwners.remove(tnt);
 				}, 5, TimeUnit.SECONDS);
 			} else if (entity instanceof EnderCrystal crystal){
-				Entity owner = crystalDetection.detectionMap.get(crystal);
-				crystalOwners.put(entity.getUniqueId(), owner.getUniqueId());
+				CrystalDetection.CrystalTag owner = crystalDetection.detectionMap.get(crystal);
+				crystalOwners.put(entity.getUniqueId(), owner.entity().getUniqueId());
 				UUID id = entity.getUniqueId();
 				fluffy.getServer().getAsyncScheduler().runDelayed(fluffy,
 						scheduledTask -> {

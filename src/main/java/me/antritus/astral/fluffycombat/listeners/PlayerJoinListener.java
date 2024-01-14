@@ -19,7 +19,7 @@ public class PlayerJoinListener implements Listener {
 
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void onJoin(@NotNull PlayerJoinEvent event){
-		fluffy.getUserManager().onJoin(event.getPlayer());
+		fluffy.getUserManager().load(event.getPlayer());
 		CombatUser user = fluffy.getUserManager().getUser(event.getPlayer());
 		CombatConfig config = fluffy.getCombatConfig();
 		int rejoinTicks = config.getCombatLogRejoinTicks();

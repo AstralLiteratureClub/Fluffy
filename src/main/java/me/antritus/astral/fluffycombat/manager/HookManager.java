@@ -1,11 +1,10 @@
 package me.antritus.astral.fluffycombat.manager;
 
+import lombok.Getter;
 import me.antritus.astral.fluffycombat.FluffyCombat;
-import me.antritus.astral.fluffycombat.hooks.CitizensHook;
-import me.antritus.astral.fluffycombat.hooks.Hook;
-import me.antritus.astral.fluffycombat.hooks.HookState;
-import me.antritus.astral.fluffycombat.hooks.WormholeHook;
+import me.antritus.astral.fluffycombat.hooks.*;
 import me.antritus.minecraft_server.wormhole.Wormhole;
+import me.clip.placeholderapi.PlaceholderAPIPlugin;
 import net.citizensnpcs.Citizens;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -18,11 +17,13 @@ import java.util.Map;
 
 public class HookManager {
 	private final Map<String, Hook> hookMap = new LinkedHashMap<>();
+	@Getter
 	private final FluffyCombat fluffyCombat;
 	public HookManager(FluffyCombat fluffyCombat){
 		this.fluffyCombat = fluffyCombat;
 		hookWormhole();
 		hookCitizens();
+		hookPlaceholderAPI();
 	}
 
 
@@ -38,16 +39,24 @@ public class HookManager {
 			hook("wormhole", Wormhole.class, WormholeHook.class);
 		} catch (ClassNotFoundException ignore) {}
 	}
+	private void hookPlaceholderAPI() {
+		try {
+			Class.forName("me.clip.placeholderapi.PlaceholderAPI");
+			hook("placeholderapi", PlaceholderAPIPlugin.class, PlaceholderAPIHook.class);
+		} catch (ClassNotFoundException ignore) {}
+	}
+
+
 
 	private <T extends JavaPlugin> void hook(@NotNull String name, @NotNull Class<T> clazz, @NotNull Class<? extends Hook> hookClass) throws ClassNotFoundException {
 		JavaPlugin javaPlugin = (JavaPlugin) getFluffyCombat().getServer().getPluginManager().getPlugin(name);
 		HookState state;
 		if (javaPlugin==null){
-			state=HookState.UNKNOWN;
+			state=HookState.HOOK_NOT_FOUND;
 		} else if (!javaPlugin.isEnabled()){
 			state=HookState.UNKNOWN;
 		} else {
-			if (getFluffyCombat().getConfig().getBoolean("hooks.wormhole.hook", false)){
+			if (getFluffyCombat().getConfig().getBoolean("hooks."+name+".enabled", false)){
 				state=HookState.HOOKED;
 			}else{
 				state=HookState.NOT_HOOKED;
@@ -68,7 +77,4 @@ public class HookManager {
 		return hookMap.get(name);
 	}
 
-	public FluffyCombat getFluffyCombat() {
-		return fluffyCombat;
-	}
 }

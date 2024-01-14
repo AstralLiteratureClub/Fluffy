@@ -61,20 +61,22 @@ public class ExplosionDeathMessageListener implements DeathListener {
 						if (material.name().endsWith("_BED")) {
 							String name = material.name().toLowerCase();
 							BedDetection bedDetection = fluffy.getBedDetection();
-							owner = bedDetection.detectionMap.get(state.getLocation().toBlockLocation());
-							if (owner == null){
+							BedDetection.BedTag bedTag = bedDetection.detectionMap.get(state.getLocation().toBlockLocation());
+							if (bedTag == null){
 								messageKey = "deaths.block_explosion.random." + name;
 							} else {
+								owner = bedTag.owner().getUniqueId();
 								messageKey = "deaths.block_explosion.combat." + name;
 								attacker = fluffy.getServer().getOfflinePlayer(owner);
 							}
 						} else if (material == Material.RESPAWN_ANCHOR) {
 							AnchorDetection anchorDetection = fluffy.getAnchorDetection();
-							owner = anchorDetection.attackers.get(state.getLocation().toBlockLocation());
-							if (owner == null){
+							AnchorDetection.AnchorTag anchorTag = anchorDetection.detectionMap.get(state.getLocation().toBlockLocation());
+							if (anchorTag == null){
 								messageKey = "deaths.block_explosion.random.respawn_anchor";
 							} else {
 								messageKey = "deaths.block_explosion.combat.respawn_anchor";
+								owner = anchorTag.owner().getUniqueId();
 								attacker = fluffy.getServer().getOfflinePlayer(owner);
 							}
 						} else {

@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.projectiles.BlockProjectileSource;
 
@@ -16,7 +17,6 @@ import java.util.Map;
 public class CrystalDetection implements Listener {
 
 	public final Map<EnderCrystal, CrystalTag> detectionMap = new HashMap<>();
-	public final Map<EnderCrystal, ItemStack> itemMap = new HashMap<>();
 	private final FluffyCombat fluffy;
 
 	public CrystalDetection(FluffyCombat fluffy) {
@@ -29,20 +29,24 @@ public class CrystalDetection implements Listener {
 		if (!(event.getEntity() instanceof EnderCrystal enderCrystal)){
 			return;
 		}
-
-		detectionMap.put(enderCrystal, event.getDamager());
-		if (event.getEntity() instanceof LivingEntity entity){
-			if (entity.getEquipment() != null) {
-				ItemStack itemStack = entity.getEquipment().getItemInMainHand();
-				itemMap.put(enderCrystal, itemStack);
+		if (event.getEntity() instanceof Player player){
+			ItemStack itemStack = player.getInventory().getItemInMainHand();
+			CrystalTag crystalTag = new CrystalTag(enderCrystal, player, itemStack);
+			detectionMap.put(enderCrystal, crystalTag);
+		} else {
+			Entity entity = event.getDamager();
+			ItemStack itemStack = null;
+			if (entity instanceof LivingEntity){
+				EntityEquipment entityEquipment = ((LivingEntity) entity).getEquipment();
+				if (entityEquipment != null){
+					itemStack = entityEquipment.getItemInMainHand();
+				}
 			}
+			CrystalTag crystalTag = new CrystalTag(enderCrystal, entity, itemStack);
+			detectionMap.put(enderCrystal, crystalTag);
 		}
-		fluffy.getServer().getScheduler().runTaskLaterAsynchronously(fluffy, new Runnable() {
-			@Override
-			public void run() {
-				detectionMap.remove(enderCrystal);
-				itemMap.remove(enderCrystal);
-			}
+		fluffy.getServer().getScheduler().runTaskLaterAsynchronously(fluffy, () -> {
+			detectionMap.remove(enderCrystal);
 		}, 3);
 	}
 
@@ -51,13 +55,14 @@ public class CrystalDetection implements Listener {
 		if (!(event.getDamager() instanceof EnderCrystal crystal)){
 			return;
 		}
-		Entity entity = detectionMap.get(crystal);
-		detectionMap.remove(crystal);
-		if (entity == null) {
+		CrystalTag tag = detectionMap.get(crystal);
+		if (tag == null) {
 			return;
 		}
+		detectionMap.remove(crystal);
+		Entity entity = tag.entity;
 		if (entity instanceof Projectile projectile){
-			if (projectile.getShooter() instanceof BlockProjectileSource blockProjectileSource){
+			if (projectile.getShooter() instanceof BlockProjectileSource){
 				return;
 			}
 			entity = (Entity) projectile.getShooter();
@@ -69,7 +74,7 @@ public class CrystalDetection implements Listener {
 				event.getEntity(),
 				entity,
 				crystal,
-				event.getFinalDamage(), itemMap.get(crystal)
+				event.getFinalDamage(), tag.itemStack
 		);
 		enderCrystalEvent.callEvent();
 		if (enderCrystalEvent.isCancelled()){
@@ -81,6 +86,6 @@ public class CrystalDetection implements Listener {
 		return fluffy;
 	}
 
-	public record CrystalTag(EnderCrystal crystal, Player player, ItemStack itemStack) {
+	public record CrystalTag(EnderCrystal crystal, Entity entity, ItemStack itemStack) {
 	}
 }

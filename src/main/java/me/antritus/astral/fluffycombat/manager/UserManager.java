@@ -4,6 +4,7 @@ import me.antritus.astral.fluffycombat.FluffyCombat;
 import me.antritus.astral.fluffycombat.api.CombatUser;
 import me.antritus.astral.fluffycombat.database.StatisticDatabase;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -84,7 +85,7 @@ public class UserManager {
 	 * Triggered when player joins the server
 	 * @param player player
 	 */
-	public void onJoin(Player player) {
+	public void load(OfflinePlayer player) {
 		if (users.get(player.getUniqueId()) == null){
 			fluffyCombat.getServer().getAsyncScheduler().runNow(fluffyCombat, (x)->{
 				StatisticDatabase database = fluffyCombat.getStatisticDatabase();
@@ -103,7 +104,7 @@ public class UserManager {
 	 * Triggered when plugin starts
 	 */
 	public void onEnable() {
-		Bukkit.getOnlinePlayers().forEach(this::onJoin);
+		Bukkit.getOnlinePlayers().forEach(this::load);
 	}
 
 	/**

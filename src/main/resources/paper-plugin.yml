@@ -11,6 +11,10 @@ dependencies:
       required: false
       join-classpath: true
     Wormhole:
-      load: AFTER
+      load: BEFORE
+      required: false
+      join-classpath: true
+    PlaceholderAPI:
+      load: BEFORE
       required: false
       join-classpath: true

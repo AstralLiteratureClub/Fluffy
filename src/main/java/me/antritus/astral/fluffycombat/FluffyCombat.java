@@ -43,7 +43,6 @@ import java.util.*;
 
 
 @Getter
-@SuppressWarnings("removal")
 public class FluffyCombat extends JavaPlugin implements Listener {
 	@Getter(AccessLevel.NONE)
 	private static final MiniMessage miniMessage = MiniMessage.miniMessage();
@@ -173,7 +172,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		new CMDReload(this).registerCommand();
 		new CMDPotions(this).registerCommand();
 		registerListeners(new PlayerBeginCombatListener(this));
-		registerListeners(new PlayerCombatEndListener(this));
+		registerListeners(new PlayerGlowDisableListener(this));
 		registerListeners(new PlayerExitWhileInCombatListener(this));
 		registerListeners(new PlayerJoinListener(this));
 		registerListeners(this);
@@ -213,7 +212,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 	public void onChunkLoad(ChunkLoadEvent event) {
 		clearIncorrectBlockData(event.getChunk());
 	}
-	@EventHandler
+//	@EventHandler
 	public void onBlockPlace(EntityChangeBlockEvent event){
 		if (event.getEntity() instanceof FallingBlock fallingBlock){
 			getServer().broadcastMessage("BEFORE: ! " + event.getBlock().getType());
@@ -221,7 +220,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		}
 	}
 
-	@EventHandler
+//	@EventHandler
 	public void onDamage(EntityDamageEvent event){
 		if (event.getCause()== EntityDamageEvent.DamageCause.LAVA){
 			event.getEntity().sendMessage("LAVA!");

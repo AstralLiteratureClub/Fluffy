@@ -43,7 +43,7 @@ hooks:
   # Wormhole Teleport plugin
   wormhole:
     # True/False
-    enabled: true
+    enabled: false
     # What kind of action in wormhole should be disabled in combat
     disable-effects:
       # /tpa
@@ -60,6 +60,13 @@ hooks:
         # /tpaccept // /tpaccept to [name]
         # True/False
         to: true
+  citizens:
+    # True/False
+    enabled: false
+  placeholderapi:
+    # True/False
+    enabled: true
+
 
 elytra:
   # Denies use of elytra in combat

@@ -59,13 +59,15 @@ public class VoidListener implements Listener {
 			Entity entity = entityDamageEvent.getDamager();
 			if (entity instanceof EnderCrystal crystal){
 				CrystalDetection detection = fluffy.getCrystalDetection();
-				Entity owner = detection.detectionMap.get(crystal);
+				CrystalDetection.CrystalTag tag = detection.detectionMap.get(crystal);
+				Entity owner = tag.entity();
 				OfflinePlayer player = null;
 				while (!(owner instanceof Player)){
 					if (owner instanceof Projectile projectile){
 						owner = (Entity) projectile.getShooter();
 					} else if (owner instanceof EnderCrystal enderCrystal) {
-						owner = detection.detectionMap.get(enderCrystal);
+						CrystalDetection.CrystalTag crystalTag = detection.detectionMap.get(enderCrystal);
+						owner = crystalTag.entity();
 					} else if (owner instanceof TNTPrimed tntPrimed){
 						UUID ownerId = null;
 						owner = fluffy.getTntDetection().tntOwners.get(tntPrimed);

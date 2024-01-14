@@ -1,7 +1,9 @@
 package me.antritus.astral.fluffycombat;
 
+import lombok.Getter;
 import net.kyori.adventure.text.format.NamedTextColor;
 
+@Getter
 public enum NamedTextColorUtils {
 	BLACK(NamedTextColor.BLACK, '0'),
 	DARK_BLUE(NamedTextColor.DARK_BLUE, '1'),
@@ -26,14 +28,6 @@ public enum NamedTextColorUtils {
 	NamedTextColorUtils(NamedTextColor color, char bukkitChar) {
 		this.color = color;
 		this.bukkitChar = bukkitChar;
-	}
-
-	public NamedTextColor getColor() {
-		return color;
-	}
-
-	public char getBukkitChar() {
-		return bukkitChar;
 	}
 
 	public static NamedTextColorUtils getByChar(char bukkitChar) {

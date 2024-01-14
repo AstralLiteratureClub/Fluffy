@@ -19,8 +19,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
+@Getter
 public class FireDetection implements Listener {
-	@Getter
 	private final FluffyCombat fluffy;
 	public FireDetection(FluffyCombat fluffyCombat){
 		this.fluffy = fluffyCombat;
