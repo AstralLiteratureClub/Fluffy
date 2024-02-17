@@ -21,9 +21,9 @@ Fluffy tracks few explosion specific kills and totems (and ofcourse kills, death
 
 ### Explosions
 - Respawn Anchor kills
-- Void Kills
 - Ender Crystal kills
 - Bed kills
+- TNT kills
 
 ### Global
 - Total kills
@@ -34,6 +34,9 @@ Fluffy tracks few explosion specific kills and totems (and ofcourse kills, death
 ### Totems
 - Totem of Undying Resurrections (amount of totems used)
 - Totems of Undying kills (activited other player's totem)
+
+## Other
+- Void Kills
 
 # Glowing
 Fluffy allows players to glow when they are tagged. Players by default will glow red, if the player is latest in combat tag list. Other players will glow orange (which have combat tag with the player).
