@@ -28,8 +28,7 @@ repositories {
 
 dependencies {
     // MESSAGE MANAGER
-    implementation 'bet.astral:MessageManager:1.1'
-    implementation 'bet.astral:Auth:1.0'
+    implementation 'bet.astral:Messenger:1.5.1'
 
     // LOMBOK
     implementation 'org.projectlombok:lombok:1.18.26'
@@ -39,7 +38,7 @@ dependencies {
     compileOnly 'net.dv8tion:JDA:5.0.0-beta.10'
 
     // GLOWING
-    implementation 'io.github.skytasul:glowingentities-paper:1.3.1'
+    implementation 'io.github.skytasul:glowingentities:1.3.2'
 
     // CITIZENS / NPCS
     compileOnly('net.citizensnpcs:citizens-main:2.0.30-SNAPSHOT') {
