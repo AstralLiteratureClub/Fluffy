@@ -67,7 +67,7 @@ shadowJar {
     archiveClassifier = null
 
     relocate 'bet.astral.messenger', 'bet.astral.fluffy.libs.messenger'
-    relocate 'io.github.skytasul', 'bet.astral.fluffy.libs.io.github.skytasul'
+    relocate 'fr.skytasul.glowingentities', 'bet.astral.fluffy.libs.fr.skytasul.glowingentities'
 }
 
 tasks.assemble {
