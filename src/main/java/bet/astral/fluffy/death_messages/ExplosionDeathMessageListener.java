@@ -8,7 +8,6 @@ import bet.astral.messagemanager.MessageManager;
 import bet.astral.fluffy.messenger.Placeholders;
 import bet.astral.messagemanager.placeholder.Placeholder;
 import bet.astral.fluffy.FluffyCombat;
-import me.antritus.astral.fluffycombat.api.*;
 import bet.astral.fluffy.hitdetection.BedDetection;
 import bet.astral.fluffy.manager.CombatManager;
 import net.kyori.adventure.text.Component;

@@ -12,7 +12,6 @@ import fr.skytasul.glowingentities.GlowingEntities;
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.BlockCombatUser;
 import bet.astral.fluffy.api.CombatTag;
-import me.antritus.astral.fluffycombat.api.events.*;
 import bet.astral.fluffy.manager.CombatManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;

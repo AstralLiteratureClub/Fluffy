@@ -2,7 +2,6 @@ package bet.astral.fluffy.hitdetection;
 
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.events.EntityDamageEntityByBedEvent;
-import bet.astral.fluffy.hooks.citizens.CombatTrait;
 import net.citizensnpcs.api.event.NPCDamageByBlockEvent;
 import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.Location;
@@ -94,41 +93,6 @@ public class BedDetection implements Listener {
 				2,
 				TimeUnit.SECONDS
 		);
-	}
-
-	@EventHandler
-	public void  onBedNPCExplode(NPCDamageByBlockEvent event){
-		System.out.println(event.getDamager());
-		if ((event.getDamager() == null)) {
-			return;
-		}
-		if (!(event.getDamager().getType().name().endsWith("_BED"))){
-			return;
-		}
-		NPC npc = event.getNPC();
-		CombatTrait combatTrait = npc.getTraitNullable(CombatTrait.class);
-		if (combatTrait == null){
-			return;
-		}
-
-
-		Location location = event.getDamager().getLocation().toBlockLocation();
-		location.setWorld(npc.getStoredLocation().getWorld());
-		BedTag bedTag = detectionMap.get(location);
-		if (bedTag == null){
-			return;
-		}
-		ItemStack itemStack = bedTag.itemStack;
-
-
-		EntityDamageEntityByBedEvent newDamageEvent =
-				new EntityDamageEntityByBedEvent(npc, combatTrait.getOwnerPlayer(),
-						bedTag.owner,
-						event.getDamager(), event.getDamager().getState(), itemStack);
-		newDamageEvent.callEvent();
-		if (newDamageEvent.isCancelled()) {
-			event.setCancelled(true);
-		}
 	}
 
 	@EventHandler

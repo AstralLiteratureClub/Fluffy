@@ -1,6 +1,5 @@
 package bet.astral.fluffy.listeners;
 
-import bet.astral.fluffy.hooks.CitizensHook;
 import bet.astral.fluffy.messenger.Placeholders;
 import bet.astral.messagemanager.placeholder.Placeholder;
 import bet.astral.fluffy.FluffyCombat;
@@ -68,11 +67,6 @@ public class PlayerExitWhileInCombatListener implements Listener {
 			if (fluffy.getCombatConfig().getCombatLogAction() == CombatConfig.CombatLogAction.NOTHING){
 				return;
 			} else if (fluffy.getCombatConfig().getCombatLogAction() == CombatConfig.CombatLogAction.SPAWN_NPC){
-				CitizensHook hook = fluffy.getCitizensHook();
-				if (hook == null){
-					return;
-				}
-				hook.spawnNPC(player, player.getLocation(), player.customName() != null ? player.customName() : player.displayName());
 				//TODO
 				return;
 			} else if (fluffy.getCombatConfig().getCombatLogAction() == CombatConfig.CombatLogAction.KILL) {

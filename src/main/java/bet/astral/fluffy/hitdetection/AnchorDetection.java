@@ -107,38 +107,6 @@ public class AnchorDetection implements Listener {
 		}
 	}
 
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
-	private void onNPCAnchorDamage(EntityDamageByBlockEvent event) {
-		if (!(event.getEntity() instanceof Player victim)) {
-			return;
-		}
-		BlockState blockState = event.getDamagerBlockState();
-		if (blockState == null) {
-			return;
-		}
-		if (blockState.getType() != Material.RESPAWN_ANCHOR) {
-			return;
-		}
-		Location location = blockState.getLocation().toBlockLocation();
-		location.setWorld(victim.getWorld());
-		AnchorTag tag = detectionMap.get(location);
-		if (tag == null) {
-			return;
-		}
-
-		ItemStack itemStack = tag.itemStack;
-
-
-		EntityDamageEntityByRespawnAnchorEvent newDamageEvent =
-				new EntityDamageEntityByRespawnAnchorEvent(victim,
-						tag.owner,
-						event.getDamager(), blockState, itemStack);
-		newDamageEvent.callEvent();
-		if (newDamageEvent.isCancelled()) {
-			event.setCancelled(true);
-		}
-	}
-
 
 	public FluffyCombat fluffyCombat() {
 		return fluffyCombat;
