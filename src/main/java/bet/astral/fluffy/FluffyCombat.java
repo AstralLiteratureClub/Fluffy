@@ -5,8 +5,7 @@ import bet.astral.fluffy.database.StatisticDatabase;
 import bet.astral.fluffy.hitdetection.*;
 import bet.astral.fluffy.listeners.*;
 import bet.astral.fluffy.manager.*;
-import bet.astral.messagemanager.Message;
-import bet.astral.messagemanager.MessageManager;
+import bet.astral.messenger.Messenger;
 import fr.skytasul.glowingentities.GlowingBlocks;
 import fr.skytasul.glowingentities.GlowingEntities;
 import lombok.AccessLevel;
@@ -123,7 +122,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 	public static boolean isPaper = false;
 	public static boolean isStopping = false;
 	public static boolean debug = false;
-	private MessageManager<FluffyCombat, FileConfiguration, HashMap<String, Message>> messageManager;
+	private Messenger<FluffyCombat> messageManager;
 	private CombatManager combatManager;
 	private UserManager userManager;
 	private BlockUserManager blockUserManager;
@@ -155,7 +154,8 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		reloadConfig();
 		debug = getConfig().getBoolean("debug");
 		FileConfiguration configuration = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "messages.yml"));
-		messageManager = new MessageManager<>(this, configuration, new HashMap<>());
+		messageManager = new Messenger<>(this, configuration, new HashMap<>());
+		messageManager.overrideDefaultPlaceholders(messageManager.loadPlaceholders("placeholders"));
 
 
 		glowingEntities = new GlowingEntities(this); // required in combat manager

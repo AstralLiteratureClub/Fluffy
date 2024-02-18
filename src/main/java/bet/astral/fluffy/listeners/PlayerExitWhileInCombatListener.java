@@ -1,13 +1,13 @@
 package bet.astral.fluffy.listeners;
 
 import bet.astral.fluffy.messenger.Placeholders;
-import bet.astral.messagemanager.placeholder.Placeholder;
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.CombatUser;
 import bet.astral.fluffy.api.events.CombatLogEvent;
 import bet.astral.fluffy.configs.CombatConfig;
 import bet.astral.fluffy.manager.CombatManager;
 import bet.astral.fluffy.manager.UserManager;
+import bet.astral.messenger.placeholder.Placeholder;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

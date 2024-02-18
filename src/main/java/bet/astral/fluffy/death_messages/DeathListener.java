@@ -1,8 +1,8 @@
 package bet.astral.fluffy.death_messages;
 
 import bet.astral.fluffy.messenger.Placeholders;
-import bet.astral.messagemanager.placeholder.LegacyPlaceholder;
-import bet.astral.messagemanager.placeholder.Placeholder;
+import bet.astral.messenger.placeholder.LegacyPlaceholder;
+import bet.astral.messenger.placeholder.Placeholder;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;

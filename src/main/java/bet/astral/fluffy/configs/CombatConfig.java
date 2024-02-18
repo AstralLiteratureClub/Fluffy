@@ -3,7 +3,7 @@ package bet.astral.fluffy.configs;
 import lombok.Getter;
 import bet.astral.fluffy.EnumUtils;
 import bet.astral.fluffy.FluffyCombat;
-import bet.astral.fluffy.NamedTextColorUtils;
+import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.potion.PotionEffectType;
@@ -60,9 +60,9 @@ public class CombatConfig {
 	private boolean isCombatGlowLatest;
 	private boolean isCombatGlowAllTagged;
 	private boolean isCombatGlowCombatLogRejoin;
-	private NamedTextColorUtils combatGlowLatest;
-	private NamedTextColorUtils combatGlowAllTagged;
-	private NamedTextColorUtils combatGlowTagRejoin;
+	private ChatColor combatGlowLatest;
+	private ChatColor combatGlowAllTagged;
+	private ChatColor combatGlowTagRejoin;
 
 	private boolean isElytraAllowed;
 	private boolean isElytraMessage;
@@ -123,9 +123,9 @@ public class CombatConfig {
 		isCombatGlowLatest = configuration.getBoolean("glowing.latest.enabled");
 		isCombatGlowAllTagged = configuration.getBoolean("glowing.regular.enabled");
 		isCombatGlowCombatLogRejoin = configuration.getBoolean("glowing.combat-log.enabled");
-		combatGlowLatest = NamedTextColorUtils.getByName(configuration.getString("glowing.latest.color"), NamedTextColorUtils.RED);
-		combatGlowAllTagged = NamedTextColorUtils.getByName(configuration.getString("glowing.regular.color"), NamedTextColorUtils.GOLD);
-		combatGlowTagRejoin = NamedTextColorUtils.getByName(configuration.getString("glowing.combat-log.color"), NamedTextColorUtils.BLUE);
+		combatGlowLatest = EnumUtils.valueOf(configuration.getString("glowing.latest.color"), ChatColor.RED);
+		combatGlowAllTagged = EnumUtils.valueOf(configuration.getString("glowing.regular.color"), ChatColor.GOLD);
+		combatGlowTagRejoin = EnumUtils.valueOf(configuration.getString("glowing.combat-log.color"), ChatColor.BLUE);
 
 		isCommandsDisabled = configuration.getBoolean("commands.combat.enabled", true);
 		commandsToDisable = configuration.getStringList("commands.combat.disabled-list");

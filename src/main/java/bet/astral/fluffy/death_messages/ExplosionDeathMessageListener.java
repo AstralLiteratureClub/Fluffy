@@ -3,13 +3,13 @@ package bet.astral.fluffy.death_messages;
 import bet.astral.fluffy.Compatibility;
 import bet.astral.fluffy.api.*;
 import bet.astral.fluffy.hitdetection.AnchorDetection;
-import bet.astral.messagemanager.Message;
-import bet.astral.messagemanager.MessageManager;
 import bet.astral.fluffy.messenger.Placeholders;
-import bet.astral.messagemanager.placeholder.Placeholder;
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.hitdetection.BedDetection;
 import bet.astral.fluffy.manager.CombatManager;
+import bet.astral.messenger.Message;
+import bet.astral.messenger.Messenger;
+import bet.astral.messenger.placeholder.Placeholder;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -22,6 +22,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -35,7 +36,7 @@ public class ExplosionDeathMessageListener implements DeathListener {
 
 	@EventHandler
 	public void onDeath(PlayerDeathEvent event){
-		MessageManager<?, ?, ?> messageManager = fluffy.getMessageManager();
+		Messenger<?> messageManager = fluffy.getMessageManager();
 		Player player = event.getEntity();
 		EntityDamageEvent entityDamageEvent = player.getLastDamageCause();
 		if (entityDamageEvent == null){
@@ -55,7 +56,7 @@ public class ExplosionDeathMessageListener implements DeathListener {
 					if (state == null){
 						Message msg = messageManager.getMessage("deaths.block_explosion.random.random");
 						List<Placeholder> placeholders = defaults("victim", player);
-						message = messageManager.parse(player, Objects.requireNonNull(msg), Message.Type.CHAT, placeholders.toArray(Placeholder[]::new));
+						message = messageManager.parse(Objects.requireNonNull(msg), Message.Type.CHAT, placeholders.toArray(Placeholder[]::new));
 					} else {
 						Material material = state.getType();
 						if (material.name().endsWith("_BED")) {
@@ -88,12 +89,12 @@ public class ExplosionDeathMessageListener implements DeathListener {
 							msg = messageManager.getMessage("deaths.block_explosion.random.random");
 						}
 						List<Placeholder> placeholders = defaults(player, attacker, new ItemStack(material));
-						message = messageManager.parse(player, Objects.requireNonNull(msg), Message.Type.CHAT, placeholders.toArray(Placeholder[]::new));
+						message = messageManager.parse(Objects.requireNonNull(msg), Message.Type.CHAT, placeholders.toArray(Placeholder[]::new));
 					}
 				} else {
 					Message msg = messageManager.getMessage("deaths.block_explosion.random.random");
 					List<Placeholder> placeholders = defaults("victim", player);
-					message = messageManager.parse(player, Objects.requireNonNull(msg), Message.Type.CHAT, placeholders.toArray(Placeholder[]::new));
+					message = messageManager.parse(Objects.requireNonNull(msg), Message.Type.CHAT, placeholders.toArray(Placeholder[]::new));
 				}
 			} else if (!(tag instanceof BlockCombatTag)) {
 				String messageKey = null;
@@ -116,7 +117,7 @@ public class ExplosionDeathMessageListener implements DeathListener {
 				if (msg == null){
 					msg = messageManager.getMessage("deaths.block_explosion.combat.respawn_anchor");
 				}
-				message = messageManager.parse(player, Objects.requireNonNull(msg), Message.Type.CHAT, placeholders.toArray(Placeholder[]::new));
+				message = messageManager.parse(Objects.requireNonNull(msg), Message.Type.CHAT, placeholders.toArray(Placeholder[]::new));
 			}
 
 			if (message == null){

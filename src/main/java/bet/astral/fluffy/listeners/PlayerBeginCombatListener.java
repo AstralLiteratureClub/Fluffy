@@ -4,9 +4,9 @@ import bet.astral.fluffy.api.CombatCause;
 import bet.astral.fluffy.api.events.*;
 import bet.astral.fluffy.configs.CombatConfig;
 import bet.astral.fluffy.manager.BlockUserManager;
-import bet.astral.messagemanager.MessageManager;
 import bet.astral.fluffy.messenger.Placeholders;
-import bet.astral.messagemanager.placeholder.Placeholder;
+import bet.astral.messenger.Messenger;
+import bet.astral.messenger.placeholder.Placeholder;
 import fr.skytasul.glowingentities.GlowingBlocks;
 import fr.skytasul.glowingentities.GlowingEntities;
 import bet.astral.fluffy.FluffyCombat;
@@ -63,7 +63,7 @@ public class PlayerBeginCombatListener implements Listener {
 		}
 		FluffyCombat fluffy = FluffyCombat.getPlugin(FluffyCombat.class);
 		CombatManager cM = fluffy.getCombatManager();
-		MessageManager<?, ?, ?> mm = fluffy.getMessageManager();
+		Messenger<?> mm = fluffy.getMessageManager();
 		if (!cM.hasTags(victim)) {
 			Placeholder[] placeholders = Placeholders.combatPlaceholders(victim, attacker, combatCause, itemStack).toArray(Placeholder[]::new);
 			mm.message(victim, "combat-enter.victim", placeholders);
@@ -97,8 +97,8 @@ public class PlayerBeginCombatListener implements Listener {
 			GlowingEntities glowingEntities = fluffy.getGlowingEntities();
 			try {
 				if (attacker instanceof Player aPlayer) {
-					glowingEntities.setGlowing(aPlayer, victim, combatConfig.getCombatGlowLatest().getColor());
-					glowingEntities.setGlowing(victim, aPlayer, combatConfig.getCombatGlowLatest().getColor());
+					glowingEntities.setGlowing(aPlayer, victim, combatConfig.getCombatGlowLatest());
+					glowingEntities.setGlowing(victim, aPlayer, combatConfig.getCombatGlowLatest());
 				}
 			} catch (ReflectiveOperationException e) {
 				throw new RuntimeException(e);
@@ -128,7 +128,7 @@ public class PlayerBeginCombatListener implements Listener {
 		FluffyCombat fluffy = FluffyCombat.getPlugin(FluffyCombat.class);
 
 		CombatManager cM = fluffy.getCombatManager();
-		MessageManager<?, ?, ?> mm = fluffy.getMessageManager();
+		Messenger<?> mm = fluffy.getMessageManager();
 		if (!cM.hasTags(victim)) {
 			Placeholder[] placeholders = Placeholders.combatPlaceholders(victim, null, combatCause, itemStack).toArray(Placeholder[]::new);
 			mm.message(victim, "combat-enter.victim", placeholders);
@@ -146,7 +146,7 @@ public class PlayerBeginCombatListener implements Listener {
 		if (combatConfig.isCombatGlow() && combatConfig.isCombatGlowLatest()) {
 			GlowingBlocks glowingBlocks = fluffy.getGlowingBlocks();
 			try {
-				glowingBlocks.setGlowing(attacker.getBlock(), victim, combatConfig.getCombatGlowLatest().getColor());
+				glowingBlocks.setGlowing(attacker.getBlock(), victim, combatConfig.getCombatGlowLatest());
 			} catch (ReflectiveOperationException e) {
 				throw new RuntimeException(e);
 			}

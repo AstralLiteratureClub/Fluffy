@@ -2,9 +2,9 @@ package bet.astral.fluffy.manager;
 
 import bet.astral.fluffy.cooldowns.Cooldown;
 import bet.astral.fluffy.cooldowns.EnderPearlCooldown;
-import bet.astral.messagemanager.placeholder.LegacyPlaceholder;
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.events.CombatFullEndEvent;
+import bet.astral.messenger.placeholder.LegacyPlaceholder;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;

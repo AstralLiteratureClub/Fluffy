@@ -11,6 +11,7 @@ import bet.astral.fluffy.api.CombatTag;
 import bet.astral.fluffy.api.CombatUser;
 import bet.astral.fluffy.api.events.CombatFullEndEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -192,7 +193,7 @@ public final class CombatManager {
 							Block block = blockCombatUser.getBlock();
 							if (victim != null) {
 								try {
-									glowingBlocks.setGlowing(block, victim, config.getCombatGlowLatest().getColor());
+									glowingBlocks.setGlowing(block, victim, config.getCombatGlowLatest());
 								} catch (ReflectiveOperationException e) {
 									throw new RuntimeException(e);
 								}
@@ -204,8 +205,8 @@ public final class CombatManager {
 						if (config.isCombatGlow() && config.isCombatGlowLatest()
 								&& victimOP.isOnline() && attackerOP.isOnline()) {
 							try {
-								glowingEntities.setGlowing(attackerOP.getPlayer(), victimOP.getPlayer(), config.getCombatGlowLatest().getColor());
-								glowingEntities.setGlowing(victimOP.getPlayer(), attackerOP.getPlayer(), config.getCombatGlowLatest().getColor());
+								glowingEntities.setGlowing(attackerOP.getPlayer(), victimOP.getPlayer(), config.getCombatGlowLatest());
+								glowingEntities.setGlowing(victimOP.getPlayer(), attackerOP.getPlayer(), config.getCombatGlowLatest());
 							} catch (ReflectiveOperationException e) {
 								throw new RuntimeException(e);
 							}
@@ -241,17 +242,17 @@ public final class CombatManager {
 		if (tag instanceof BlockCombatTag){
 			Block block = ((BlockCombatUser) tag.getAttacker()).getBlock();
 			try {
-				fluffy.getGlowingBlocks().setGlowing(block, whoSees, fluffy.getCombatConfig().getCombatGlowAllTagged().getColor());
+				fluffy.getGlowingBlocks().setGlowing(block, whoSees, fluffy.getCombatConfig().getCombatGlowAllTagged());
 			} catch (ReflectiveOperationException e) {
 				throw new RuntimeException(e);
 			}
 		} else {
 			OfflinePlayer p = attacker.getPlayer();
 			if (p instanceof Player online) {
-				NamedTextColor color = fluffy.getCombatConfig().getCombatGlowAllTagged().getColor();
+				ChatColor color = fluffy.getCombatConfig().getCombatGlowAllTagged();
 				boolean isTimer = attacker.getRejoinTimer() >= 0;
 				if (isTimer && fluffy.getCombatConfig().isCombatGlowCombatLogRejoin()){
-					color = fluffy.getCombatConfig().getCombatGlowTagRejoin().getColor();
+					color = fluffy.getCombatConfig().getCombatGlowTagRejoin();
 				}
 				if (!isTimer && !fluffy.getCombatConfig().isCombatGlowAllTagged()){
 					return;
