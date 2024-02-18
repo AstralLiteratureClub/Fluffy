@@ -2,10 +2,10 @@ package bet.astral.fluffy.death_messages;
 
 import bet.astral.fluffy.Compatibility;
 import bet.astral.fluffy.api.*;
-import bet.astral.fluffy.hitdetection.AnchorDetection;
+import bet.astral.fluffy.listeners.hitdetection.AnchorDetection;
 import bet.astral.fluffy.messenger.Placeholders;
 import bet.astral.fluffy.FluffyCombat;
-import bet.astral.fluffy.hitdetection.BedDetection;
+import bet.astral.fluffy.listeners.hitdetection.BedDetection;
 import bet.astral.fluffy.manager.CombatManager;
 import bet.astral.messenger.Message;
 import bet.astral.messenger.Messenger;
@@ -22,7 +22,6 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;

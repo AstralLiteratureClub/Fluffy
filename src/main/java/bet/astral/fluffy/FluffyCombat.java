@@ -2,7 +2,7 @@ package bet.astral.fluffy;
 
 import bet.astral.fluffy.configs.CombatConfig;
 import bet.astral.fluffy.database.StatisticDatabase;
-import bet.astral.fluffy.hitdetection.*;
+import bet.astral.fluffy.listeners.hitdetection.*;
 import bet.astral.fluffy.listeners.*;
 import bet.astral.fluffy.manager.*;
 import bet.astral.messenger.Messenger;

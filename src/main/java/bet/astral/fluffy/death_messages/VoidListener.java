@@ -1,6 +1,6 @@
 package bet.astral.fluffy.death_messages;
 
-import bet.astral.fluffy.hitdetection.CrystalDetection;
+import bet.astral.fluffy.listeners.hitdetection.CrystalDetection;
 import bet.astral.fluffy.FluffyCombat;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;

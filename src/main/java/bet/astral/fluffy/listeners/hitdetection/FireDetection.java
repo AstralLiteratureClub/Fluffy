@@ -1,4 +1,4 @@
-package bet.astral.fluffy.hitdetection;
+package bet.astral.fluffy.listeners.hitdetection;
 
 import com.destroystokyo.paper.event.block.BlockDestroyEvent;
 import lombok.Getter;

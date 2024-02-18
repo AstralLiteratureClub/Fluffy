@@ -1,4 +1,4 @@
-package bet.astral.fluffy.hitdetection;
+package bet.astral.fluffy.listeners.hitdetection;
 
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.BlockCombatUser;
