@@ -11,7 +11,7 @@ plugins {
     id 'io.freefair.lombok' version '5.1.0'
 }
 
-group 'me.antritus'
+group 'bet.astral'
 version '1.0'
 
 repositories {
@@ -34,12 +34,6 @@ dependencies {
     // LOMBOK
     implementation 'org.projectlombok:lombok:1.18.26'
     annotationProcessor 'org.projectlombok:lombok:1.18.22'
-
-    // TPA
-    compileOnly 'me.antritus:Wormhole:1.2'
-
-    // Economy
-    compileOnly 'me.antritus:CosmicCapitalAPI:1.2.5'
 
     // DISCORD
     compileOnly 'net.dv8tion:JDA:5.0.0-beta.10'
