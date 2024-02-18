@@ -1,19 +1,11 @@
 name: Fluffy
-version: 1.0-SNAPSHOT
-main: me.antritus.astral.fluffycombat.FluffyCombat
+version: '1.0'
+main: bet.astral.fluffy.FluffyCombat
 api-version: '1.20'
-authors: [antritus]
+authors: [Antritus]
 
 dependencies:
   server:
-    Citizens:
-      load: BEFORE
-      required: false
-      join-classpath: true
-    Wormhole:
-      load: BEFORE
-      required: false
-      join-classpath: true
     PlaceholderAPI:
       load: BEFORE
       required: false
