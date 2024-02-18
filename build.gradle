@@ -1,7 +1,9 @@
 //file:noinspection VulnerableLibrariesLocal
 plugins {
     id 'java'
-    id 'com.github.johnrengelman.shadow' version '8.1.1'
+    // Shadow gradle is broken currently so using googler's one works for now.
+    //id 'com.github.johnrengelman.shadow' version '8.1.1'
+    id("io.github.goooler.shadow") version "8.1.3"
     //NMS
     id("io.papermc.paperweight.userdev") version "1.5.6"
 
@@ -63,6 +65,9 @@ configurations.compileOnly {
 
 shadowJar {
     archiveClassifier = null
+
+    relocate 'bet.astral.messenger', 'bet.astral.fluffy.libs.messenger'
+    relocate 'io.github.skytasul', 'bet.astral.fluffy.libs.io.github.skytasul'
 }
 
 tasks.assemble {
