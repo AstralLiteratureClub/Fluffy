@@ -36,6 +36,7 @@ public class ElytraWhileInCombatListener implements Listener {
 			event.getDrops().removeIf(item->item.getAmount()==replacementElytra.getAmount() && replacementElytra.isSimilar(replacementElytra));
 
 			if (itemStack.getEnchantmentLevel(Enchantment.VANISHING_CURSE)>0){
+				elytras.remove(event.getEntity());
 				return;
 			}
 			if (event.getKeepInventory()){
