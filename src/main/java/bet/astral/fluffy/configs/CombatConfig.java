@@ -1,8 +1,8 @@
 package bet.astral.fluffy.configs;
 
 import lombok.Getter;
-import bet.astral.fluffy.EnumUtils;
 import bet.astral.fluffy.FluffyCombat;
+import org.apache.commons.lang3.EnumUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -90,7 +90,7 @@ public class CombatConfig {
 		isResetCooldownsOnDeath = configuration.getBoolean("cooldowns.reset-on-combat-end", true);
 
 
-		combatLogAction = EnumUtils.valueOf(configuration.getString("combat-log.quit.action"), CombatLogAction.NOTHING);
+		combatLogAction = EnumUtils.getEnum(CombatLogAction.class, configuration.getString("combat-log.quit.action"), CombatLogAction.NOTHING);
 
 		isCombatLogRejoinBroadcast = configuration.getBoolean("combat-log.join.broadcast");
 		isCombatLogRejoinPrivateMessage = configuration.getBoolean("combat-log.join.player-message");
@@ -123,9 +123,9 @@ public class CombatConfig {
 		isCombatGlowLatest = configuration.getBoolean("glowing.latest.enabled");
 		isCombatGlowAllTagged = configuration.getBoolean("glowing.regular.enabled");
 		isCombatGlowCombatLogRejoin = configuration.getBoolean("glowing.combat-log.enabled");
-		combatGlowLatest = EnumUtils.valueOf(configuration.getString("glowing.latest.color"), ChatColor.RED);
-		combatGlowAllTagged = EnumUtils.valueOf(configuration.getString("glowing.regular.color"), ChatColor.GOLD);
-		combatGlowTagRejoin = EnumUtils.valueOf(configuration.getString("glowing.combat-log.color"), ChatColor.BLUE);
+		combatGlowLatest = EnumUtils.getEnumIgnoreCase(ChatColor.class, configuration.getString("glowing.latest.color"), ChatColor.RED);
+		combatGlowAllTagged = EnumUtils.getEnumIgnoreCase(ChatColor.class, configuration.getString("glowing.regular.color"), ChatColor.GOLD);
+		combatGlowTagRejoin = EnumUtils.getEnumIgnoreCase(ChatColor.class, configuration.getString("glowing.combat-log.color"), ChatColor.BLUE);
 
 		isCommandsDisabled = configuration.getBoolean("commands.combat.enabled", true);
 		commandsToDisable = configuration.getStringList("commands.combat.disabled-list");
