@@ -1,70 +1,55 @@
 placeholders:
-  - name: prefix
+  - name: "prefix"
     value: "<dark_gray>[<light_purple>FluffyCombat</light_purple>]</dark_gray>"
-  - name: usage
-    value: "<red>Wrong Usage!</red>"
-command-parse:
-  incorrect-format: "%prefix% %usage% <click:suggest_command:/%command%><hover:show_text:'<green>Click here to suggest the correct format!'><gray>/%command%</gray></hover>"
-  player-only: "%prefix% <red>You cannot execute <white>%command%.</white>"
-  console-only: "%prefix% <red>You cannot execute <white>%command%.</white>"
-  no-tab:
-    player: "< No players found >"
 
+combat-execute-illegal-command: "%prefix% <green>You cannot use <gray>%command%</gray> while in combat!"
 
-combat:
-  execute-illegal-command: "%prefix% <green>You cannot use <gray>%command%</gray> while in combat!"
-  end:
-    action_bar: "%prefix% <gray>You are no longer in combat! You may now log out!"
-    chat: "%prefix% <green>You are no longer in combat!"
-  log:
-    join:
-      npc:
-        killed:
-          broadcast: "%prefix% <white>%player% <red>combat logged earlier and was killed. They are back now!"
-          self:
-            - "%prefix% <red>You combat logged out earlier and your NPC for the tag was killed."
-            - "%prefix% <red>Your items were dropped at the NPC location. <gray><italic>(Near combat log location)"
-        alive:
-          broadcast: "<hover:show_text:'<dark_red>Go get them!\n<gray>Location: <green>%player_x%<gray>, <green>%player_y%<gray>, <green>%player_z% <gray>in <yellow>%player_world%'>%prefix% <white>%player% <red>logged in combat earlier.. <dark_red>hunt them down!"
-          self: "%prefix% <red>You combat logged earlier.. <dark_red>you are being hunted!"
-    quit:
-      kill:
-        broadcast:
-          - "<red>"
-          - "%prefix% <white>%player% <dark_red>has logged out in combat! They have been killed!"
-          - "<red>"
-      npc:
-        # Uses deaths.yml for deaths. Uses only
-        death:
-          broadcast: "%prefix% <dark_red>%player% <red>has died after logging out in combat!"
+combat-end:
+  action_bar: "%prefix% <gray>You are no longer in combat! You may now log out!"
+  chat: "%prefix% <green>You are no longer in combat!"
 
-  enter:
-    victim:
-      chat: "%prefix% <red>You are in combat with %attacker%<red>! Don't log out!"
-      title: "<red><b><underlined>Combat"
-      subtitle: "<gray>You're in combat! Don't log out!"
-      placeholders:
-        - name: attacker
-          value: "<white>The Unknown</white>"
-    attacker:
-      title: "<red><b><n><underlined>Combat"
-      subtitle: "<gray>You're in combat! Don't log out!"
-      chat: "%prefix% <red>You are in combat with %victim%<red>! Don't log out!"
+combat-logged-rejoin-npc-replacement-alive-broadcast:
+  disabled: true
+combat-logged-rejoin-npc-replacement-alive-player: "%prefix% <red>You combat logged earlier.. <dark_red>you are being hunted!"
 
-  use-item:
-    elytra:
-      glide: "%prefix% <red>You are not allowed to use elytra in combat."
-      rocket-boost: "%prefix% <red>You are not allowed to use rocket boosters in combat."
-    trident:
-      riptide: "%prefix% <red>You are not allowed to use riptide tridents in combat!"
-  cooldown:
-    # Item specific
-    enchanted_golden_apple: "%prefix% <gray>You're on a cooldown for <yellow><underlined>enchanted golden apple<reset><gray>."
-    # Global
-    default: "%prefix% <gray>You're on a cooldown for <white>%item_type%<reset><gray>."
+combat-logged-rejoin-npc-replacement-dead-broadcast:
+  disabled: true
+combat-logged-rejoin-npc-replacement-dead-player:
+ - "%prefix% <red>You combat logged out earlier and your NPC for the tag was killed."
+ - "%prefix% <red>Your items were dropped at the NPC location. <gray><italic>(Near combat log location)"
 
+combat-logged-rejoin-kill-broadcast:
+ disabled: true
+combat-logged-rejoin-kill-player: "%prefix% <red>You left the server while in combat last time! You were killed because you left while in combat!"
 
-# Wormhole plugin made by antritus can be hooked
-wormhole:
-  request: "%prefix% <red>You cannot send teleport requests while in combat!"
-  accept: "%prefix% <red>You cannot accept teleport requests while in combat!"
+combat-logged-rejoin-no-action-broadcast: "%prefix% <red>You left the server while in combat last time! Shame on you!"
+combat-logged-rejoin-no-action-rejoin: "%prefix% <red>You left the server while in combat last time! Shame on you!"
+
+combat-logged-quit-npc-spawn: "%prefix% <white>%player% <red>has left while in combat. You can find a killable NPC at position of <white>%player%<red>."
+combat-logged-quit-kill: "%prefix% <white>%player% <red>has left while in combat. They have been killed!"
+combat-logged-quit-no-action: "%prefix% <white>%player% <red>has left while in combat."
+
+combat-enter-victim:
+  chat: "%prefix% <red>You are in combat with %attacker%<red>! Don't log out!"
+  title: "<red><b><underlined>Combat"
+  subtitle: "<gray>You're in combat! Don't log out!"
+  placeholders:
+   - name: attacker
+     value: "<white>The Unknown</white>"
+
+combat-enter-attacker:
+  title: "<red><b><n><underlined>Combat"
+  subtitle: "<gray>You're in combat! Don't log out!"
+  chat: "%prefix% <red>You are in combat with %victim%<red>! Don't log out!"
+
+combat-every-1-second:
+  action-bar: "<red>You are currently in combat! Do not log out!"
+
+combat-use-item-elytra-glide: "%prefix% <red>You are not allowed to use elytra in combat."
+combat-use-item-elytra-rocket-boost: "%prefix% <red>You are not allowed to use rocket boosters in combat."
+combat-use-item-trident-riptide: "%prefix% <red>You are not allowed to use riptide tridents in combat!"
+
+combat-item-cooldown-enchanted_golden_apple: "%prefix% <gray>You're on a cooldown for <yellow><underlined>enchanted golden apple<reset><gray>."
+combat-item-cooldown-default: "%prefix% <gray>You're on a cooldown for <white>%item_type%<reset><gray>."
+combat-command-cooldown: "%prefix% <red>You're not allowed to use <white>%command%<red> while you are in combat."
+
