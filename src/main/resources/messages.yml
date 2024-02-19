@@ -18,16 +18,14 @@ combat-logged-rejoin-npc-replacement-dead-player:
  - "%prefix% <red>You combat logged out earlier and your NPC for the tag was killed."
  - "%prefix% <red>Your items were dropped at the NPC location. <gray><italic>(Near combat log location)"
 
-combat-logged-rejoin-kill-broadcast:
- disabled: true
-combat-logged-rejoin-kill-player: "%prefix% <red>You left the server while in combat last time! You were killed because you left while in combat!"
+combat-logged-rejoin-broadcast:
+  - ""
+  - "%prefix% <white>%player%<red> logged out while in combat! Go to their location for their items!"
+  - ""
+combat-logged-rejoin-player: "%prefix% <red>You left the server while in combat last time!"
 
-combat-logged-rejoin-no-action-broadcast: "%prefix% <red>You left the server while in combat last time! Shame on you!"
-combat-logged-rejoin-no-action-rejoin: "%prefix% <red>You left the server while in combat last time! Shame on you!"
-
-combat-logged-quit-npc-spawn: "%prefix% <white>%player% <red>has left while in combat. You can find a killable NPC at position of <white>%player%<red>."
-combat-logged-quit-kill: "%prefix% <white>%player% <red>has left while in combat. They have been killed!"
-combat-logged-quit-no-action: "%prefix% <white>%player% <red>has left while in combat."
+combat-logged-quit-npc-spawn-broadcast: "%prefix% <white>%player% <red>has left while in combat. You can find a killable NPC at position of <white>%player%<red>."
+combat-logged-quit-broadcast: "%prefix% <white>%player% <red>has left while in combat. Killed the combat logger!"
 
 combat-enter-victim:
   chat: "%prefix% <red>You are in combat with %attacker%<red>! Don't log out!"
