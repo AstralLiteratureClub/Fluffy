@@ -1,7 +1,6 @@
 package bet.astral.fluffy.api.events;
 
 import lombok.Getter;
-import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -21,9 +20,6 @@ public class EntityDamageEntityByBedEvent extends Event implements Cancellable {
 	@NotNull
 	private final OfflinePlayer damager;
 	@Getter
-	@Nullable
-	private final NPC npc;
-	@Getter
 	private final boolean isNPCVictim;
 	@Getter
 	@Nullable
@@ -38,24 +34,12 @@ public class EntityDamageEntityByBedEvent extends Event implements Cancellable {
 
 	public EntityDamageEntityByBedEvent(@NotNull Player victim, @NotNull OfflinePlayer attacker, @Nullable Block block, @NotNull  BlockState state, @Nullable ItemStack itemStack) {
 		this.entity = victim;
-		this.npc = null;
 		this.damager = attacker;
 		this.block = block;
 		this.state = state;
 		this.item = itemStack;
 		isNPCVictim = false;
 	}
-
-	public EntityDamageEntityByBedEvent(@NotNull NPC victim, @NotNull OfflinePlayer player, @NotNull OfflinePlayer attacker, @Nullable Block block, @NotNull BlockState state, @Nullable ItemStack itemStack) {
-		this.entity = player;
-		this.npc = victim;
-		this.damager = attacker;
-		this.block = block;
-		this.state = state;
-		this.item = itemStack;
-		isNPCVictim = true;
-	}
-
 
 	private static final HandlerList HANDLERS = new HandlerList();
 	@NotNull
