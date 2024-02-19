@@ -5,7 +5,10 @@ import bet.astral.fluffy.database.StatisticDatabase;
 import bet.astral.fluffy.listeners.hitdetection.*;
 import bet.astral.fluffy.listeners.*;
 import bet.astral.fluffy.manager.*;
+import bet.astral.fluffy.messenger.MessageKey;
 import bet.astral.messenger.Messenger;
+import bet.astral.messenger.placeholder.LegacyPlaceholder;
+import bet.astral.messenger.placeholder.Placeholder;
 import fr.skytasul.glowingentities.GlowingBlocks;
 import fr.skytasul.glowingentities.GlowingEntities;
 import lombok.AccessLevel;
@@ -13,21 +16,15 @@ import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.FallingBlock;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityChangeBlockEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -155,7 +152,22 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		debug = getConfig().getBoolean("debug");
 		FileConfiguration configuration = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "messages.yml"));
 		messageManager = new Messenger<>(this, configuration, new HashMap<>());
-		messageManager.overrideDefaultPlaceholders(messageManager.loadPlaceholders("placeholders"));
+		getLogger().info("Loading placeholders for messages...");
+		Map<String, Placeholder> placeholderMap = messageManager.loadPlaceholders("placeholders");
+		getLogger().info("Loaded placeholders for messages...");
+		// Debug
+		if (placeholderMap == null){
+			placeholderMap = new HashMap<>();
+		} else {
+			placeholderMap = new HashMap<>(placeholderMap);
+		}
+		placeholderMap.put("prefix-2", new LegacyPlaceholder("prefix", "&d&lDebug Fluffy"));
+		// REMOVE ^
+		getLogger().info("Overriding message placeholders...");
+		messageManager.overrideDefaultPlaceholders(placeholderMap);
+		getLogger().info("Overrode message placeholders...");
+		// Just loading the plugin-specific messages.
+		MessageKey.loadMessages(messageManager);
 
 
 		glowingEntities = new GlowingEntities(this); // required in combat manager
@@ -206,24 +218,12 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		//statisticDatabase = new StatisticDatabase(this);
 
 		registerListeners(this);
+
+		getLogger().info("Fluffy Combat Management plugin has loaded!");
 	}
 	@EventHandler
 	public void onChunkLoad(ChunkLoadEvent event) {
 		clearIncorrectBlockData(event.getChunk());
-	}
-//	@EventHandler
-	public void onBlockPlace(EntityChangeBlockEvent event){
-		if (event.getEntity() instanceof FallingBlock fallingBlock){
-			getServer().broadcastMessage("BEFORE: ! " + event.getBlock().getType());
-			getServer().broadcastMessage("AFTER: ! " + event.getTo());
-		}
-	}
-
-//	@EventHandler
-	public void onDamage(EntityDamageEvent event){
-		if (event.getCause()== EntityDamageEvent.DamageCause.LAVA){
-			event.getEntity().sendMessage("LAVA!");
-		}
 	}
 
 	@Override

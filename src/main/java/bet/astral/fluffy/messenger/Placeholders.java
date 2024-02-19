@@ -1,6 +1,7 @@
 package bet.astral.fluffy.messenger;
 
 import bet.astral.fluffy.api.CombatCause;
+import bet.astral.messenger.Messenger;
 import bet.astral.messenger.placeholder.LegacyPlaceholder;
 import bet.astral.messenger.placeholder.Placeholder;
 import net.kyori.adventure.text.Component;
