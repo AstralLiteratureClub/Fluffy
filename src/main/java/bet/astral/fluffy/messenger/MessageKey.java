@@ -64,19 +64,19 @@ public final class MessageKey
 	@KeyType(Type.MESSAGE)
 	public static final String COMBAT_REJOIN_NPC_REPLACEMENT_DEAD = "combat-logged-rejoin-npc-replacement-alive-player";
 	/*
-	 * Rejoin - Kill
+	 * Rejoin
 	 */
 	@KeyType(Type.MESSAGE)
-	public static final String COMBAT_REJOIN_KILLED_BROADCAST = "combat-logged-rejoin-killed-broadcast";
+	public static final String COMBAT_REJOIN_BROADCAST = "combat-logged-rejoin-broadcast";
 	@KeyType(Type.MESSAGE)
-	public static final String COMBAT_REJOIN_KILLED_PLAYER = "combat-logged-rejoin-killed-player";
+	public static final String COMBAT_REJOIN_PLAYER = "combat-logged-rejoin-player";
 	/*
-	 * Rejoin - No action
+	 * Combat LOG OUT
 	 */
 	@KeyType(Type.MESSAGE)
-	public static final String COMBAT_REJOIN_NO_ACTION_BROADCAST = "combat-logged-rejoin-no-action-broadcast";
+	public static final String COMBAT_LOG_BROADCAST = "combat-logged-quit-npc-spawn-broadcast";
 	@KeyType(Type.MESSAGE)
-	public static final String COMBAT_REJOIN_NO_ACTION_PLAYER = "combat-logged-rejoin-no-action-player";
+	public static final String COMBAT_LOG_NPC_SPAWN_BROADCAST = "combat-logged-quit-broadcast";
 	/*
 	 * Combat tagging
 	 */
@@ -84,6 +84,7 @@ public final class MessageKey
 	public static final String COMBAT_ENTER_VICTIM = "combat-enter-victim";
 	@KeyType(Type.MESSAGE)
 	public static final String COMBAT_ENTER_ATTACKER = "combat-enter-attacker";
+
 
 	/*
 	 * 1 second messages

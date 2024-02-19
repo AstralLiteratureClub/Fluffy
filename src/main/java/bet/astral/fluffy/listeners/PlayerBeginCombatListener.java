@@ -2,8 +2,8 @@ package bet.astral.fluffy.listeners;
 
 import bet.astral.fluffy.api.CombatCause;
 import bet.astral.fluffy.api.events.*;
-import bet.astral.fluffy.configs.CombatConfig;
 import bet.astral.fluffy.manager.BlockUserManager;
+import bet.astral.fluffy.messenger.MessageKey;
 import bet.astral.fluffy.messenger.Placeholders;
 import bet.astral.messenger.Messenger;
 import bet.astral.messenger.placeholder.Placeholder;
@@ -11,8 +11,6 @@ import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.BlockCombatUser;
 import bet.astral.fluffy.api.CombatTag;
 import bet.astral.fluffy.manager.CombatManager;
-import fr.skytasul.glowingentities.GlowingBlocks;
-import fr.skytasul.glowingentities.GlowingEntities;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -28,6 +26,8 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -64,14 +64,13 @@ public class PlayerBeginCombatListener implements Listener {
 		FluffyCombat fluffy = FluffyCombat.getPlugin(FluffyCombat.class);
 		CombatManager cM = fluffy.getCombatManager();
 		Messenger<?> mm = fluffy.getMessageManager();
+		List<Placeholder> placeholders = new LinkedList<>(Placeholders.combatPlaceholders(victim, attacker, combatCause, itemStack));
 		if (!cM.hasTags(victim)) {
-			Placeholder[] placeholders = Placeholders.combatPlaceholders(victim, attacker, combatCause, itemStack).toArray(Placeholder[]::new);
-			mm.message(victim, "combat-enter.victim", placeholders);
+			mm.message(victim, MessageKey.COMBAT_ENTER_VICTIM, placeholders);
 		}
 		if (!cM.hasTags(attacker)) {
 			if (attacker instanceof Player attackerPlayer) {
-				Placeholder[] placeholders = Placeholders.combatPlaceholders(victim, attackerPlayer, combatCause, itemStack).toArray(Placeholder[]::new);
-				mm.message(attackerPlayer, "combat-enter.attacker", placeholders);
+				mm.message(attackerPlayer, MessageKey.COMBAT_ENTER_ATTACKER, placeholders);
 			}
 		}
 
@@ -119,7 +118,7 @@ public class PlayerBeginCombatListener implements Listener {
 		Messenger<?> mm = fluffy.getMessageManager();
 		if (!cM.hasTags(victim)) {
 			Placeholder[] placeholders = Placeholders.combatPlaceholders(victim, null, combatCause, itemStack).toArray(Placeholder[]::new);
-			mm.message(victim, "combat-enter.victim", placeholders);
+			mm.message(victim, MessageKey.COMBAT_ENTER_VICTIM, placeholders);
 		}
 		CombatTag tag = cM.getTag(victim, attacker);
 		if (tag == null) {

@@ -1,5 +1,6 @@
 package bet.astral.fluffy.listeners;
 
+import bet.astral.fluffy.messenger.MessageKey;
 import bet.astral.fluffy.messenger.Placeholders;
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.CombatUser;
@@ -19,6 +20,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Objects;
 
 public class PlayerExitWhileInCombatListener implements Listener {
 	private final FluffyCombat fluffy;
@@ -32,12 +34,17 @@ public class PlayerExitWhileInCombatListener implements Listener {
 		Player player = event.getPlayer();
 		boolean logged = fluffy.getCombatLogManager().hasCombatLogged(player); // Automatically deleted
 		if (logged){
-			CombatConfig combatConfig = fluffy.getCombatConfig();
 			Placeholder[] placeholders = Placeholders.playerPlaceholders("player", player).toArray(Placeholder[]::new);
-			if (combatConfig.isCombatLogRejoinBroadcast())
-				fluffy.getMessageManager().broadcast("combat-log.join.broadcast", placeholders);
-			if (combatConfig.isCombatLogRejoinPrivateMessage())
-				fluffy.getMessageManager().message(player, "combat-log.join.broadcast", placeholders);
+			if (Objects.requireNonNull(fluffy.getCombatConfig().getCombatLogAction()) == CombatConfig.CombatLogAction.SPAWN_NPC) {
+				// TODO - Make the message chosen if the NPC is alive or dead.
+//					fluffy.getMessageManager().broadcast(MessageKey.COMBAT_REJOIN_NPC_REPLACEMENT_DEAD_BROADCAST, placeholders);
+				fluffy.getMessageManager().broadcast(MessageKey.COMBAT_REJOIN_NPC_REPLACEMENT_ALIVE_BROADCAST, placeholders);
+//					fluffy.getMessageManager().message(player, MessageKey.COMBAT_REJOIN_NPC_REPLACEMENT_DEAD, placeholders);
+				fluffy.getMessageManager().message(player, MessageKey.COMBAT_REJOIN_NPC_REPLACEMENT_ALIVE, placeholders);
+			} else {
+				fluffy.getMessageManager().broadcast(MessageKey.COMBAT_REJOIN_BROADCAST, placeholders);
+				fluffy.getMessageManager().message(player, MessageKey.COMBAT_REJOIN_PLAYER, placeholders);
+			}
 		}
 	}
 
@@ -58,16 +65,15 @@ public class PlayerExitWhileInCombatListener implements Listener {
 			if (logEvent.isCancelled()) {
 				return;
 			}
-			if (fluffy.getCombatConfig().isCombatLogBroadcast()){
-				List<Placeholder> placeholders = Placeholders.playerPlaceholders("player", player);
-				Placeholder[] placeholderArray = placeholders.toArray(Placeholder[]::new);
-				fluffy.getMessageManager().broadcast("combat-log.quit.broadcast",
-						placeholderArray);
-			}
+			List<Placeholder> placeholders = Placeholders.playerPlaceholders("player", player);
+			Placeholder[] placeholderArray = placeholders.toArray(Placeholder[]::new);
+			fluffy.getMessageManager().broadcast(MessageKey.COMBAT_LOG_BROADCAST, placeholderArray);
+
 			if (fluffy.getCombatConfig().getCombatLogAction() == CombatConfig.CombatLogAction.NOTHING){
 				return;
 			} else if (fluffy.getCombatConfig().getCombatLogAction() == CombatConfig.CombatLogAction.SPAWN_NPC){
-				//TODO
+				fluffy.getMessageManager().broadcast(MessageKey.COMBAT_LOG_NPC_SPAWN_BROADCAST, placeholderArray);
+				//TODO - Make the NPC spawning possible using hooks for the plugin
 				return;
 			} else if (fluffy.getCombatConfig().getCombatLogAction() == CombatConfig.CombatLogAction.KILL) {
 				assert user != null;

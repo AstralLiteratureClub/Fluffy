@@ -73,14 +73,12 @@ elytra:
   # True/False
   # Bypass permission: fluffy.bypass.combat-elytra
   allow-in-combat: false
-  message: true
   # True/False
   rocket-boost:
     # Denies use of rocket boosting with elytra in combat
     # Bypass permission: fluffy.bypass.combat-elytra
     # True/False
     allow-in-combat: false
-    message: true
 
 trident:
   # Denies use of riptide enchantment in combat.
@@ -88,7 +86,6 @@ trident:
   # True/False
   riptide:
     allow-in-combat: false
-    message: true
 
 
 combat-log:
@@ -121,7 +118,6 @@ combat-log:
     action: KILL
     # Broadcast to the server about the combat log
     # True/False
-    broadcast: true
     # Configuration for killing the player when they log out.
     # combat-log.action.value = KILL
     kill:
@@ -157,20 +153,10 @@ combat-log:
         restart-combat: true
 
       death:
-        # Broadcast the death of the npc
-        broadcast: true
-        # Broadcast the death message for the npc?
-        death-message: true
         # check comments on: combat-log.quit.kill.*
         drop-items: true
         drop-experience: false
   join:
-    # Send player a private message about combat logging
-    # True/False
-    player-message: true
-    # Broadcast the server that given player had combat logged
-    # True/False
-    broadcast: true
     # How long does the rejoin period last
     rejoin-ticks: 50 # 2.5 seconds
 

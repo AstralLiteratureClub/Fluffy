@@ -1,5 +1,7 @@
 package bet.astral.fluffy.listeners;
 
+import bet.astral.fluffy.messenger.MessageKey;
+import bet.astral.fluffy.messenger.Placeholders;
 import com.destroystokyo.paper.event.player.PlayerElytraBoostEvent;
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.manager.CombatManager;
@@ -71,7 +73,7 @@ public class ElytraWhileInCombatListener implements Listener {
 		}
 		if (!player.isGliding() &&
 				fluffy.getCombatConfig().isElytraMessage()) {
-			fluffy.getMessageManager().message(player, "elytra.glide");
+			fluffy.getMessageManager().message(player, MessageKey.COMBAT_USE_ITEM_ELYTRA_GLIDE, Placeholders.playerPlaceholders("player", player));
 		}
 
 		e.setCancelled(true);
@@ -101,9 +103,9 @@ public class ElytraWhileInCombatListener implements Listener {
 			event.setCancelled(true);
 			event.setShouldConsume(false);
 			if (fluffy.getCombatConfig().isElytraBoostMessage()){
-				fluffy.getMessageManager()
-						.message(player, "elytra.rocket-boost");
 			}
+			fluffy.getMessageManager()
+					.message(player, MessageKey.COMBAT_USE_ITEM_ELYTRA_ROCKET_BOOST, Placeholders.playerPlaceholders("player", player));
 		}
 	}
 }

@@ -2,6 +2,7 @@ package bet.astral.fluffy.manager;
 
 import bet.astral.fluffy.api.events.CombatEndEvent;
 import bet.astral.fluffy.configs.CombatConfig;
+import bet.astral.fluffy.messenger.MessageKey;
 import fr.skytasul.glowingentities.GlowingBlocks;
 import fr.skytasul.glowingentities.GlowingEntities;
 import bet.astral.fluffy.FluffyCombat;
@@ -10,7 +11,6 @@ import bet.astral.fluffy.api.BlockCombatUser;
 import bet.astral.fluffy.api.CombatTag;
 import bet.astral.fluffy.api.CombatUser;
 import bet.astral.fluffy.api.events.CombatFullEndEvent;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
@@ -157,14 +157,14 @@ public final class CombatManager {
 					Set<String> keys = tags.keySet();
 					if (victimPlayer.isOnline()) {
 						if (keys.isEmpty() || keys.stream().noneMatch(id -> id.contains(victimPlayer.getUniqueId().toString()))) {
-							main.getMessageManager().message((Player) victimPlayer, "combat-end");
+							main.getMessageManager().message((Player) victimPlayer, MessageKey.COMBAT_END);
 						}
 					}
 					if (!(attacker instanceof BlockCombatUser)) {
 						OfflinePlayer attackerPlayer = attacker.getPlayer();
 						if (attackerPlayer.isOnline()) {
 							if (keys.isEmpty() || keys.stream().noneMatch(id -> id.contains(attackerPlayer.getUniqueId().toString()))) {
-								main.getMessageManager().message((Player) attackerPlayer, "combat-end");
+								main.getMessageManager().message((Player) attackerPlayer, MessageKey.COMBAT_END);
 							}
 						}
 					}
@@ -173,7 +173,7 @@ public final class CombatManager {
 				});
 
 				userTags.forEach((idString, tagList)->{
-					if (tagList.size()==0){
+					if (tagList.isEmpty()){
 						try {
 							UUID id = UUID.fromString(idString);
 							OfflinePlayer player = main.getServer().getOfflinePlayer(id);
