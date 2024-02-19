@@ -22,10 +22,6 @@ repositories {
     maven { url "https://repo.papermc.io/repository/maven-public/" }
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
     maven { url 'https://jitpack.io' }
-    maven {
-        name = 'citizens-repo'
-        url = 'https://maven.citizensnpcs.co/repo'
-    }
 }
 
 dependencies {
@@ -42,10 +38,6 @@ dependencies {
     // GLOWING
     implementation 'io.github.skytasul:glowingentities:1.3.2'
 
-    // CITIZENS / NPCS
-    compileOnly('net.citizensnpcs:citizens-main:2.0.30-SNAPSHOT') {
-        exclude group: '*', module: '*'
-    }
 
     compileOnly 'me.clip:placeholderapi:2.11.2'
 
