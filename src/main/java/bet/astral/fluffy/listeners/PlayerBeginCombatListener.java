@@ -92,18 +92,6 @@ public class PlayerBeginCombatListener implements Listener {
 		} else {
 			tag.setVictimWeapon(itemStack);
 		}
-		CombatConfig combatConfig = fluffy.getCombatConfig();
-		if (combatConfig.isCombatGlow() && combatConfig.isCombatGlowLatest()) {
-			GlowingEntities glowingEntities = fluffy.getGlowingEntities();
-			try {
-				if (attacker instanceof Player aPlayer) {
-					glowingEntities.setGlowing(aPlayer, victim, combatConfig.getCombatGlowLatest());
-					glowingEntities.setGlowing(victim, aPlayer, combatConfig.getCombatGlowLatest());
-				}
-			} catch (ReflectiveOperationException e) {
-				throw new RuntimeException(e);
-			}
-		}
 	}
 	public static void handle(Player victim, Block attacker, CombatCause combatCause) {
 		handle(victim, attacker, combatCause, null);
@@ -141,16 +129,6 @@ public class PlayerBeginCombatListener implements Listener {
 		tag.resetTicks();
 		CombatEnterEvent enterEvent = new CombatEnterEvent(fluffy, tag);
 		enterEvent.callEvent();
-
-		CombatConfig combatConfig = fluffy.getCombatConfig();
-		if (combatConfig.isCombatGlow() && combatConfig.isCombatGlowLatest()) {
-			GlowingBlocks glowingBlocks = fluffy.getGlowingBlocks();
-			try {
-				glowingBlocks.setGlowing(attacker.getBlock(), victim, combatConfig.getCombatGlowLatest());
-			} catch (ReflectiveOperationException e) {
-				throw new RuntimeException(e);
-			}
-		}
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
