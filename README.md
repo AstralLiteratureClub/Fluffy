@@ -36,3 +36,12 @@ Fluffy tracks few explosion specific kills and totems (and ofcourse kills, death
 # Glowing
 Fluffy allows players to glow when they are tagged. Players by default will glow red, if the player is latest in combat tag list. Other players will glow orange (which have combat tag with the player).
 
+# Expansions? Addons?
+Fluffy will not custom expansions/addons to the plugin.
+You can create your own expansions by creating a new plugin and just using the API inside the plugin.
+
+Other combat management plugins have 10+ expansions/addons.
+Having 1 single plugin is the reason why fluffy was created.
+Having 10 different expansions/addons which should have been built inside the plugin is not ideal for anyone,
+as you need to download multiple jar files for them.
+In fluffy you can just disable features in the config.
