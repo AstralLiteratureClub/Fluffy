@@ -1,12 +1,8 @@
 placeholders:
   - name: "prefix"
-    value: "<dark_gray>[<light_purple>FluffyCombat</light_purple>]</dark_gray>"
+    value: "<hover:show_text:'<light_purple>Fluffy Combat Manager\n<white>Encountered bugs? Report them to <yellow>@antritus <dark_gray>(<aqua>Discord<dark_gray>)'><white><light_purple><b>Fluffy<reset>"
 
 combat-execute-illegal-command: "%prefix% <green>You cannot use <gray>%command%</gray> while in combat!"
-
-combat-end:
-  action_bar: "%prefix% <gray>You are no longer in combat! You may now log out!"
-  chat: "%prefix% <green>You are no longer in combat!"
 
 combat-logged-rejoin-npc-replacement-alive-broadcast:
   disabled: true
@@ -28,7 +24,7 @@ combat-logged-quit-npc-spawn-broadcast: "%prefix% <white>%player% <red>has left 
 combat-logged-quit-broadcast: "%prefix% <white>%player% <red>has left while in combat. Killed the combat logger!"
 
 combat-enter-victim:
-  chat: "%prefix% <red>You are in combat with %attacker%<red>! Don't log out!"
+  chat: "%prefix% <red>You are in combat with <white>%attacker%<red>! Don't log out!"
   title: "<red><b><underlined>Combat"
   subtitle: "<gray>You're in combat! Don't log out!"
   placeholders:
@@ -36,12 +32,15 @@ combat-enter-victim:
      value: "<white>The Unknown</white>"
 
 combat-enter-attacker:
-  title: "<red><b><n><underlined>Combat"
+  title: "<red><b><underlined>Combat"
   subtitle: "<gray>You're in combat! Don't log out!"
-  chat: "%prefix% <red>You are in combat with %victim%<red>! Don't log out!"
+  chat: "%prefix% <red>You are in combat with <white>%victim%<red>! Don't log out!"
 
-combat-every-1-second:
-  action-bar: "<red>You are currently in combat! Do not log out!"
+combat-end:
+  title: "<green><b><underlined>Combat Over"
+  subtitle: "<green>You're no longer in combat. You can log out!"
+  chat: "%prefix% <green>You are no longer in combat..! You can now logout!"
+
 
 combat-use-item-elytra-glide: "%prefix% <red>You are not allowed to use elytra in combat."
 combat-use-item-elytra-rocket-boost: "%prefix% <red>You are not allowed to use rocket boosters in combat."

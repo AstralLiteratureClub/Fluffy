@@ -22,6 +22,9 @@ public final class MessageKey
 					return;
 				}
 				KeyType type = field.getAnnotation(KeyType.class);
+				if (!type.autoLoad()){
+					continue;
+				}
 				field.setAccessible(true);
 				Object value = field.get(null);
 				if (value instanceof String key){
@@ -105,7 +108,7 @@ public final class MessageKey
 	 */
 	@KeyType(Type.MESSAGE)
 	public static final String COMBAT_COOLDOWN_DEFAULT = "combat-item-cooldown-default";
-	@KeyType(Type.MESSAGE)
+	@KeyType(value = Type.MESSAGE, autoLoad = false)
 	public static final String COMBAT_COOLDOWN_ITEM_SPECIFIC = "combat-item-cooldown-%item%";
 
 	@NotNull
@@ -126,10 +129,11 @@ public final class MessageKey
 	@Retention(RetentionPolicy.RUNTIME)
 	public @interface KeyType {
 		Type value() default Type.MESSAGE;
+		boolean autoLoad() default true;
 	}
 
 	public enum Type {
 		PLACEHOLDER,
-		MESSAGE
+		MESSAGE,
 	}
 }

@@ -7,7 +7,6 @@ import bet.astral.fluffy.listeners.*;
 import bet.astral.fluffy.manager.*;
 import bet.astral.fluffy.messenger.MessageKey;
 import bet.astral.messenger.Messenger;
-import bet.astral.messenger.placeholder.LegacyPlaceholder;
 import bet.astral.messenger.placeholder.Placeholder;
 import fr.skytasul.glowingentities.GlowingBlocks;
 import fr.skytasul.glowingentities.GlowingEntities;
@@ -20,6 +19,8 @@ import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
+import org.bukkit.configuration.Configuration;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
@@ -34,7 +35,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
+
+import static bet.astral.fluffy.utils.Resource.loadResourceAsTemp;
+import static bet.astral.fluffy.utils.Resource.loadResourceToFile;
 
 
 @Getter
@@ -146,6 +151,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 
 	@Override
 	public void onEnable() {
+		uploadUploads();
 		configuration = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "config.yml"));
 		combatConfig = new CombatConfig(this);
 		reloadConfig();
@@ -161,14 +167,13 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		} else {
 			placeholderMap = new HashMap<>(placeholderMap);
 		}
-		placeholderMap.put("prefix-2", new LegacyPlaceholder("prefix", "&d&lDebug Fluffy"));
-		// REMOVE ^
 		getLogger().info("Overriding message placeholders...");
 		messageManager.overrideDefaultPlaceholders(placeholderMap);
 		getLogger().info("Overrode message placeholders...");
 		// Just loading the plugin-specific messages.
 		MessageKey.loadMessages(messageManager);
 
+		statisticDatabase = new StatisticDatabase(this);
 
 		glowingEntities = new GlowingEntities(this); // required in combat manager
 		glowingBlocks = new GlowingBlocks(this); // required in combat manager
@@ -182,6 +187,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		new CMDDebug(this).registerCommand();
 		new CMDReload(this).registerCommand();
 		new CMDPotions(this).registerCommand();
+		new CMDGlow(this).registerCommand();
 		registerListeners(new PlayerBeginCombatListener(this));
 		registerListeners(new PlayerGlowDisableListener(this));
 		registerListeners(new PlayerExitWhileInCombatListener(this));
@@ -255,6 +261,60 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 	public void reloadConfig() {
 		super.reloadConfig();
 		combatConfig.reload(getConfig());
+	}
+
+	private void uploadUploads(){
+		String[] files = new String[]{
+				"config|yml",
+				"deaths|yml",
+				"deaths-npc|yml",
+				"messages|yml",
+		};
+		for (String name : files){
+			name = name.replace("dm/", "discord-messages/");
+
+			String[] split = name.split("\\|");
+			String fileName = split[0];
+			String ending = split[1];
+			File fileTemp = loadResourceAsTemp("/upload/"+fileName, ending);
+			File file = loadResourceToFile("/upload/"+fileName, ending, new File(getDataFolder(), fileName+"."+ending), true);
+			if (ending.matches("(?i)yml") || ending.matches("(?i)yaml")){
+				loadConfig(getConfig(fileTemp), getConfig(file), file);
+			}
+		}
+	}
+
+	private void loadConfig(FileConfiguration tempConfig, FileConfiguration config, File file){
+		Set<String> keys = tempConfig.getKeys(false);
+		for (String key : keys){
+			addDefaults(key, tempConfig, config);
+		}
+		try {
+			config.save(file);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private void addDefaults(String key, Configuration tempConfig, Configuration config) {
+		List<String> comment = tempConfig.getComments(key);
+		if (!comment.isEmpty() && config.getInlineComments(key).isEmpty()) {
+			config.setComments(key, comment);
+		}
+		comment = tempConfig.getInlineComments(key);
+		if (!comment.isEmpty() && config.getInlineComments(key).isEmpty()) {
+			config.setInlineComments(key, comment);
+		}
+		Object value = tempConfig.get(key); // Retrieve the value from the tempConfig
+		if (value instanceof ConfigurationSection section) {
+			for (String k : section.getKeys(false)) {
+				addDefaults(key + "." + k, tempConfig, config); // Append current key
+			}
+		}
+	}
+
+	private FileConfiguration getConfig(File file){
+		return YamlConfiguration.loadConfiguration(file);
 	}
 
 

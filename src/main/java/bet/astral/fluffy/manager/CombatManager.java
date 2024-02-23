@@ -206,7 +206,9 @@ public final class CombatManager {
 								&& victimOP.isOnline() && attackerOP.isOnline()) {
 							try {
 								glowingEntities.setGlowing(attackerOP.getPlayer(), victimOP.getPlayer(), config.getCombatGlowLatest());
-								glowingEntities.setGlowing(victimOP.getPlayer(), attackerOP.getPlayer(), config.getCombatGlowLatest());
+								if (!victimOP.equals(attackerOP)){
+									glowingEntities.setGlowing(victimOP.getPlayer(), attackerOP.getPlayer(), config.getCombatGlowLatest());
+								}
 							} catch (ReflectiveOperationException e) {
 								throw new RuntimeException(e);
 							}

@@ -183,14 +183,14 @@ anchors:
   # And start combat with players
   # Note: This doesn't disable respawn anchor damage
   # True/False
-  begin-combat: false
+  begin-combat: true
 
 crystals:
   # Allows players using ender crystals to damage other players
   # And start combat with other players
   # Note: This doesn't disable ender crystal damage
   # True/False
-  begin-combat: false
+  begin-combat: true
 
 tnt:
   # Allows players using tnt to damage other players
@@ -198,14 +198,14 @@ tnt:
   # Note: This doesn't disable tnt damage
   # Note: This check is chained with other TNTs and looks for the first explosion cause
   # True/False
-  begin-combat: false
+  begin-combat: true
 
 beds:
   # Allows players to use beds to damage other players.
   # Beds explode only in the end and nether
   # Note: This doesn't disable tnt damage
   # True/False
-  begin-combat: false
+  begin-combat: true
 
 potions:
   # Potions to enable combat
