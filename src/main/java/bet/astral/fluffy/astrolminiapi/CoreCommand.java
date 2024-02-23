@@ -14,6 +14,7 @@ import java.lang.reflect.Field;
  * @author antritus
  * @version 3-CosmicCapital
  */
+@Deprecated(forRemoval = true)
 public abstract class CoreCommand extends BukkitCommand {
 	public void registerCommand() {
 		try {

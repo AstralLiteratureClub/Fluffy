@@ -73,14 +73,12 @@ elytra:
   # True/False
   # Bypass permission: fluffy.bypass.combat-elytra
   allow-in-combat: false
-  message: true
   # True/False
   rocket-boost:
     # Denies use of rocket boosting with elytra in combat
     # Bypass permission: fluffy.bypass.combat-elytra
     # True/False
     allow-in-combat: false
-    message: true
 
 trident:
   # Denies use of riptide enchantment in combat.
@@ -88,7 +86,6 @@ trident:
   # True/False
   riptide:
     allow-in-combat: false
-    message: true
 
 
 combat-log:
@@ -121,7 +118,6 @@ combat-log:
     action: KILL
     # Broadcast to the server about the combat log
     # True/False
-    broadcast: true
     # Configuration for killing the player when they log out.
     # combat-log.action.value = KILL
     kill:
@@ -157,20 +153,10 @@ combat-log:
         restart-combat: true
 
       death:
-        # Broadcast the death of the npc
-        broadcast: true
-        # Broadcast the death message for the npc?
-        death-message: true
         # check comments on: combat-log.quit.kill.*
         drop-items: true
         drop-experience: false
   join:
-    # Send player a private message about combat logging
-    # True/False
-    player-message: true
-    # Broadcast the server that given player had combat logged
-    # True/False
-    broadcast: true
     # How long does the rejoin period last
     rejoin-ticks: 50 # 2.5 seconds
 
@@ -197,14 +183,14 @@ anchors:
   # And start combat with players
   # Note: This doesn't disable respawn anchor damage
   # True/False
-  begin-combat: false
+  begin-combat: true
 
 crystals:
   # Allows players using ender crystals to damage other players
   # And start combat with other players
   # Note: This doesn't disable ender crystal damage
   # True/False
-  begin-combat: false
+  begin-combat: true
 
 tnt:
   # Allows players using tnt to damage other players
@@ -212,14 +198,14 @@ tnt:
   # Note: This doesn't disable tnt damage
   # Note: This check is chained with other TNTs and looks for the first explosion cause
   # True/False
-  begin-combat: false
+  begin-combat: true
 
 beds:
   # Allows players to use beds to damage other players.
   # Beds explode only in the end and nether
   # Note: This doesn't disable tnt damage
   # True/False
-  begin-combat: false
+  begin-combat: true
 
 potions:
   # Potions to enable combat

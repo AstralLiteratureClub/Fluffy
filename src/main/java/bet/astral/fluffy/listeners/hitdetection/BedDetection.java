@@ -1,9 +1,7 @@
-package bet.astral.fluffy.hitdetection;
+package bet.astral.fluffy.listeners.hitdetection;
 
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.events.EntityDamageEntityByBedEvent;
-import net.citizensnpcs.api.event.NPCDamageByBlockEvent;
-import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;

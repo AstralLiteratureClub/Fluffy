@@ -2,9 +2,11 @@ package bet.astral.fluffy.manager;
 
 import bet.astral.fluffy.cooldowns.Cooldown;
 import bet.astral.fluffy.cooldowns.EnderPearlCooldown;
-import bet.astral.messagemanager.placeholder.LegacyPlaceholder;
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.events.CombatFullEndEvent;
+import bet.astral.fluffy.messenger.MessageKey;
+import bet.astral.messenger.Message;
+import bet.astral.messenger.placeholder.LegacyPlaceholder;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -116,10 +118,16 @@ public class CooldownManager implements Listener {
 				} else {
 					event.setCancelled(true);
 					if (cooldown.message()){
-						fluffy.getMessageManager()
-								.message(player, "cooldown."+material.toString()
-										.replace("_", "-")
-										.toLowerCase());
+						Message message = fluffy.getMessageManager().getMessage(MessageKey.itemSpecificItemCooldown(material));
+						if (message == null){
+							fluffy.getMessageManager()
+									.message(player, MessageKey.COMBAT_COOLDOWN_DEFAULT,
+											new LegacyPlaceholder("cooldown", String.valueOf(cooldown.seconds())));
+						} else {
+							fluffy.getMessageManager()
+									.message(player, MessageKey.itemSpecificItemCooldown(material),
+											new LegacyPlaceholder("cooldown", String.valueOf(cooldown.seconds())));
+						}
 					}
 				}
 			}
@@ -153,11 +161,16 @@ public class CooldownManager implements Listener {
 							player.playSound(sound);
 						}
 						if (cooldown.message()){
-							fluffy.getMessageManager()
-									.message(player, "cooldown."+material.toString()
-											.replace("_", "-")
-											.toLowerCase(),
-											new LegacyPlaceholder("cooldown", String.valueOf(cooldown.seconds())));
+							Message message = fluffy.getMessageManager().getMessage(MessageKey.itemSpecificItemCooldown(material));
+							if (message == null){
+								fluffy.getMessageManager()
+										.message(player, MessageKey.COMBAT_COOLDOWN_DEFAULT,
+												new LegacyPlaceholder("cooldown", String.valueOf(cooldown.seconds())));
+							} else {
+								fluffy.getMessageManager()
+										.message(player, MessageKey.itemSpecificItemCooldown(material),
+												new LegacyPlaceholder("cooldown", String.valueOf(cooldown.seconds())));
+							}
 						}
 					} else {
 						event.setCancelled(true);

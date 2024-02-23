@@ -37,7 +37,7 @@ public class BlockUserManager {
 		fluffyCombat.getServer().getScheduler().runTaskTimerAsynchronously(fluffyCombat,
 				(x) -> {
 
-					if (users.size() == 0) {
+					if (users.isEmpty()) {
 						return;
 					}
 					List<Location> deleteLocations = new LinkedList<>();

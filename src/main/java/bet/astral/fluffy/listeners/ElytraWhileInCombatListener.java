@@ -1,11 +1,11 @@
 package bet.astral.fluffy.listeners;
 
+import bet.astral.fluffy.messenger.MessageKey;
+import bet.astral.fluffy.messenger.Placeholders;
 import com.destroystokyo.paper.event.player.PlayerElytraBoostEvent;
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.manager.CombatManager;
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -31,19 +31,21 @@ public class ElytraWhileInCombatListener implements Listener {
 	public void onDeath(PlayerDeathEvent event){
 		if (elytras.get(event.getEntity()) != null){
 			ItemStack itemStack = elytras.get(event.getEntity());
+			ItemStack replacementElytra = FluffyCombat.convertElytraWithReplacer(itemStack);
+			if (replacementElytra == null){
+				return;
+			}
+			event.getDrops().removeIf(item->item.getAmount()==replacementElytra.getAmount() && replacementElytra.isSimilar(replacementElytra));
+
 			if (itemStack.getEnchantmentLevel(Enchantment.VANISHING_CURSE)>0){
+				elytras.remove(event.getEntity());
 				return;
 			}
 			if (event.getKeepInventory()){
 				return;
 			}
 			event.getDrops().add(itemStack);
-			if (true)
-				return;
-
-			Location location = event.getEntity().getLocation();
-			World world = location.getWorld();
-			world.dropItemNaturally(location, itemStack);
+			elytras.remove(event.getEntity());
 		}
 	}
 
@@ -71,7 +73,7 @@ public class ElytraWhileInCombatListener implements Listener {
 		}
 		if (!player.isGliding() &&
 				fluffy.getCombatConfig().isElytraMessage()) {
-			fluffy.getMessageManager().message(player, "elytra.glide");
+			fluffy.getMessageManager().message(player, MessageKey.COMBAT_USE_ITEM_ELYTRA_GLIDE, Placeholders.playerPlaceholders("player", player));
 		}
 
 		e.setCancelled(true);
@@ -101,9 +103,9 @@ public class ElytraWhileInCombatListener implements Listener {
 			event.setCancelled(true);
 			event.setShouldConsume(false);
 			if (fluffy.getCombatConfig().isElytraBoostMessage()){
-				fluffy.getMessageManager()
-						.message(player, "elytra.rocket-boost");
 			}
+			fluffy.getMessageManager()
+					.message(player, MessageKey.COMBAT_USE_ITEM_ELYTRA_ROCKET_BOOST, Placeholders.playerPlaceholders("player", player));
 		}
 	}
 }

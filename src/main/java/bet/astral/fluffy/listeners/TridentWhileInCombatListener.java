@@ -2,6 +2,7 @@ package bet.astral.fluffy.listeners;
 
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.manager.CombatManager;
+import bet.astral.fluffy.messenger.MessageKey;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -30,9 +31,7 @@ public class TridentWhileInCombatListener implements Listener {
 				player.setVelocity(vel);
 				player.teleportAsync(location);
 			}, 1L);
-			if (fluffy.getCombatConfig().isTridentBoostMessage()){
-				fluffy.getMessageManager().message(player, "trident.riptide");
-			}
+			fluffy.getMessageManager().message(player, MessageKey.COMBAT_USE_ITEM_TRIDENT_RIPTIDE);
 		}
 	}
 }

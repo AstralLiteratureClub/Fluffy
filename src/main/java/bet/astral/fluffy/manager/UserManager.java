@@ -14,6 +14,7 @@ import java.util.*;
 public class UserManager {
 	private final FluffyCombat fluffyCombat;
 	private final Map<UUID, CombatUser> users = new LinkedHashMap<>();
+	private final Set<CombatUser> requireSave = new HashSet<>();
 
 	/**
 	 * Creates new instance of user manager.
@@ -27,12 +28,9 @@ public class UserManager {
 					List<UUID> removeList = new LinkedList<>();
 					for (CombatUser user : users.values()) {
 						// Might be null in testing. Database isn't working atm so this fixes it
-						StatisticDatabase database = fluffyCombat.getStatisticDatabase();
-						if (database != null) {
-							fluffyCombat.getStatisticDatabase().updateDatabase(user);
-						}
 						if (!user.getPlayer().isOnline()) {
 							removeList.add(user.getUniqueId());
+							requireSave.add(user);
 						}
 					}
 					for (UUID uuid : removeList) {
@@ -94,7 +92,8 @@ public class UserManager {
 					users.put(player.getUniqueId(), new CombatUser(fluffyCombat, player.getUniqueId()));
 					return;
 				}
-				CombatUser user = database.loadFromDatabase(player.getUniqueId());
+				CombatUser user = new CombatUser(fluffyCombat, player.getUniqueId());
+				database.load(user);
 				users.put(player.getUniqueId(), user);
 			});
 		}

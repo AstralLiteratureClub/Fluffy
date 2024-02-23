@@ -1,4 +1,4 @@
-package bet.astral.fluffy.hitdetection;
+package bet.astral.fluffy.listeners.hitdetection;
 
 import org.bukkit.event.Listener;
 

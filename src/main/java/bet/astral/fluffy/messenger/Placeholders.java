@@ -1,8 +1,9 @@
 package bet.astral.fluffy.messenger;
 
-import bet.astral.messagemanager.placeholder.LegacyPlaceholder;
-import bet.astral.messagemanager.placeholder.Placeholder;
 import bet.astral.fluffy.api.CombatCause;
+import bet.astral.messenger.Messenger;
+import bet.astral.messenger.placeholder.LegacyPlaceholder;
+import bet.astral.messenger.placeholder.Placeholder;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import org.bukkit.Bukkit;

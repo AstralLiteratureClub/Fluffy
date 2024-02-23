@@ -183,9 +183,6 @@ public class PlaceholderAPIHook extends PlaceholderExpansion implements Hook {
 					case "total" -> {
 						return user.getTotalKills();
 					}
-					case "melee"->{
-						return user.getMeleeKills();
-					}
 					case "anchor"-> {
 						return user.getAnchorKills();
 					}
@@ -198,8 +195,8 @@ public class PlaceholderAPIHook extends PlaceholderExpansion implements Hook {
 					case "bed"->{
 						return user.getBedKills();
 					}
-					case "projectile"->{
-						return user.getProjectileKills();
+					case "totem", "totems" ->{
+						return user.getTotemKills();
 					}
 					default -> {
 						return 0;
@@ -207,7 +204,14 @@ public class PlaceholderAPIHook extends PlaceholderExpansion implements Hook {
 				}
 			}
 			case "deaths"->{
-				return user.getTotalDeaths();
+				switch (type.toLowerCase()){
+					case "total"->{
+						return user.getTotalDeaths();
+					}
+					case "totem", "totems" -> {
+						return user.getTotemDeaths();
+					}
+				}
 			}
 			case "killstreak"->{
 				return user.getKillstreak();
@@ -216,10 +220,10 @@ public class PlaceholderAPIHook extends PlaceholderExpansion implements Hook {
 				return user.getDeathStreak();
 			}
 			case "totem_activated"->{
-				return user.getTotemsActivated();
+				return user.getTotemKills();
 			}
 			case "totem_resurrections"->{
-				return user.getTotemsResurrected();
+				return user.getTotemDeaths();
 			}
 		}
  		return 0;

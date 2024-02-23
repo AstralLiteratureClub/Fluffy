@@ -3,7 +3,6 @@ package bet.astral.fluffy.api;
 import bet.astral.fluffy.FluffyCombat;
 import lombok.Getter;
 import lombok.Setter;
-import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
@@ -20,18 +19,24 @@ import java.util.UUID;
 @Getter
 @Setter
 public class CombatUser {
+	/*
+	 * Statistics
+	 */
 	private int totalKills;
-	private int meleeKills;
 	private int anchorKills;
 	private int tntKills;
 	private int crystalKills;
 	private int bedKills;
-	private int projectileKills;
+	private int totemKills;
 	private int killstreak;
 	private int totalDeaths;
+	private int totemDeaths;
 	private int deathStreak;
-	private int totemsResurrected;
-	private int totemsActivated;
+
+	/*
+	 * Glowing
+	 */
+
 	private boolean showGlowingLatest;
 	private boolean showGlowingTagged;
 	private boolean showGlowingTagReLogged;
@@ -39,13 +44,15 @@ public class CombatUser {
 	private BukkitTask taskTotemTimer;
 	private BukkitTask taskRejoinTimer;
 
+	/*
+	 * Totem of Undying counting
+	 */
+
 	private int totemCounter;
 	private int totemResetTimer;
 
 	private boolean isOffline = false;
 	private int rejoinTimer = -1;
-
-	private NPC npc;
 
 	private final Map<String, Object> data = new LinkedHashMap<>();
 	@Getter

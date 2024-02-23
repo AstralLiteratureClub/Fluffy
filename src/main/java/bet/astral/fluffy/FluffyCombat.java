@@ -2,11 +2,12 @@ package bet.astral.fluffy;
 
 import bet.astral.fluffy.configs.CombatConfig;
 import bet.astral.fluffy.database.StatisticDatabase;
-import bet.astral.fluffy.hitdetection.*;
+import bet.astral.fluffy.listeners.hitdetection.*;
 import bet.astral.fluffy.listeners.*;
 import bet.astral.fluffy.manager.*;
-import bet.astral.messagemanager.Message;
-import bet.astral.messagemanager.MessageManager;
+import bet.astral.fluffy.messenger.MessageKey;
+import bet.astral.messenger.Messenger;
+import bet.astral.messenger.placeholder.Placeholder;
 import fr.skytasul.glowingentities.GlowingBlocks;
 import fr.skytasul.glowingentities.GlowingEntities;
 import lombok.AccessLevel;
@@ -14,21 +15,17 @@ import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
+import org.bukkit.configuration.Configuration;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.FallingBlock;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityChangeBlockEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -38,7 +35,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
+
+import static bet.astral.fluffy.utils.Resource.loadResourceAsTemp;
+import static bet.astral.fluffy.utils.Resource.loadResourceToFile;
 
 
 @Getter
@@ -123,7 +124,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 	public static boolean isPaper = false;
 	public static boolean isStopping = false;
 	public static boolean debug = false;
-	private MessageManager<FluffyCombat, FileConfiguration, HashMap<String, Message>> messageManager;
+	private Messenger<FluffyCombat> messageManager;
 	private CombatManager combatManager;
 	private UserManager userManager;
 	private BlockUserManager blockUserManager;
@@ -150,13 +151,29 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 
 	@Override
 	public void onEnable() {
+		uploadUploads();
 		configuration = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "config.yml"));
 		combatConfig = new CombatConfig(this);
 		reloadConfig();
 		debug = getConfig().getBoolean("debug");
 		FileConfiguration configuration = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "messages.yml"));
-		messageManager = new MessageManager<>(this, configuration, new HashMap<>());
+		messageManager = new Messenger<>(this, configuration, new HashMap<>());
+		getLogger().info("Loading placeholders for messages...");
+		Map<String, Placeholder> placeholderMap = messageManager.loadPlaceholders("placeholders");
+		getLogger().info("Loaded placeholders for messages...");
+		// Debug
+		if (placeholderMap == null){
+			placeholderMap = new HashMap<>();
+		} else {
+			placeholderMap = new HashMap<>(placeholderMap);
+		}
+		getLogger().info("Overriding message placeholders...");
+		messageManager.overrideDefaultPlaceholders(placeholderMap);
+		getLogger().info("Overrode message placeholders...");
+		// Just loading the plugin-specific messages.
+		MessageKey.loadMessages(messageManager);
 
+		statisticDatabase = new StatisticDatabase(this);
 
 		glowingEntities = new GlowingEntities(this); // required in combat manager
 		glowingBlocks = new GlowingBlocks(this); // required in combat manager
@@ -170,6 +187,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		new CMDDebug(this).registerCommand();
 		new CMDReload(this).registerCommand();
 		new CMDPotions(this).registerCommand();
+		new CMDGlow(this).registerCommand();
 		registerListeners(new PlayerBeginCombatListener(this));
 		registerListeners(new PlayerGlowDisableListener(this));
 		registerListeners(new PlayerExitWhileInCombatListener(this));
@@ -206,24 +224,12 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		//statisticDatabase = new StatisticDatabase(this);
 
 		registerListeners(this);
+
+		getLogger().info("Fluffy Combat Management plugin has loaded!");
 	}
 	@EventHandler
 	public void onChunkLoad(ChunkLoadEvent event) {
 		clearIncorrectBlockData(event.getChunk());
-	}
-//	@EventHandler
-	public void onBlockPlace(EntityChangeBlockEvent event){
-		if (event.getEntity() instanceof FallingBlock fallingBlock){
-			getServer().broadcastMessage("BEFORE: ! " + event.getBlock().getType());
-			getServer().broadcastMessage("AFTER: ! " + event.getTo());
-		}
-	}
-
-//	@EventHandler
-	public void onDamage(EntityDamageEvent event){
-		if (event.getCause()== EntityDamageEvent.DamageCause.LAVA){
-			event.getEntity().sendMessage("LAVA!");
-		}
 	}
 
 	@Override
@@ -255,6 +261,60 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 	public void reloadConfig() {
 		super.reloadConfig();
 		combatConfig.reload(getConfig());
+	}
+
+	private void uploadUploads(){
+		String[] files = new String[]{
+				"config|yml",
+				"deaths|yml",
+				"deaths-npc|yml",
+				"messages|yml",
+		};
+		for (String name : files){
+			name = name.replace("dm/", "discord-messages/");
+
+			String[] split = name.split("\\|");
+			String fileName = split[0];
+			String ending = split[1];
+			File fileTemp = loadResourceAsTemp("/upload/"+fileName, ending);
+			File file = loadResourceToFile("/upload/"+fileName, ending, new File(getDataFolder(), fileName+"."+ending), true);
+			if (ending.matches("(?i)yml") || ending.matches("(?i)yaml")){
+				loadConfig(getConfig(fileTemp), getConfig(file), file);
+			}
+		}
+	}
+
+	private void loadConfig(FileConfiguration tempConfig, FileConfiguration config, File file){
+		Set<String> keys = tempConfig.getKeys(false);
+		for (String key : keys){
+			addDefaults(key, tempConfig, config);
+		}
+		try {
+			config.save(file);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private void addDefaults(String key, Configuration tempConfig, Configuration config) {
+		List<String> comment = tempConfig.getComments(key);
+		if (!comment.isEmpty() && config.getInlineComments(key).isEmpty()) {
+			config.setComments(key, comment);
+		}
+		comment = tempConfig.getInlineComments(key);
+		if (!comment.isEmpty() && config.getInlineComments(key).isEmpty()) {
+			config.setInlineComments(key, comment);
+		}
+		Object value = tempConfig.get(key); // Retrieve the value from the tempConfig
+		if (value instanceof ConfigurationSection section) {
+			for (String k : section.getKeys(false)) {
+				addDefaults(key + "." + k, tempConfig, config); // Append current key
+			}
+		}
+	}
+
+	private FileConfiguration getConfig(File file){
+		return YamlConfiguration.loadConfiguration(file);
 	}
 
 
