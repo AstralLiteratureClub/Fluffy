@@ -276,6 +276,9 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		registerListeners(cooldownManager);
 		registerListeners(new TridentWhileInCombatListener(this));
 		registerListeners(new ElytraWhileInCombatListener(this));
+		registerListeners(new LiquidOwnerListener(this));
+		registerListeners(new PlayerFlightListener(this));
+
 		if (Compatibility.RESPAWN_ANCHOR.isCompatible())
 			anchorDetection = new AnchorDetection(this);
 		if (Compatibility.ENDER_CRYSTAL.isCompatible())

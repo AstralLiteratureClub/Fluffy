@@ -43,6 +43,9 @@ public class CombatUser {
 
 	private UUID lastFireDamage = null;
 
+	private BukkitTask taskFlightTimer;
+	private int flightTimer;
+
 	private BukkitTask taskTotemTimer;
 	private BukkitTask taskRejoinTimer;
 

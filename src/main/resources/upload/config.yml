@@ -11,6 +11,19 @@ database:
     user: "root"
     password: "!(#Nus3_B3tt3r_P4ssw0rds!"
 
+flight:
+  # Should the player be able to use flight?
+  # DENY/ALLOW/ALLOW_TICKS
+  flight-mode: DENY
+  # How long should the player be able to fly in combat?
+  # This is set by ticks
+  # -1 = Infinite
+  # 20 = 1 second
+  # 100 = 5 seconds
+  allow-flight-time: 200
+
+# Glowing doesn't work properly with colors if TAB plugin is installed
+#  because of how they have made the groups.
 glowing:
   # Use bukkit chat color names for these colors.
   # Colors must be real glowing colors ex: ChatColor.RED = glowing red.

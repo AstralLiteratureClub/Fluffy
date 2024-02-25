@@ -80,6 +80,9 @@ public class CombatConfig {
 	private boolean isLingeringPotionDetection;
 	private boolean isSplashPotionDetection;
 
+	private FlightMode flightMode;
+	private int flightTicks;
+
 	public CombatConfig(FluffyCombat fluffy){
 		this.fluffy = fluffy;
 		reload(fluffy.getConfig());
@@ -175,6 +178,9 @@ public class CombatConfig {
 			}
 			potionsToBeginCombat.add(type);
 		}
+
+		flightMode = EnumUtils.getEnum(FlightMode.class, configuration.getString("flight.flight-mode"), FlightMode.DENY);
+		flightTicks = configuration.getInt("flight.allow-flight-time", 0);
 	}
 
 	public FluffyCombat fluffy() {
@@ -185,5 +191,10 @@ public class CombatConfig {
 		KILL,
 		NOTHING,
 		SPAWN_NPC
+	}
+	public enum FlightMode {
+		DENY,
+		ALLOW,
+		ALLOW_TICKS
 	}
 }
