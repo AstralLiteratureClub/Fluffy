@@ -1,28 +1,30 @@
 package bet.astral.fluffy.listeners;
 
+import bet.astral.fluffy.api.BlockCombatUser;
 import bet.astral.fluffy.api.CombatCause;
+import bet.astral.fluffy.api.CombatTag;
+import bet.astral.fluffy.api.CombatUser;
 import bet.astral.fluffy.api.events.*;
 import bet.astral.fluffy.manager.BlockUserManager;
+import bet.astral.fluffy.manager.CombatManager;
 import bet.astral.fluffy.messenger.MessageKey;
 import bet.astral.fluffy.messenger.Placeholders;
+import bet.astral.fluffy.FluffyCombat;
 import bet.astral.messenger.Messenger;
 import bet.astral.messenger.placeholder.Placeholder;
-import bet.astral.fluffy.FluffyCombat;
-import bet.astral.fluffy.api.BlockCombatUser;
-import bet.astral.fluffy.api.CombatTag;
-import bet.astral.fluffy.manager.CombatManager;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,6 +33,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import static bet.astral.fluffy.FluffyCombat.*;
 import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.*;
 
 /**
@@ -91,6 +94,14 @@ public class PlayerBeginCombatListener implements Listener {
 		} else {
 			tag.setVictimWeapon(itemStack);
 		}
+		if (combatCause==CombatCause.FIRE){
+			CombatUser user = tag.getUser(victim);
+			user.setLastFireDamage(attacker.getUniqueId());
+		} else if (itemStack.containsEnchantment(Enchantment.FIRE_ASPECT) && combatCause == CombatCause.MELEE
+				|| itemStack.getType()==Material.BOW && itemStack.containsEnchantment(Enchantment.ARROW_FIRE)) {
+			CombatUser user = tag.getUser(victim);
+			user.setLastFireDamage(attacker.getUniqueId());
+		}
 	}
 	public static void handle(Player victim, Block attacker, CombatCause combatCause) {
 		handle(victim, attacker, combatCause, null);
@@ -130,40 +141,44 @@ public class PlayerBeginCombatListener implements Listener {
 		enterEvent.callEvent();
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onEntityBlock(EntityDamageEvent event) {
 		if (!(event.getEntity() instanceof Player player)) {
 			return;
 		}
-		player.sendRichMessage("Oh no help!!!");
-		Block block = event.getEntity().getLocation().getBlock();
-		player.sendRichMessage(block.getType().name());
 		if (event.getCause() == FIRE) {
-			player.sendRichMessage("Hello!");
-			Material material = block.getType();
+			Block nearest = findNearestOwnedBlock(player, Material.FIRE, Material.SOUL_FIRE);
+			if (nearest == null){
+				return;
+			}
+			UUID owner = FluffyCombat.getBlockOwner(nearest);
+			if (owner == null) {
+				return;
+			}
+			Material material = nearest.getType();
 			if (material == Material.FIRE || material == Material.SOUL_FIRE) {
-				@Nullable UUID owner = FluffyCombat.getBlockOwner(block);
-				if (owner == null) {
-					return;
-				}
-				player.sendRichMessage("Heyllo!");
 				OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(owner);
 				handle(player, offlinePlayer, CombatCause.FIRE);
 			}
 		} else if (event.getCause() == LAVA) {
-			player.sendRichMessage("Hi!");
-			@Nullable UUID owner = FluffyCombat.getBlockOwner(block);
-			if (owner == null) {
+			Block block = FluffyCombat.findNearestOwnedBlock(player, Material.LAVA);
+			UUID owner = FluffyCombat.getBlockOwner(block);
+			if (owner == null){
 				return;
 			}
-			player.sendRichMessage("Hiollo!");
+
+			try {
+				combat.getGlowingBlocks().setGlowing(block, player, ChatColor.RED);
+			} catch (ReflectiveOperationException e) {
+				throw new RuntimeException(e);
+			}
 			OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(owner);
 			handle(player, offlinePlayer, CombatCause.FIRE);
 		}
 	}
 
 
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onEntityDamage(EntityDamageByEntityEvent event) {
 
 		if (!(event.getEntity() instanceof Player victim)) {

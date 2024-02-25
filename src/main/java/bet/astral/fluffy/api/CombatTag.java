@@ -161,4 +161,8 @@ public class CombatTag {
 	public boolean isActive(Player player) {
 		return isActive(player.getUniqueId());
 	}
+
+	public CombatUser getUser(Player victim) {
+		return victim.getUniqueId().equals(this.victim.getUniqueId()) ? this.victim : attacker;
+	}
 }

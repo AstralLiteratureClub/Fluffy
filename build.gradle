@@ -41,6 +41,10 @@ dependencies {
 
     compileOnly 'me.clip:placeholderapi:2.11.2'
 
+    implementation 'org.incendo:cloud-core:2.0.0-beta.2'
+    implementation 'org.incendo:cloud-paper:2.0.0-beta.2'
+    implementation 'org.incendo:cloud-minecraft-extras:2.0.0-beta.2'
+
     // PAPER MC
     paperweight.paperDevBundle("1.20.2-R0.1-SNAPSHOT")
 }
@@ -60,6 +64,7 @@ shadowJar {
 
     relocate 'bet.astral.messenger', 'bet.astral.fluffy.libs.messenger'
     relocate 'fr.skytasul.glowingentities', 'bet.astral.fluffy.libs.fr.skytasul.glowingentities'
+    relocate 'org.incendo.cloud', 'bet.astral.fluffy.libs.org.incendo.cloud'
 }
 
 tasks.assemble {

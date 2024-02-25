@@ -41,6 +41,8 @@ public class CombatUser {
 	private boolean showGlowingTagged;
 	private boolean showGlowingTagReLogged;
 
+	private UUID lastFireDamage = null;
+
 	private BukkitTask taskTotemTimer;
 	private BukkitTask taskRejoinTimer;
 
