@@ -43,8 +43,11 @@ public class CooldownManager implements Listener {
 
 	public void loadCooldowns(){
 		cooldowns.clear();
+		if (!fluffy.getCombatConfig().isCustomCooldowns()){
+			return;
+		}
 		@SuppressWarnings("removal") FileConfiguration configuration = fluffy.getConfig();
-		List<Map<?, ?>> cooldownListMap = configuration.getMapList("cooldowns");
+		List<Map<?, ?>> cooldownListMap = configuration.getMapList("cooldowns.cooldowns");
 		for (Map<?, ?> cooldownMap : cooldownListMap){
 			Material material = Material.valueOf((String) cooldownMap.get("material"));
 			Object objTime = cooldownMap.get("cooldown");
@@ -103,6 +106,7 @@ public class CooldownManager implements Listener {
 					return;
 				}
 				Cooldown cooldown = cooldowns.get(material);
+				player.sendMessage("You have cooldown: " + cooldown.hasCooldown(player) + ".");
 				if (!cooldown.hasCooldown(player)) {
 					cooldown.handleCooldown(player);
 					if (cooldown.sound() != null){

@@ -271,7 +271,7 @@ potions:
 cooldowns:
   # Enabled?
   # True/False
-  enabled: false
+  enabled: true
   reset-on-combat-end: true
   # Bypass: fluffy.bypass.combat-cooldown.%material%
   cooldowns:
