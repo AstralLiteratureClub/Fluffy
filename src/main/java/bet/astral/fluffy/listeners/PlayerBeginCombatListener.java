@@ -4,7 +4,7 @@ import bet.astral.fluffy.api.BlockCombatUser;
 import bet.astral.fluffy.api.CombatCause;
 import bet.astral.fluffy.api.CombatTag;
 import bet.astral.fluffy.api.CombatUser;
-import bet.astral.fluffy.api.events.*;
+import bet.astral.fluffy.events.*;
 import bet.astral.fluffy.manager.BlockUserManager;
 import bet.astral.fluffy.manager.CombatManager;
 import bet.astral.fluffy.messenger.MessageKey;
@@ -209,59 +209,4 @@ public class PlayerBeginCombatListener implements Listener {
 		handle(victim, attacker,  CombatCause.MELEE);
 	}
 
-	@EventHandler
-	public void onTnTHit(EntityDamageEntityByTNTEvent event){
-		if (!combat.getCombatConfig().isTNTDetection()){
-			return;
-		}
-		if (!(event.getEntity() instanceof Player player)){
-			return;
-		}
-		if (!(event.attacker() instanceof OfflinePlayer attacker)){
-			return;
-		}
-		handle(player, attacker, CombatCause.TNT);
-	}
-
-	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-	public void onAnchorHit(EntityDamageEntityByRespawnAnchorEvent event) {
-		if (!combat.getCombatConfig().isAnchorDetection()){
-			return;
-		}
-		if (!(event.getEntity() instanceof Player victim)){
-			return;
-		}
-		// those entities are players as mobs can't click on anchors
-		Player attacker = (Player) event.getDamager();
-		handle(victim, attacker, CombatCause.RESPAWN_ANCHOR, event.getItem());
-	}
-
-	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-	public void onBedHit(EntityDamageEntityByBedEvent event) {
-		if (!combat.getCombatConfig().isBedDetection()){
-			return;
-		}
-		if (!(event.getEntity() instanceof Player victim)){
-			return;
-		}
-		// those entities are players as mobs can't click on anchors
-		Player attacker = (Player) event.getDamager();
-		handle(victim, attacker, CombatCause.BED, event.getItem());
-	}
-
-
-
-	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-	public void onCrystalHit(EntityDamageEntityByEnderCrystalEvent event) {
-		if (!combat.getCombatConfig().isCrystalDetection()){
-			return;
-		}
-		if (!(event.getEntity() instanceof Player player)){
-			return;
-		}
-		if (!(event.getDamager() instanceof Player attacker)){
-			return;
-		}
-		handle(player, attacker, CombatCause.ENDER_CRYSTAL, event.getItem());
-	}
 }

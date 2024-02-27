@@ -35,6 +35,10 @@ Fluffy tracks few explosion specific kills and totems (and ofcourse kills, death
 
 # Glowing
 Fluffy allows players to glow when they are tagged. Players by default will glow red, if the player is latest in combat tag list. Other players will glow orange (which have combat tag with the player).
+### TAB (Plugin)
+When a server is using TAB plugin, it's advised to turn off the glowing feature.
+TAB plugin makes the glowing colors not work correctly and only displays them as white.
+TAB is using custom teams for each player and doesn't like the current glowing system.
 
 # Expansions? Addons?
 Fluffy will not custom expansions/addons to the plugin.

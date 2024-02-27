@@ -9,6 +9,7 @@ import bet.astral.fluffy.manager.*;
 import bet.astral.fluffy.messenger.MessageKey;
 import bet.astral.messenger.Messenger;
 import bet.astral.messenger.placeholder.Placeholder;
+import com.jeff_media.armorequipevent.ArmorEquipEvent;
 import fr.skytasul.glowingentities.GlowingBlocks;
 import fr.skytasul.glowingentities.GlowingEntities;
 import lombok.AccessLevel;
@@ -37,6 +38,7 @@ import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -52,6 +54,7 @@ import static bet.astral.fluffy.utils.Resource.loadResourceToFile;
 
 @Getter
 public class FluffyCombat extends JavaPlugin implements Listener {
+	public static NamespacedKey ELYTRA_KEY = new NamespacedKey("fluffy", "elytra");
 	@Getter(AccessLevel.NONE)
 	private static final MiniMessage miniMessage = MiniMessage.miniMessage();
 	public static ItemStack elytraReplacer = new ItemStack(Material.LEATHER_CHESTPLATE);
@@ -160,27 +163,35 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 
 
 	/**
-	 *  Returns the elytra replacer with item meta of given elytra
-	 *  Returns null if not elytra
-	 * @param original elytra
+	 * Returns the elytra replacer with item meta of given elytra
+	 * Returns null if not elytra
+	 *
+	 * @param original   elytra
+	 * @param elytraMode
 	 * @return replacer, else if not elytra null
 	 */
 	@Nullable
-	public static ItemStack convertElytraWithReplacer(ItemStack original) {
+	public static ItemStack convertElytraWithReplacer(ItemStack original, CombatConfig.ElytraMode elytraMode) {
 		if (original.getType()!=Material.ELYTRA){
 			return null;
 		}
-		ItemStack clone = elytraReplacer.clone();
+		ItemStack clone = elytraMode== CombatConfig.ElytraMode.DENY_CHESTPLATE ? elytraReplacer.clone() : original.clone();
 		clone.setItemMeta(original.getItemMeta());
+
 		ItemMeta meta = original.getItemMeta();
-		Component displayname = meta.displayName();
-		if (displayname == null)
-			displayname = miniMessage.deserialize("<Yellow>Elytra Placeholder").decoration(TextDecoration.ITALIC, false);
-		meta.displayName(displayname);
+		if (elytraMode== CombatConfig.ElytraMode.DENY_CHESTPLATE) {
+			Component displayname = meta.displayName();
+			if (displayname == null)
+				displayname = miniMessage.deserialize("<Yellow>Elytra Placeholder").decoration(TextDecoration.ITALIC, false);
+			meta.displayName(displayname);
+		}
 		@Nullable List<Component> lore = meta.lore();
 		if (lore == null) {
 			lore = new LinkedList<>();
+		} else {
+			lore = new ArrayList<>(lore);
 		}
+
 		lore.add(Component.text().build());
 		lore.add(miniMessage.deserialize("<dark_gray> | <gray>This item will disappear soon").decoration(TextDecoration.ITALIC, false));
 		lore.add(miniMessage.deserialize("<dark_gray> |  <gray>and give your elytra back!").decoration(TextDecoration.ITALIC, false));
@@ -188,16 +199,19 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		lore.add(miniMessage.deserialize("<dark_gray> |  <gray>bug so it may be fixed.").decoration(TextDecoration.ITALIC, false));
 		meta.lore(lore);
 
-		meta.removeAttributeModifier(Attribute.GENERIC_ARMOR);
-		meta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier("FluffyElytraReplacer", -3, AttributeModifier.Operation.ADD_NUMBER));
-		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		if (!meta.hasEnchants()){
-			meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+		if (elytraMode== CombatConfig.ElytraMode.DENY_CHESTPLATE) {
+			meta.removeAttributeModifier(Attribute.GENERIC_ARMOR);
+			meta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier("FluffyElytraReplacer", -3, AttributeModifier.Operation.ADD_NUMBER));
+			meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+			if (!meta.hasEnchants()) {
+				meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+			}
+			clone.setItemMeta(meta);
 		}
 
+		meta.getPersistentDataContainer().set(ELYTRA_KEY, PersistentDataType.BOOLEAN, true);
 		clone.setItemMeta(meta);
-		clone.addUnsafeEnchantment(Enchantment.BINDING_CURSE, 5);
-		clone.addUnsafeEnchantment(Enchantment.VANISHING_CURSE, 5);
+
 		return clone;
 	}
 	public static boolean isPaper = false;
@@ -278,6 +292,9 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		registerListeners(new ElytraWhileInCombatListener(this));
 		registerListeners(new LiquidOwnerListener(this));
 		registerListeners(new PlayerFlightListener(this));
+		registerListeners(new ArmorChangeListener(this));
+
+		ArmorEquipEvent.registerListener(this);
 
 		if (Compatibility.RESPAWN_ANCHOR.isCompatible())
 			anchorDetection = new AnchorDetection(this);

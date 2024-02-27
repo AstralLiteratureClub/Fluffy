@@ -1,7 +1,11 @@
 package bet.astral.fluffy.listeners.hitdetection;
 
 import bet.astral.fluffy.FluffyCombat;
-import bet.astral.fluffy.api.events.EntityDamageEntityByEnderCrystalEvent;
+import bet.astral.fluffy.api.CombatCause;
+import bet.astral.fluffy.api.CombatTag;
+import bet.astral.fluffy.events.damage.CombatDamageUsingEnderCrystalEvent;
+import bet.astral.fluffy.listeners.PlayerBeginCombatListener;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -55,6 +59,9 @@ public class CrystalDetection implements Listener {
 		if (!(event.getDamager() instanceof EnderCrystal crystal)){
 			return;
 		}
+		if (!(event.getEntity() instanceof Player victim)){
+			return;
+		}
 		CrystalTag tag = detectionMap.get(crystal);
 		if (tag == null) {
 			return;
@@ -70,16 +77,19 @@ public class CrystalDetection implements Listener {
 				return;
 			}
 		}
-		EntityDamageEntityByEnderCrystalEvent enderCrystalEvent = new EntityDamageEntityByEnderCrystalEvent(
-				event.getEntity(),
-				entity,
-				crystal,
-				event.getFinalDamage(), tag.itemStack
-		);
-		enderCrystalEvent.callEvent();
-		if (enderCrystalEvent.isCancelled()){
-			event.setCancelled(true);
+
+		if (!(entity instanceof OfflinePlayer attacker)){
+			return;
 		}
+
+		ItemStack itemStack = tag.itemStack;
+		PlayerBeginCombatListener.handle(victim, attacker, CombatCause.ENDER_CRYSTAL, itemStack);
+		CombatTag combatTag = fluffy.getCombatManager().getLatest(victim);
+		CombatDamageUsingEnderCrystalEvent damageEvent = new CombatDamageUsingEnderCrystalEvent(
+				fluffy, combatTag, victim, attacker, tag.itemStack, crystal);
+		combatTag.setDamageDealt(attacker, event.getFinalDamage());
+		damageEvent.callEvent();
+
 	}
 
 	public FluffyCombat fluffy() {

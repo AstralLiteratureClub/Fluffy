@@ -1,4 +1,4 @@
-package bet.astral.fluffy.api.events;
+package bet.astral.fluffy.events.player;
 
 import lombok.Getter;
 import org.bukkit.Location;

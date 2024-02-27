@@ -22,6 +22,15 @@ flight:
   # 100 = 5 seconds
   allow-flight-time: 200
 
+armor-change:
+  # Should players be allowed to swap their armor during combat?
+  allow-armor-change: true
+  # Should players be able to equip armor from hotbar during combat?
+  allow-hotbar-equip: true
+  # Should players be able to swap their armor from hotbar during combat?
+  allow-hotbar-swap: true
+
+
 # Glowing doesn't work properly with colors if TAB plugin is installed
 #  because of how they have made the groups.
 glowing:
@@ -83,9 +92,11 @@ hooks:
 
 elytra:
   # Denies use of elytra in combat
-  # True/False
+  # ALLOW/DENY_ELYTRA/DENY_CHESTPLATE
+  # DENY_ELYTRA = Replace player's elytra with durability 0 elytra
+  # DENY_CHESTPLATE = Replace player's elytra with copy of the elytra on leather chestplate
   # Bypass permission: fluffy.bypass.combat-elytra
-  allow-in-combat: false
+  allow-in-combat: DENY_ELYTRA
   # True/False
   rocket-boost:
     # Denies use of rocket boosting with elytra in combat

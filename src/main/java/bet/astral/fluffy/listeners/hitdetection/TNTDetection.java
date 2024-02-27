@@ -1,9 +1,12 @@
 package bet.astral.fluffy.listeners.hitdetection;
 
 import bet.astral.fluffy.Compatibility;
-import bet.astral.fluffy.api.events.EntityDamageEntityByTNTEvent;
-import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
+import bet.astral.fluffy.api.CombatCause;
+import bet.astral.fluffy.api.CombatTag;
+import bet.astral.fluffy.events.damage.CombatDamageUsingTNTEvent;
+import bet.astral.fluffy.listeners.PlayerBeginCombatListener;
 import bet.astral.fluffy.FluffyCombat;
+import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -318,6 +321,9 @@ public class TNTDetection implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	private void onTNTDamage(EntityDamageByEntityEvent event) {
+		if (!(event.getEntity() instanceof Player victim)){
+			return;
+		}
 		if (event.getDamager() instanceof TNTPrimed tnt){
 			if (tnt.hasMetadata("fluffy_tnt_primer")){
 				Object value = getStartingEntityPrimer(tnt);
@@ -325,12 +331,13 @@ public class TNTDetection implements Listener {
 				if (value == null){
 					return;
 				}
-				if (value instanceof Entity entity){
-					EntityDamageEntityByTNTEvent tntEvent = new EntityDamageEntityByTNTEvent(event.getEntity(), entity, tnt);
-					tntEvent.callEvent();
-					if (tntEvent.isCancelled()){
-						event.setCancelled(true);
-					}
+				if (value instanceof OfflinePlayer attacker){
+					PlayerBeginCombatListener.handle(victim, attacker, CombatCause.TNT, null);
+					CombatTag combatTag = fluffy.getCombatManager().getLatest(victim);
+					CombatDamageUsingTNTEvent damageEvent = new CombatDamageUsingTNTEvent(
+							fluffy, combatTag, victim, attacker, null, tnt);
+					combatTag.setDamageDealt(attacker, event.getFinalDamage());
+					damageEvent.callEvent();
 				}
 			}
 		}

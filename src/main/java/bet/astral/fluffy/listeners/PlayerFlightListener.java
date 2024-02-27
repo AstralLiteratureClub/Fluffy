@@ -2,7 +2,7 @@ package bet.astral.fluffy.listeners;
 
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.CombatUser;
-import bet.astral.fluffy.api.events.CombatFullEndEvent;
+import bet.astral.fluffy.events.CombatFullEndEvent;
 import bet.astral.fluffy.configs.CombatConfig;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;

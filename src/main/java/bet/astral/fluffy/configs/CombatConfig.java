@@ -28,11 +28,9 @@ public class CombatConfig {
 
 	private boolean isResetCooldownsOnDeath;
 
-	private boolean isCombatLogBroadcast;
+
 	private CombatLogAction combatLogAction;
 
-	private boolean isCombatLogRejoinBroadcast;
-	private boolean isCombatLogRejoinPrivateMessage;
 	private int combatLogRejoinTicks;
 
 	private boolean isCombatLogDiscordEnabled;
@@ -51,8 +49,6 @@ public class CombatConfig {
 	private boolean isCombatLogNPCAttackAI;
 	private boolean isCombatLogNPCKnockback;
 	private boolean isCombatLogNPCDamageCombatReset;
-	private boolean isCombatLogNPCDeathBroadcast;
-	private boolean isCombatLogNPCDeathUseMessage;
 	private boolean isCombatLogNPCDeathKeepItems;
 	private boolean isCombatLogNPCDeathKeepExperience;
 
@@ -64,14 +60,14 @@ public class CombatConfig {
 	private ChatColor combatGlowAllTagged;
 	private ChatColor combatGlowTagRejoin;
 
-	private boolean isElytraAllowed;
-	private boolean isElytraMessage;
+	private ElytraMode elytraMode;
 	private boolean isElytraBoostAllowed;
-	private boolean isElytraBoostMessage;
 
 	private boolean isTridentBoostAllowed;
-	private boolean isTridentBoostMessage;
 
+	private boolean isArmorChangeAllowed;
+	private boolean isArmorHotSwapAllowed;
+	private boolean isArmorHotBarEquipAllowed;
 
 	private boolean isAnchorDetection;
 	private boolean isBedDetection;
@@ -93,13 +89,9 @@ public class CombatConfig {
 		isResetCooldownsOnDeath = configuration.getBoolean("cooldowns.reset-on-combat-end", true);
 
 
-		combatLogAction = EnumUtils.getEnum(CombatLogAction.class, configuration.getString("combat-log.quit.action"), CombatLogAction.NOTHING);
+		combatLogAction = EnumUtils.getEnumIgnoreCase(CombatLogAction.class, configuration.getString("combat-log.quit.action"), CombatLogAction.NOTHING);
 
-		isCombatLogRejoinBroadcast = configuration.getBoolean("combat-log.join.broadcast");
-		isCombatLogRejoinPrivateMessage = configuration.getBoolean("combat-log.join.player-message");
 		combatLogRejoinTicks = configuration.getInt("combat-log.join.rejoin-ticks");
-
-		isCombatLogBroadcast = configuration.getBoolean("combat-log.quit.broadcast");
 
 		isCombatLogDiscordEnabled = configuration.getBoolean("combat-log.quit.discord-dms.enabled");
 		combatLogDiscordNPCSpawn = configuration.getString("combat-log.quit.discord-dms.npc.spawn");
@@ -117,8 +109,6 @@ public class CombatConfig {
 		isCombatLogNPCAttackAI = configuration.getBoolean("combat-log.quit.npc.attack-others");
 		isCombatLogNPCKnockback =  configuration.getBoolean("combat-log.quit.npc.knockback");
 		isCombatLogNPCDamageCombatReset = configuration.getBoolean("combat-log.quit.npc.damage.restart-combat");
-		isCombatLogNPCDeathBroadcast = configuration.getBoolean("combat-log.quit.npc.death.broadcast");
-		isCombatLogNPCDeathUseMessage = configuration.getBoolean("combat-log.quit.npc.death.death-message");
 		isCombatLogNPCDeathKeepItems = configuration.getBoolean("combat-log.quit.npc.death.keep-items");
 		isCombatLogNPCDeathKeepExperience = configuration.getBoolean("combat-log.quit.npc.death.keep-experience");
 
@@ -133,13 +123,10 @@ public class CombatConfig {
 		isCommandsDisabled = configuration.getBoolean("commands.combat.enabled", true);
 		commandsToDisable = configuration.getStringList("commands.combat.disabled-list");
 
-		isElytraAllowed = configuration.getBoolean("elytra.allow-in-combat", true);
-		isElytraMessage = configuration.getBoolean("elytra.message", true);
+		elytraMode = EnumUtils.getEnumIgnoreCase(ElytraMode.class, configuration.getString("elytra.allow-in-combat"), ElytraMode.DENY_CHESTPLATE);
 		isElytraBoostAllowed = configuration.getBoolean("elytra.rocket-boost.allow-in-combat", true);
-		isElytraBoostMessage = configuration.getBoolean("elytra.rocket-boost.message", true);
 
 		isTridentBoostAllowed = configuration.getBoolean("trident.riptide.allow-in-combat", true);
-		isTridentBoostMessage = configuration.getBoolean("trident.riptide.message", true);
 
 		isAnchorDetection = configuration.getBoolean("anchors.begin-combat", true);
 		isBedDetection = configuration.getBoolean("beds.begin-combat", true);
@@ -179,8 +166,12 @@ public class CombatConfig {
 			potionsToBeginCombat.add(type);
 		}
 
-		flightMode = EnumUtils.getEnum(FlightMode.class, configuration.getString("flight.flight-mode"), FlightMode.DENY);
+		flightMode = EnumUtils.getEnumIgnoreCase(FlightMode.class, configuration.getString("flight.flight-mode"), FlightMode.DENY);
 		flightTicks = configuration.getInt("flight.allow-flight-time", 0);
+
+		isArmorChangeAllowed = configuration.getBoolean("armor-change.allow-armor-change", true);
+		isArmorHotSwapAllowed = configuration.getBoolean("armor-change.allow-hotbar-swap", true);
+		isArmorHotBarEquipAllowed = configuration.getBoolean("armor-change.allow-hotbar-equip", true);
 	}
 
 	public FluffyCombat fluffy() {
@@ -196,5 +187,11 @@ public class CombatConfig {
 		DENY,
 		ALLOW,
 		ALLOW_TICKS
+	}
+
+	public enum ElytraMode {
+		ALLOW,
+		DENY_ELYTRA,
+		DENY_CHESTPLATE
 	}
 }
