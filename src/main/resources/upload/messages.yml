@@ -1,6 +1,6 @@
 placeholders:
   - name: "prefix"
-    value: "<hover:show_text:'<light_purple>Fluffy Combat Manager\n<white>Encountered bugs? Report them to <yellow>@antritus <dark_gray>(<aqua>Discord<dark_gray>)'><white><light_purple><b>Fluffy<reset>"
+    value: "<click:copy_to_clipboard:@antritus><hover:show_text:'<light_purple>Fluffy Combat Manager\n<white>Encountered bugs? Report them to <yellow>@antritus <dark_gray>(<aqua>Discord<dark_gray>)\n<white>Click to copy the tag to your clipboard.'><white><light_purple><b>Fluffy<reset>"
 
 combat-execute-illegal-command: "%prefix% <green>You cannot use <gray>%command%</gray> while in combat!"
 

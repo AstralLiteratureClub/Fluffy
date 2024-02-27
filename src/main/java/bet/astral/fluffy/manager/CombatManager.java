@@ -1,6 +1,6 @@
 package bet.astral.fluffy.manager;
 
-import bet.astral.fluffy.api.events.CombatEndEvent;
+import bet.astral.fluffy.events.CombatEndEvent;
 import bet.astral.fluffy.configs.CombatConfig;
 import bet.astral.fluffy.messenger.MessageKey;
 import fr.skytasul.glowingentities.GlowingBlocks;
@@ -10,7 +10,7 @@ import bet.astral.fluffy.api.BlockCombatTag;
 import bet.astral.fluffy.api.BlockCombatUser;
 import bet.astral.fluffy.api.CombatTag;
 import bet.astral.fluffy.api.CombatUser;
-import bet.astral.fluffy.api.events.CombatFullEndEvent;
+import bet.astral.fluffy.events.CombatFullEndEvent;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;

@@ -3,7 +3,7 @@ package bet.astral.fluffy.manager;
 import bet.astral.fluffy.cooldowns.Cooldown;
 import bet.astral.fluffy.cooldowns.EnderPearlCooldown;
 import bet.astral.fluffy.FluffyCombat;
-import bet.astral.fluffy.api.events.CombatFullEndEvent;
+import bet.astral.fluffy.events.CombatFullEndEvent;
 import bet.astral.fluffy.messenger.MessageKey;
 import bet.astral.messenger.Message;
 import bet.astral.messenger.placeholder.LegacyPlaceholder;

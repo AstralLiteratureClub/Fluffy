@@ -6,7 +6,7 @@ import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.BlockCombatUser;
 import bet.astral.fluffy.api.CombatTag;
 import bet.astral.fluffy.api.CombatUser;
-import bet.astral.fluffy.api.events.CombatEndEvent;
+import bet.astral.fluffy.events.CombatEndEvent;
 import bet.astral.fluffy.configs.CombatConfig;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;

@@ -1,7 +1,8 @@
-package bet.astral.fluffy.api.events;
+package bet.astral.fluffy.events;
 
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.CombatTag;
+import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
@@ -18,6 +19,12 @@ import java.util.List;
  */
 public class CombatLogEvent extends AbstractListCombatEvent implements Cancellable {
 
+	/**
+	 * -- GETTER --
+	 *  Returns the player who left the server
+	 *
+	 */
+	@Getter
 	private final Player who;
 	private boolean cancel;
 
@@ -29,14 +36,6 @@ public class CombatLogEvent extends AbstractListCombatEvent implements Cancellab
 	public CombatLogEvent(FluffyCombat fluffyCombat, Player who, List<CombatTag> combatTag) {
 		super(fluffyCombat, combatTag);
 		this.who = who;
-	}
-
-	/**
-	 * Returns the player who left the server
-	 * @return player
-	 */
-	public Player getWho() {
-		return who;
 	}
 
 	private static final HandlerList HANDLERS = new HandlerList();

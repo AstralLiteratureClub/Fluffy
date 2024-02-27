@@ -3,6 +3,7 @@ package bet.astral.fluffy.api;
 import bet.astral.fluffy.FluffyCombat;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -53,6 +54,13 @@ public class CombatTag {
 	@Getter
 	@Setter
 	private int attackerRejoinTimer;
+	@Getter
+	@Setter
+	private double victimDamageDealt;
+	@Getter
+	@Setter
+	private double attackerDamageDealt;
+
 	/**
 	 * Creates new instance of the class.
 	 * This should not be initialized outside the combat manager.
@@ -70,6 +78,7 @@ public class CombatTag {
 	 * Returns the main class
 	 * @return main class
 	 */
+	@NotNull
 	public FluffyCombat getFluffyCombat() {
 		return fluffyCombat;
 	}
@@ -91,6 +100,7 @@ public class CombatTag {
 	 * The Victim is just a label and doesn't get changed even that the attacker might be attacked by victim.
 	 * @return attacker's combat user
 	 */
+	@NotNull
 	public CombatUser getVictim() {
 		return victim;
 	}
@@ -160,5 +170,20 @@ public class CombatTag {
 	 */
 	public boolean isActive(Player player) {
 		return isActive(player.getUniqueId());
+	}
+
+	public CombatUser getUser(Player victim) {
+		return victim.getUniqueId().equals(this.victim.getUniqueId()) ? this.victim : attacker;
+	}
+
+	public double getDamageDealt(OfflinePlayer player){
+		return player.getUniqueId().equals(this.victim.getUniqueId()) ? this.victimDamageDealt : this.attackerDamageDealt;
+	}
+	public void setDamageDealt(OfflinePlayer player, double amount){
+		if (player.getUniqueId().equals(this.victim.getUniqueId())){
+			this.victimDamageDealt = amount;
+		} else {
+			this.attackerDamageDealt = amount;
+		}
 	}
 }

@@ -1,5 +1,6 @@
-package bet.astral.fluffy.api.events;
+package bet.astral.fluffy.events;
 
+import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -7,6 +8,7 @@ import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
 public class CombatReLogEvent extends Event implements Cancellable {
+	@Getter
 	private final Player player;
 	private boolean cancel = false;
 	public CombatReLogEvent(Player player){

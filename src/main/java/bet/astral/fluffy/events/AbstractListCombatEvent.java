@@ -1,24 +1,28 @@
-package bet.astral.fluffy.api.events;
+package bet.astral.fluffy.events;
 
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.CombatTag;
 import org.bukkit.event.Event;
 
+import java.util.List;
+
 /**
  * Default for many combat events.
  * This is only abstract class, so it won't fire.
  */
-public abstract class AbstractCombatEvent extends Event {
-	private final CombatTag combatTag;
+public abstract class AbstractListCombatEvent extends Event {
+	private final List<CombatTag> combatTags;
 	private final FluffyCombat fluffyCombat;
 
 	/**
 	 * The default constructor is defined for cleaner code. This constructor
 	 * assumes the event is synchronous.
+	 * @param fluffyCombat The main plugin instance
+	 * @param combatTags tags
 	 */
-	public AbstractCombatEvent(FluffyCombat fluffyCombat, CombatTag combatTag) {
+	public AbstractListCombatEvent(FluffyCombat fluffyCombat, List<CombatTag> combatTags) {
 		this.fluffyCombat = fluffyCombat;
-		this.combatTag = combatTag;
+		this.combatTags = combatTags;
 	}
 
 	/**
@@ -27,20 +31,21 @@ public abstract class AbstractCombatEvent extends Event {
 	 *
 	 * @param isAsync true indicates the event will fire asynchronously, false
 	 *                by default from default constructor
+	 * @param fluffyCombat The main plugin instance
+	 * @param combatTags tags
 	 */
-	public AbstractCombatEvent(boolean isAsync, FluffyCombat fluffyCombat, CombatTag combatTag) {
+	public AbstractListCombatEvent(boolean isAsync, FluffyCombat fluffyCombat, List<CombatTag> combatTags) {
 		super(isAsync);
 		this.fluffyCombat = fluffyCombat;
-		this.combatTag = combatTag;
+		this.combatTags = combatTags;
 	}
 
 	/**
-	 * Returns the combat tag in this event
-	 * @return tag
+	 * Returns the combat tags in this event
+	 * @return tags
 	 */
-
-	public CombatTag getCombatTag() {
-		return combatTag;
+	public List<CombatTag> getCombatTag() {
+		return combatTags;
 	}
 
 	/**

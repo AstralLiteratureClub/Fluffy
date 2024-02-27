@@ -1,5 +1,6 @@
 package bet.astral.fluffy;
 
+import bet.astral.fluffy.api.CombatUser;
 import bet.astral.fluffy.configs.CombatConfig;
 import bet.astral.fluffy.database.StatisticDatabase;
 import bet.astral.fluffy.listeners.hitdetection.*;
@@ -8,6 +9,7 @@ import bet.astral.fluffy.manager.*;
 import bet.astral.fluffy.messenger.MessageKey;
 import bet.astral.messenger.Messenger;
 import bet.astral.messenger.placeholder.Placeholder;
+import com.jeff_media.armorequipevent.ArmorEquipEvent;
 import fr.skytasul.glowingentities.GlowingBlocks;
 import fr.skytasul.glowingentities.GlowingEntities;
 import lombok.AccessLevel;
@@ -15,6 +17,7 @@ import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.apache.commons.lang.Validate;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -24,12 +27,18 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockFadeEvent;
+import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -37,6 +46,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static bet.astral.fluffy.utils.Resource.loadResourceAsTemp;
 import static bet.astral.fluffy.utils.Resource.loadResourceToFile;
@@ -44,16 +54,78 @@ import static bet.astral.fluffy.utils.Resource.loadResourceToFile;
 
 @Getter
 public class FluffyCombat extends JavaPlugin implements Listener {
+	public static NamespacedKey ELYTRA_KEY = new NamespacedKey("fluffy", "elytra");
 	@Getter(AccessLevel.NONE)
 	private static final MiniMessage miniMessage = MiniMessage.miniMessage();
 	public static ItemStack elytraReplacer = new ItemStack(Material.LEATHER_CHESTPLATE);
 	@Getter(AccessLevel.NONE)
 	private static Map<Chunk, Map<Location, Pair<UUID, Material>>> blockOwners = new HashMap<>();
 	public static Pair<UUID, Material> getBlockData(Block block){
-		return blockOwners.get(block.getChunk()) != null ? ((blockOwners.get(block.getChunk()).get(block.getLocation())) != null ? blockOwners.get(block.getChunk()).get(block.getLocation()) : null): null;
+		if (blockOwners.get(block.getChunk()) == null){
+			return null;
+		}
+
+		Pair<UUID, Material> data = blockOwners.get(block.getChunk()).get(block.getLocation());
+		if (data == null){
+			return null;
+		}
+		if (data.value2() != block.getType()){
+			return null;
+		}
+		return data;
+	}
+	public static boolean isOwned(Block block){
+		return getBlockData(block) != null;
 	}
 	public static UUID getBlockOwner(Block block){
-		return blockOwners.get(block.getChunk()) != null ? ((blockOwners.get(block.getChunk()).get(block.getLocation())) != null ? blockOwners.get(block.getChunk()).get(block.getLocation()).value() : null): null;
+		Pair<UUID, Material> blockData = getBlockData(block);
+		if (blockData == null){
+			return null;
+		}
+		if (blockData.value2() != block.getType()){
+			return null;
+		}
+		return blockData.value();
+	}
+	public static @Nullable Block findNearestOwnedBlock(Player player, Material... allowedMaterials) {
+		Validate.notNull(player, "Player cannot be null.");
+
+		Location playerLocation = player.getLocation();
+		List<Block> surroundingBlocks = getSurroundingBlocks(playerLocation, allowedMaterials);
+
+		return getNearestOwnedBlock(player, surroundingBlocks);
+	}
+
+	private static List<Block> getSurroundingBlocks(Location playerLocation, Material... materials) {
+		Set<Material> set = Arrays.stream(materials).collect(Collectors.toSet());;
+		List<Block> surroundingBlocks = new ArrayList<>();
+		int radius = 1; // Adjust as needed
+		for (int x = -radius; x <= radius; x++) {
+			for (int y = -radius; y <= radius; y++) {
+				for (int z = -radius; z <= radius; z++) {
+					Block block = playerLocation.clone().add(x, y, z).getBlock();
+					if (set.contains(block.getType())) {
+						surroundingBlocks.add(block);
+					}
+				}
+			}
+		}
+		return surroundingBlocks;
+	}
+
+	public static @Nullable Block getNearestOwnedBlock(Player player, List<Block> blocks) {
+		Block nearestBlock = null;
+		double shortestDistance = Double.MAX_VALUE;
+		for (Block block : blocks) {
+			if (isOwned(block)) {
+				double distance = block.getLocation().distanceSquared(player.getLocation());
+				if (distance < shortestDistance) {
+					shortestDistance = distance;
+					nearestBlock = block;
+				}
+			}
+		}
+		return nearestBlock;
 	}
 	public static void clearBlockData(Chunk chunk, Location location){
 		if (blockOwners.get(chunk) != null) {
@@ -61,6 +133,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		}
 	}
 	public static void clearIncorrectBlockData(Chunk chunk){
+		List<Block> remove = new ArrayList<>();
 		if (blockOwners.get(chunk) != null) {
 			for (Location location : blockOwners.get(chunk).keySet()) {
 				if (blockOwners.get(chunk).get(location).value2()!=location.getBlock().getType()){
@@ -70,39 +143,55 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 					if (blockOwners.get(chunk).get(location).value2()==Material.SOUL_FIRE && location.getBlock().getType() == Material.FIRE){
 						continue;
 					}
-					blockOwners.get(chunk).remove(location);
+					remove.add(location.getBlock());
 				}
 			}
+		}
+		for (Block block : remove){
+			blockOwners.get(block.getChunk()).remove(block.getLocation());
 		}
 	}
 	public static void setBlockOwner(OfflinePlayer player, Block block){
 		blockOwners.putIfAbsent(block.getChunk(), new HashMap<>());
 		blockOwners.get(block.getChunk()).put(block.getLocation(), new Pair<>(player.getUniqueId(), block.getType()));
 	}
+	public static void setBlockOwner(OfflinePlayer player, Block block, Material material) {
+		blockOwners.putIfAbsent(block.getChunk(), new HashMap<>());
+		blockOwners.get(block.getChunk()).put(block.getLocation(), new Pair<>(player.getUniqueId(), material));
+	}
+
 
 
 	/**
-	 *  Returns the elytra replacer with item meta of given elytra
-	 *  Returns null if not elytra
-	 * @param original elytra
+	 * Returns the elytra replacer with item meta of given elytra
+	 * Returns null if not elytra
+	 *
+	 * @param original   elytra
+	 * @param elytraMode
 	 * @return replacer, else if not elytra null
 	 */
 	@Nullable
-	public static ItemStack convertElytraWithReplacer(ItemStack original) {
+	public static ItemStack convertElytraWithReplacer(ItemStack original, CombatConfig.ElytraMode elytraMode) {
 		if (original.getType()!=Material.ELYTRA){
 			return null;
 		}
-		ItemStack clone = elytraReplacer.clone();
+		ItemStack clone = elytraMode== CombatConfig.ElytraMode.DENY_CHESTPLATE ? elytraReplacer.clone() : original.clone();
 		clone.setItemMeta(original.getItemMeta());
+
 		ItemMeta meta = original.getItemMeta();
-		Component displayname = meta.displayName();
-		if (displayname == null)
-			displayname = miniMessage.deserialize("<Yellow>Elytra Placeholder").decoration(TextDecoration.ITALIC, false);
-		meta.displayName(displayname);
+		if (elytraMode== CombatConfig.ElytraMode.DENY_CHESTPLATE) {
+			Component displayname = meta.displayName();
+			if (displayname == null)
+				displayname = miniMessage.deserialize("<Yellow>Elytra Placeholder").decoration(TextDecoration.ITALIC, false);
+			meta.displayName(displayname);
+		}
 		@Nullable List<Component> lore = meta.lore();
 		if (lore == null) {
 			lore = new LinkedList<>();
+		} else {
+			lore = new ArrayList<>(lore);
 		}
+
 		lore.add(Component.text().build());
 		lore.add(miniMessage.deserialize("<dark_gray> | <gray>This item will disappear soon").decoration(TextDecoration.ITALIC, false));
 		lore.add(miniMessage.deserialize("<dark_gray> |  <gray>and give your elytra back!").decoration(TextDecoration.ITALIC, false));
@@ -110,15 +199,19 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		lore.add(miniMessage.deserialize("<dark_gray> |  <gray>bug so it may be fixed.").decoration(TextDecoration.ITALIC, false));
 		meta.lore(lore);
 
-		meta.removeAttributeModifier(Attribute.GENERIC_ARMOR);
-		meta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier("FluffyElytraReplacer", -3, AttributeModifier.Operation.ADD_NUMBER));
-		meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		if (!meta.hasEnchants()){
-			meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+		if (elytraMode== CombatConfig.ElytraMode.DENY_CHESTPLATE) {
+			meta.removeAttributeModifier(Attribute.GENERIC_ARMOR);
+			meta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier("FluffyElytraReplacer", -3, AttributeModifier.Operation.ADD_NUMBER));
+			meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+			if (!meta.hasEnchants()) {
+				meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+			}
+			clone.setItemMeta(meta);
 		}
+
+		meta.getPersistentDataContainer().set(ELYTRA_KEY, PersistentDataType.BOOLEAN, true);
 		clone.setItemMeta(meta);
-		clone.addUnsafeEnchantment(Enchantment.BINDING_CURSE, 5);
-		clone.addUnsafeEnchantment(Enchantment.VANISHING_CURSE, 5);
+
 		return clone;
 	}
 	public static boolean isPaper = false;
@@ -139,8 +232,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 	private CrystalDetection crystalDetection;
 	private TNTDetection tntDetection;
 	private MagicDetection magicDetection;
-	private LavaDetection lavaDetection;
-	private LavaCauldronDetection lavaCauldronDetection;
+	private LiquidOwnerListener lavaDetection;
 	private FireDetection fireDetection;
 
 	private FileConfiguration configuration;
@@ -188,6 +280,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		new CMDReload(this).registerCommand();
 		new CMDPotions(this).registerCommand();
 		new CMDGlow(this).registerCommand();
+		new CMDBlockOwner(this).registerCommand();
 		registerListeners(new PlayerBeginCombatListener(this));
 		registerListeners(new PlayerGlowDisableListener(this));
 		registerListeners(new PlayerExitWhileInCombatListener(this));
@@ -197,6 +290,12 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		registerListeners(cooldownManager);
 		registerListeners(new TridentWhileInCombatListener(this));
 		registerListeners(new ElytraWhileInCombatListener(this));
+		registerListeners(new LiquidOwnerListener(this));
+		registerListeners(new PlayerFlightListener(this));
+		registerListeners(new ArmorChangeListener(this));
+
+		ArmorEquipEvent.registerListener(this);
+
 		if (Compatibility.RESPAWN_ANCHOR.isCompatible())
 			anchorDetection = new AnchorDetection(this);
 		if (Compatibility.ENDER_CRYSTAL.isCompatible())
@@ -206,16 +305,14 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		tntDetection = new TNTDetection(this, crystalDetection);
 		magicDetection = new MagicDetection(this);
 		fireDetection = new FireDetection(this);
-		lavaDetection = new LavaDetection(this);
-		lavaCauldronDetection = new LavaCauldronDetection(this);
+		lavaDetection = new LiquidOwnerListener(this);
 		registerListeners(anchorDetection,
 				bedDetection,
 				crystalDetection,
 				tntDetection,
 				magicDetection,
 				fireDetection,
-				lavaDetection,
-				lavaCauldronDetection
+				lavaDetection
 				);
 
 
@@ -225,11 +322,35 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 
 		registerListeners(this);
 
+		getServer().getScheduler().runTaskTimerAsynchronously(this, ()->{
+			for (Player player : Bukkit.getOnlinePlayers()){
+				CombatUser user = userManager.getUser(player.getUniqueId());
+				if (user.getLastFireDamage() != null && player.getFireTicks()==0){
+					user.setLastFireDamage(null);
+				}
+			}
+		}, 1, 1);
+
 		getLogger().info("Fluffy Combat Management plugin has loaded!");
 	}
-	@EventHandler
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onChunkLoad(ChunkLoadEvent event) {
 		clearIncorrectBlockData(event.getChunk());
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	private void blockBreak(BlockBreakEvent event){
+		FluffyCombat.clearBlockData(event.getBlock().getChunk(), event.getPlayer().getLocation());
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void bucketFill(PlayerBucketFillEvent event){
+		clearBlockData(event.getBlock().getChunk(), event.getBlock().getLocation());
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void blockFade(BlockFadeEvent event){
+		clearBlockData(event.getBlock().getChunk(), event.getBlock().getLocation());
 	}
 
 	@Override

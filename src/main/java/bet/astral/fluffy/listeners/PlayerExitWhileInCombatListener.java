@@ -4,7 +4,7 @@ import bet.astral.fluffy.messenger.MessageKey;
 import bet.astral.fluffy.messenger.Placeholders;
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.CombatUser;
-import bet.astral.fluffy.api.events.CombatLogEvent;
+import bet.astral.fluffy.events.CombatLogEvent;
 import bet.astral.fluffy.configs.CombatConfig;
 import bet.astral.fluffy.manager.CombatManager;
 import bet.astral.fluffy.manager.UserManager;

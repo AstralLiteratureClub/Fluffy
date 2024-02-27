@@ -1,4 +1,4 @@
-package bet.astral.fluffy.api.events;
+package bet.astral.fluffy.events;
 
 import bet.astral.fluffy.FluffyCombat;
 import org.bukkit.OfflinePlayer;
