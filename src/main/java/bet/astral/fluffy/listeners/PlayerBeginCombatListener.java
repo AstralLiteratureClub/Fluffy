@@ -94,11 +94,11 @@ public class PlayerBeginCombatListener implements Listener {
 		} else {
 			tag.setVictimWeapon(itemStack);
 		}
-		if (combatCause==CombatCause.FIRE){
+		if (combatCause==CombatCause.FIRE || combatCause == CombatCause.LAVA){
 			CombatUser user = tag.getUser(victim);
 			user.setLastFireDamage(attacker.getUniqueId());
-		} else if (itemStack.containsEnchantment(Enchantment.FIRE_ASPECT) && combatCause == CombatCause.MELEE
-				|| itemStack.getType()==Material.BOW && itemStack.containsEnchantment(Enchantment.ARROW_FIRE)) {
+		} else if (itemStack != null && (itemStack.containsEnchantment(Enchantment.FIRE_ASPECT) && combatCause == CombatCause.MELEE
+				|| itemStack.getType()==Material.BOW && itemStack.containsEnchantment(Enchantment.ARROW_FIRE))) {
 			CombatUser user = tag.getUser(victim);
 			user.setLastFireDamage(attacker.getUniqueId());
 		}
@@ -183,6 +183,15 @@ public class PlayerBeginCombatListener implements Listener {
 
 		if (!(event.getEntity() instanceof Player victim)) {
 			return;
+		}
+		if (event.getCause()==FIRE_TICK){
+			CombatUser user = combat.getUserManager().getUser(victim);
+			if (user.getLastFireDamage() != null){
+				if (!combat.getCombatManager().hasTags(victim)){
+					return;
+				}
+				handle(victim, Bukkit.getOfflinePlayer(user.getLastFireDamage()), CombatCause.FIRE);
+			}
 		}
 		// Ignore so we can handle in custom potion effect check
 		if (isAny(event.getCause(), MAGIC, WITHER, POISON)) {

@@ -1,5 +1,6 @@
 package bet.astral.fluffy.configs;
 
+import bet.astral.fluffy.database.AbstractDatabase;
 import lombok.Getter;
 import bet.astral.fluffy.FluffyCombat;
 import org.apache.commons.lang3.EnumUtils;
@@ -78,6 +79,8 @@ public class CombatConfig {
 
 	private FlightMode flightMode;
 	private int flightTicks;
+
+	private AbstractDatabase.DBType statisticDatabaseType;
 
 	public CombatConfig(FluffyCombat fluffy){
 		this.fluffy = fluffy;
@@ -172,6 +175,12 @@ public class CombatConfig {
 		isArmorChangeAllowed = configuration.getBoolean("armor-change.allow-armor-change", true);
 		isArmorHotSwapAllowed = configuration.getBoolean("armor-change.allow-hotbar-swap", true);
 		isArmorHotBarEquipAllowed = configuration.getBoolean("armor-change.allow-hotbar-equip", true);
+
+
+		statisticDatabaseType = EnumUtils.getEnumIgnoreCase(AbstractDatabase.DBType.class, "database.statistic.type");
+		if (statisticDatabaseType == null){
+			throw new RuntimeException("Couldn't find a correct database type for database database.statistic.type");
+		}
 	}
 
 	public FluffyCombat fluffy() {

@@ -2,7 +2,7 @@ package bet.astral.fluffy;
 
 import bet.astral.fluffy.api.CombatUser;
 import bet.astral.fluffy.configs.CombatConfig;
-import bet.astral.fluffy.database.StatisticDatabase;
+import bet.astral.fluffy.database.CombinedStatisticDatabase;
 import bet.astral.fluffy.listeners.hitdetection.*;
 import bet.astral.fluffy.listeners.*;
 import bet.astral.fluffy.manager.*;
@@ -26,7 +26,6 @@ import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -224,6 +223,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 	private HookManager hookManager;
 	private CooldownManager cooldownManager;
 	private CombatLogManager combatLogManager;
+	private StatisticManager statisticManager;
 
 	private CombatConfig combatConfig;
 
@@ -236,7 +236,8 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 	private FireDetection fireDetection;
 
 	private FileConfiguration configuration;
-	private StatisticDatabase statisticDatabase;
+
+	private CombinedStatisticDatabase statisticDatabase;
 
 	private GlowingEntities glowingEntities;
 	private GlowingBlocks glowingBlocks;
@@ -265,7 +266,9 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		// Just loading the plugin-specific messages.
 		MessageKey.loadMessages(messageManager);
 
-		statisticDatabase = new StatisticDatabase(this);
+		statisticDatabase = new CombinedStatisticDatabase(this);
+		statisticManager = new StatisticManager(this);
+		statisticManager.onEnable();
 
 		glowingEntities = new GlowingEntities(this); // required in combat manager
 		glowingBlocks = new GlowingBlocks(this); // required in combat manager
@@ -288,6 +291,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		registerListeners(this);
 		registerListeners(new DeathWhileInCombatListener(this));
 		registerListeners(cooldownManager);
+		registerListeners(statisticManager);
 		registerListeners(new TridentWhileInCombatListener(this));
 		registerListeners(new ElytraWhileInCombatListener(this));
 		registerListeners(new LiquidOwnerListener(this));
@@ -318,7 +322,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 
 		hookManager = new HookManager(this);
 
-		//statisticDatabase = new StatisticDatabase(this);
+		//statisticDatabase = new CombinedStatisticDatabase(this);
 
 		registerListeners(this);
 
@@ -358,7 +362,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		isStopping = true;
 		userManager.onDisable();
 		combatManager.onDisable();
-		statisticDatabase.disable();
+		statisticManager.onDisable();
 		glowingEntities.disable();
 		glowingBlocks.disable();
 	}
