@@ -1,6 +1,6 @@
 package bet.astral.fluffy.listeners.hitdetection;
 
-import bet.astral.fluffy.Compatibility;
+import bet.astral.fluffy.utils.Compatibility;
 import bet.astral.fluffy.api.CombatCause;
 import bet.astral.fluffy.api.CombatTag;
 import bet.astral.fluffy.events.damage.CombatDamageUsingTNTEvent;

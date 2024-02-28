@@ -1,7 +1,8 @@
-package bet.astral.fluffy;
+package bet.astral.fluffy.utils;
 
 import org.bukkit.Bukkit;
 
+@Deprecated()
 public enum Compatibility {
 	ENDER_CRYSTAL( "1.19", "1.20"),
 	RESPAWN_ANCHOR("1.20.2"),

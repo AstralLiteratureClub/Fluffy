@@ -7,6 +7,8 @@ import bet.astral.fluffy.listeners.hitdetection.*;
 import bet.astral.fluffy.listeners.*;
 import bet.astral.fluffy.manager.*;
 import bet.astral.fluffy.messenger.MessageKey;
+import bet.astral.fluffy.utils.Compatibility;
+import bet.astral.fluffy.utils.Pair;
 import bet.astral.messenger.Messenger;
 import bet.astral.messenger.placeholder.Placeholder;
 import com.jeff_media.armorequipevent.ArmorEquipEvent;

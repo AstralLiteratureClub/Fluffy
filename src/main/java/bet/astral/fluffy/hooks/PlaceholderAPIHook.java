@@ -1,4 +1,5 @@
 package bet.astral.fluffy.hooks;
+/*
 
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.BlockCombatUser;
@@ -292,12 +293,9 @@ public class PlaceholderAPIHook extends PlaceholderExpansion implements Hook {
 		return true;
 	}
 
-	/**
-	 * Something worth noting, however, is that you need to override the persist() method and make it return true. This ensures that the expansion won't be unregistered by PlaceholderAPI whenever it is reloaded.
-	 * @return true
-	 */
 	@Override
 	public boolean persist(){
 		return true;
 	}
 }
+*/
