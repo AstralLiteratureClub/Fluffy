@@ -35,7 +35,7 @@ public class CommandWhileInCombatListener implements Listener {
 			final String finalCommand = command;
 			if (fluffy.getCombatConfig().getCommandsToDisable().stream().
 					anyMatch(
-							cmd -> cmd.equalsIgnoreCase(finalCommand)
+							cmd -> cmd.toLowerCase().startsWith(finalCommand)
 					)
 			) {
 				event.setCancelled(true);
