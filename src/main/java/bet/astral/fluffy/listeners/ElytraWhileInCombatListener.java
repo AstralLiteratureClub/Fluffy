@@ -53,7 +53,7 @@ public class ElytraWhileInCombatListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onQuit(PlayerQuitEvent event){
 		if (elytras.get(event.getPlayer()) != null){
 			ItemStack itemStack = elytras.get(event.getPlayer());
