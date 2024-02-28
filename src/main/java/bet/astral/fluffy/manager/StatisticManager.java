@@ -53,7 +53,9 @@ public class StatisticManager implements Listener {
 		}
 	}
 	public void onDisable(){
-		fluffy.getStatisticDatabase().disable(savingUsers);
+		for (StatisticUser user : savingUsers){
+			fluffy.getStatisticDatabase().save(user);
+		}
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
@@ -94,6 +96,6 @@ public class StatisticManager implements Listener {
 	}
 
 	public CompletableFuture<StatisticUser> load(OfflinePlayer player){
-		return fluffy.getStatisticDatabase().load(new StatisticUser(player.getUniqueId()));
+		return fluffy.getStatisticDatabase().loadASync(new StatisticUser(player.getUniqueId()));
 	}
 }
