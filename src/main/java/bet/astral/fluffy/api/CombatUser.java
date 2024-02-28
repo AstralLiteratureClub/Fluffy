@@ -19,19 +19,6 @@ import java.util.UUID;
 @Getter
 @Setter
 public class CombatUser {
-	/*
-	 * Statistics
-	 */
-	private int totalKills;
-	private int anchorKills;
-	private int tntKills;
-	private int crystalKills;
-	private int bedKills;
-	private int totemKills;
-	private int killstreak;
-	private int totalDeaths;
-	private int totemDeaths;
-	private int deathStreak;
 
 	/*
 	 * Glowing

@@ -1,15 +1,24 @@
-# How long should combat last for?
-# TICKS; 1 second = 20 ticks
-time: 300
 # Enables debugging features, as self combat tagging
 debug: false
 
 database:
   stats:
-    table: "fluffy_users"
-    url: "connection..."
+    # Currently only supports sqlite, but adding mysql hopefully in the future.
+    type: sqlite
+    table:
+      kills: "fluffy_kills"
+      deaths: "fluffy_deaths"
+      streak: "fluffy_streak"
+    url: "jdbc:sqlite:./database.db"
+    # If you're using sqlite, you won't need the user or the password field.
     user: "root"
-    password: "!(#Nus3_B3tt3r_P4ssw0rds!"
+    password: "password"
+
+# Changing this requires the restart of the server (or if you are unsafe, reload of the plugin)
+# How long should combat last for?
+# TICKS; 1 second = 20 ticks
+time: 300
+
 
 flight:
   # Should the player be able to use flight?
