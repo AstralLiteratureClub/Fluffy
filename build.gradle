@@ -105,14 +105,15 @@ processResources {
     }
 }
 
-configurations {
-}
-
 publishing {
     publications {
-        //noinspection GroovyAssignabilityCheck
-        maven(MavenPublication) {
-            from(components.java)
+        shadow(MavenPublication) { publication ->
+            project.shadow.component(publication)
         }
     }
+//    repositories {
+//        maven {
+//            url "http://repo.astral.bet"
+//        }
+//    }
 }

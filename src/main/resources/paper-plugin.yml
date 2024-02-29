@@ -3,10 +3,3 @@ version: '1.0'
 main: bet.astral.fluffy.FluffyCombat
 api-version: '1.20'
 authors: [Antritus]
-
-dependencies:
-  server:
-    PlaceholderAPI:
-      load: BEFORE
-      required: false
-      join-classpath: true
