@@ -8,7 +8,7 @@ public class CMDReload  extends CoreCommand {
 	private final FluffyCombat combat;
 	protected CMDReload(FluffyCombat main) {
 		super(main, "fluffy-reload");
-		setPermission("fluffy.debug");
+		setPermission("fluffy.reload");
 		this.combat = main;
 	}
 

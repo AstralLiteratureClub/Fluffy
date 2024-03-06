@@ -14,6 +14,7 @@ public class CMDGlow extends CoreCommand {
 	protected CMDGlow(FluffyCombat main) {
 		super(main, "fluffy-glowing");
 		this.fluffy = main;
+		setPermission("fluffy.glowing");
 	}
 
 	/**

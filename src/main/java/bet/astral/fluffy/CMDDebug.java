@@ -20,6 +20,7 @@ public class CMDDebug extends CoreCommand {
 	protected CMDDebug(FluffyCombat main) {
 		super(main, "fluffy-tag");
 		this.combat = main;
+		setPermission("fluffy.tag");
 	}
 
 	/**

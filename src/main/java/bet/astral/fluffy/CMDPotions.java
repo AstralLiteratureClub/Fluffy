@@ -10,6 +10,7 @@ public class CMDPotions extends CoreCommand {
 	protected CMDPotions(FluffyCombat main) {
 		super(main, "fluffy-potions");
 		this.combat = main;
+		setPermission("fluffy.potions");
 	}
 
 	/**

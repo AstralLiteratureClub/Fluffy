@@ -16,6 +16,7 @@ import java.util.UUID;
 public class CMDBlockOwner extends CoreCommand {
 	protected CMDBlockOwner(JavaPlugin main) {
 		super(main, "fluffy-block");
+		setPermission("fluffy.block");
 	}
 
 	@Override

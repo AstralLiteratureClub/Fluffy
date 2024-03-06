@@ -2,6 +2,8 @@ package bet.astral.fluffy.messenger;
 
 import bet.astral.messenger.Messenger;
 import bet.astral.messenger.placeholder.Placeholder;
+import net.minecraft.server.commands.GiveCommand;
+import net.minecraft.server.commands.SummonCommand;
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
 
@@ -123,6 +125,27 @@ public final class MessageKey
 
 	@KeyType(Type.MESSAGE)
 	public static final String COMBAT_COOLDOWN_COMMAND = "combat-command-cooldown";
+
+
+
+
+	/*
+	 * Deaths
+	 */
+
+
+	@KeyType(value = Type.MESSAGE, autoLoad = false)
+	public static final String DEATH_ENTITY_EXPLOSION_COMBAT = "entity_explosion.combat.*";
+
+
+
+
+
+
+
+
+
+
 
 	@Documented
 	@Target(ElementType.FIELD)
