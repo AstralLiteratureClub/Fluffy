@@ -55,7 +55,8 @@ import static bet.astral.fluffy.utils.Resource.loadResourceToFile;
 
 @Getter
 public class FluffyCombat extends JavaPlugin implements Listener {
-	public static NamespacedKey ELYTRA_KEY = new NamespacedKey("fluffy", "elytra");
+	public static final NamespacedKey PROJECTILE_ITEM_KEY = new NamespacedKey("fluffy", "shooter_tool");
+	public static final NamespacedKey ELYTRA_KEY = new NamespacedKey("fluffy", "elytra");
 	@Getter(AccessLevel.NONE)
 	private static final MiniMessage miniMessage = MiniMessage.miniMessage();
 	public static ItemStack elytraReplacer = new ItemStack(Material.LEATHER_CHESTPLATE);

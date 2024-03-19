@@ -96,6 +96,11 @@ public class StatisticManager implements Listener {
 	}
 
 	public CompletableFuture<StatisticUser> load(OfflinePlayer player){
+		if (true) {
+			return CompletableFuture.supplyAsync(()->{
+				return new StatisticUser(player.getUniqueId());
+			});
+		}
 		return fluffy.getStatisticDatabase().loadASync(new StatisticUser(player.getUniqueId()));
 	}
 }

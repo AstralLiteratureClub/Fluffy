@@ -31,7 +31,7 @@ public class ElytraWhileInCombatListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	public void onDeath(PlayerDeathEvent event){
+	private void onDeath(PlayerDeathEvent event){
 		if (elytras.get(event.getEntity()) != null){
 			ItemStack itemStack = elytras.get(event.getEntity());
 
@@ -54,7 +54,7 @@ public class ElytraWhileInCombatListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void onQuit(PlayerQuitEvent event){
+	private void onQuit(PlayerQuitEvent event){
 		if (elytras.get(event.getPlayer()) != null){
 			ItemStack itemStack = elytras.get(event.getPlayer());
 			event.getPlayer().getInventory().setChestplate(itemStack);
@@ -62,13 +62,13 @@ public class ElytraWhileInCombatListener implements Listener {
 	}
 
 	@EventHandler
-	public void onItemDrop(PlayerDropItemEvent event){
+	private void onItemDrop(PlayerDropItemEvent event){
 		if (event.getItemDrop().getPersistentDataContainer().has(FluffyCombat.ELYTRA_KEY)){
 			event.setCancelled(true);
 		}
 	}
 	@EventHandler
-	public void onItemPickup(PlayerAttemptPickupItemEvent event){
+	private void onItemPickup(PlayerAttemptPickupItemEvent event){
 		if (event.getItem().getPersistentDataContainer().has(FluffyCombat.ELYTRA_KEY)){
 			event.setCancelled(true);
 		}
@@ -76,7 +76,7 @@ public class ElytraWhileInCombatListener implements Listener {
 
 
 	@EventHandler
-	public void onEntityToggleGlide(EntityToggleGlideEvent e) {
+	private void onEntityToggleGlide(EntityToggleGlideEvent e) {
 		if (!(e.getEntity() instanceof Player player)) return;
 		ItemStack itemStack = player.getInventory().getChestplate();
 		if (itemStack == null || itemStack.getType() != Material.ELYTRA) {
@@ -110,7 +110,7 @@ public class ElytraWhileInCombatListener implements Listener {
 	}
 
 	@EventHandler
-	public void onElytraBoost(PlayerElytraBoostEvent event){
+	private void onElytraBoost(PlayerElytraBoostEvent event){
 		if (fluffy.getCombatConfig().isElytraBoostAllowed()){
 			return;
 		}

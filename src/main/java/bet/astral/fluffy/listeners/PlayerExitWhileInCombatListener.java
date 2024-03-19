@@ -30,7 +30,7 @@ public class PlayerExitWhileInCombatListener implements Listener {
 	}
 
 	@EventHandler
-	public void onJoin(PlayerJoinEvent event) {
+	private void onJoin(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
 		boolean logged = fluffy.getCombatLogManager().hasCombatLogged(player); // Automatically deleted
 		if (logged){
@@ -49,7 +49,7 @@ public class PlayerExitWhileInCombatListener implements Listener {
 	}
 
 	@EventHandler
-	public void onQuit(@NotNull PlayerQuitEvent event) {
+	private void onQuit(@NotNull PlayerQuitEvent event) {
 		if (FluffyCombat.isStopping) {
 			return;
 		}
@@ -86,7 +86,7 @@ public class PlayerExitWhileInCombatListener implements Listener {
 
 	@SuppressWarnings("removal")
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void onTotemResurrect(EntityResurrectEvent event){
+	private void onTotemResurrect(EntityResurrectEvent event){
 		if (FluffyCombat.isStopping){
 			return;
 		}
@@ -120,7 +120,7 @@ public class PlayerExitWhileInCombatListener implements Listener {
 
 	@SuppressWarnings("removal")
 	@EventHandler(priority = EventPriority.NORMAL)
-	public void onDeath(PlayerDeathEvent event) {
+	private void onDeath(PlayerDeathEvent event) {
 		if (FluffyCombat.isStopping) {
 			return;
 		}

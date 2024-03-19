@@ -27,10 +27,7 @@ import org.bukkit.projectiles.BlockProjectileSource;
 import org.bukkit.projectiles.ProjectileSource;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class TNTDetection implements Listener {
@@ -312,10 +309,13 @@ public class TNTDetection implements Listener {
 	private void onEntityRemove(EntityRemoveFromWorldEvent event){
 		if (event.getEntity() instanceof TNTPrimed tnt){
 			tnt.removeMetadata("fluffy_tnt_primer", fluffy);
-			Location location = (Location) tnt.getMetadata("fluffy_location").stream().filter(data->data.getOwningPlugin() instanceof FluffyCombat).findAny().orElse(null);
-			blockPrimers.remove(location);
-			primers.remove(location);
-			tnt.removeMetadata("fluffy_location", fluffy);
+			MetadataValue value = tnt.getMetadata("fluffy_location").stream().filter(data->data.getOwningPlugin() instanceof FluffyCombat).findAny().orElse(null);
+			if (value != null) {
+				Location location = (Location) value.value();
+				blockPrimers.remove(location);
+				primers.remove(location);
+				tnt.removeMetadata("fluffy_location", fluffy);
+			}
 		}
 	}
 

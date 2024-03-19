@@ -26,7 +26,7 @@ repositories {
 
 dependencies {
     // MESSAGE MANAGER
-    implementation 'bet.astral:Messenger:1.5.1'
+    implementation 'bet.astral:Messenger:1.5.2'
 
     // LOMBOK
     implementation 'org.projectlombok:lombok:1.18.26'

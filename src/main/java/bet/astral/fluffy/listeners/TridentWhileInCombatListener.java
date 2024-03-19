@@ -18,7 +18,7 @@ public class TridentWhileInCombatListener implements Listener {
 	}
 
 	@EventHandler
-	public void onPlayerRiptide(PlayerRiptideEvent e) {
+	private void onPlayerRiptide(PlayerRiptideEvent e) {
 		CombatManager combatManager =  fluffy.getCombatManager();
 		Player player = e.getPlayer();
 		if (fluffy.getCombatConfig().isTridentBoostAllowed()){

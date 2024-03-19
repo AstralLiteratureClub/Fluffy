@@ -20,6 +20,12 @@ public class CombinedStatisticDatabase extends AbstractDatabase {
 
 	public CombinedStatisticDatabase(FluffyCombat fluffyCombat) {
 		super(fluffyCombat, fluffyCombat.getCombatConfig().getStatisticDatabaseType());
+		if (true) {
+			deathDatabase = null;
+			killDatabase = null;
+			streakDatabase = null;
+			return;
+		}
 		Connection connection = connect();
 
 
@@ -48,6 +54,8 @@ public class CombinedStatisticDatabase extends AbstractDatabase {
 
 	@Override
 	public void save(StatisticUser user) {
+		if (true)
+			return;
 		deathDatabase.save(user);
 		killDatabase.save(user);
 		streakDatabase.save(user);
@@ -55,6 +63,8 @@ public class CombinedStatisticDatabase extends AbstractDatabase {
 
 	@Override
 	public void saveASync(StatisticUser user) {
+		if (true)
+			return;
 		deathDatabase.saveASync(user);
 		killDatabase.saveASync(user);
 		streakDatabase.saveASync(user);
@@ -62,6 +72,8 @@ public class CombinedStatisticDatabase extends AbstractDatabase {
 
 	@Override
 	public void load(StatisticUser user) {
+		if (true)
+			return;
 		deathDatabase.load(user);
 		killDatabase.load(user);
 		streakDatabase.load(user);
@@ -69,6 +81,8 @@ public class CombinedStatisticDatabase extends AbstractDatabase {
 
 	@Override
 	public CompletableFuture<StatisticUser> loadASync(StatisticUser user) {
+		if (true)
+			return null;
 		CompletableFuture<StatisticUser> kill = killDatabase.loadASync(user);
 		CompletableFuture<StatisticUser> death = deathDatabase.loadASync(user);
 		CompletableFuture<StatisticUser> streak = streakDatabase.loadASync(user);

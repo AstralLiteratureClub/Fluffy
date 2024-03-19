@@ -47,7 +47,7 @@ public class DeathListener implements Listener {
 	}
 
 	@EventHandler
-	public void onEntityDeathEvent(PlayerDeathEvent event){
+	private void onEntityDeathEvent(PlayerDeathEvent event){
 		EntityDamageEvent damageEvent = event.getEntity().getLastDamageCause();
 		if (damageEvent == null){
 			getLogger().error("Damage event found null!");

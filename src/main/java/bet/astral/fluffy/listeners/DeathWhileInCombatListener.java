@@ -23,7 +23,7 @@ public class DeathWhileInCombatListener implements Listener {
 
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
-	public void onDeath(PlayerDeathEvent event){
+	private void onDeath(PlayerDeathEvent event){
 		CombatManager combatManager = fluffy.getCombatManager();
 		Player player = event.getEntity();
 		if (combatManager.hasTags(player)){
@@ -31,8 +31,10 @@ public class DeathWhileInCombatListener implements Listener {
 				tags.forEach(tag->{
 					if (tag.getAttacker().getUniqueId().equals(player.getUniqueId())){
 						tag.setDeadAttacker(true);
+						tag.setAttackerTicksLeft(0);
 					} else {
 						tag.setDeadVictim(true);
+						tag.setVictimTicksLeft(0);
 					}
 			});
 		}

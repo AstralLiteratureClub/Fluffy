@@ -10,22 +10,22 @@ import bet.astral.fluffy.manager.CombatManager;
 import bet.astral.fluffy.messenger.MessageKey;
 import bet.astral.fluffy.messenger.Placeholders;
 import bet.astral.fluffy.FluffyCombat;
+import bet.astral.fluffy.nms.ItemReflections;
 import bet.astral.messenger.Messenger;
 import bet.astral.messenger.placeholder.Placeholder;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
-import org.bukkit.entity.ThrownPotion;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.*;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.projectiles.BlockProjectileSource;
+import org.bukkit.projectiles.ProjectileSource;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedList;
@@ -35,6 +35,7 @@ import java.util.UUID;
 
 import static bet.astral.fluffy.FluffyCombat.*;
 import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.*;
+import static org.bukkit.persistence.PersistentDataType.STRING;
 
 /**
  * @author Antritus
@@ -48,9 +49,9 @@ public class PlayerBeginCombatListener implements Listener {
 		this.combat = combat;
 	}
 
-	public static boolean isAny(EntityDamageEvent.DamageCause damageCause, EntityDamageEvent.DamageCause... causes){
+	public static boolean isAny(EntityDamageEvent.DamageCause damageCause, EntityDamageEvent.DamageCause... causes) {
 		for (EntityDamageEvent.DamageCause cause : causes) {
-			if (cause == damageCause){
+			if (cause == damageCause) {
 				return true;
 			}
 		}
@@ -60,8 +61,16 @@ public class PlayerBeginCombatListener implements Listener {
 	public static void handle(Player victim, OfflinePlayer attacker, CombatCause combatCause) {
 		handle(victim, attacker, combatCause, null);
 	}
+
 	public static void handle(Player victim, OfflinePlayer attacker, CombatCause combatCause, ItemStack itemStack) {
+		handle(victim, attacker, combatCause, itemStack, false);
+	}
+
+	public static void handle(Player victim, OfflinePlayer attacker, CombatCause combatCause, ItemStack itemStack, boolean fireTicks) {
 		if (victim.getUniqueId() == attacker.getUniqueId() && !FluffyCombat.debug) {
+			return;
+		}
+		if (victim.isDead()){
 			return;
 		}
 		FluffyCombat fluffy = FluffyCombat.getPlugin(FluffyCombat.class);
@@ -94,35 +103,46 @@ public class PlayerBeginCombatListener implements Listener {
 		} else {
 			tag.setVictimWeapon(itemStack);
 		}
-		if (combatCause==CombatCause.FIRE || combatCause == CombatCause.LAVA){
+		if (combatCause == CombatCause.FIRE || combatCause == CombatCause.LAVA) {
 			CombatUser user = tag.getUser(victim);
 			user.setLastFireDamage(attacker.getUniqueId());
 		} else if (itemStack != null && (itemStack.containsEnchantment(Enchantment.FIRE_ASPECT) && combatCause == CombatCause.MELEE
-				|| itemStack.getType()==Material.BOW && itemStack.containsEnchantment(Enchantment.ARROW_FIRE))) {
+				|| itemStack.getType() == Material.BOW && itemStack.containsEnchantment(Enchantment.ARROW_FIRE))) {
+			CombatUser user = tag.getUser(victim);
+			user.setLastFireDamage(attacker.getUniqueId());
+		} else if (fireTicks) {
 			CombatUser user = tag.getUser(victim);
 			user.setLastFireDamage(attacker.getUniqueId());
 		}
 	}
+
 	public static void handle(Player victim, Block attacker, CombatCause combatCause) {
 		handle(victim, attacker, combatCause, null);
 	}
 
 	public static void handle(Player victim, Block attacker, CombatCause combatCause, @Nullable ItemStack itemStack) {
+		if (victim.isDead()){
+			return;
+		}
 		FluffyCombat combat = FluffyCombat.getPlugin(FluffyCombat.class);
 		BlockUserManager blockUserManager = combat.getBlockUserManager();
 
-		if (blockUserManager.getUser(attacker.getLocation())==null ||
-				!Objects.requireNonNull(blockUserManager.getUser(attacker.getLocation())).isAlive()){
+		if (blockUserManager.getUser(attacker.getLocation()) == null ||
+				!Objects.requireNonNull(blockUserManager.getUser(attacker.getLocation())).isAlive()) {
 			blockUserManager.create(attacker);
 		}
 		BlockCombatUser blockUser = blockUserManager.getUser(attacker.getLocation());
 		handle(victim, blockUser, combatCause, itemStack);
 	}
+
 	public static void handle(Player victim, BlockCombatUser attacker, CombatCause combatCause) {
 		handle(victim, attacker, combatCause, null);
 	}
 
 	public static void handle(Player victim, BlockCombatUser attacker, CombatCause combatCause, @Nullable ItemStack itemStack) {
+		if (victim.isDead()){
+			return;
+		}
 		FluffyCombat fluffy = FluffyCombat.getPlugin(FluffyCombat.class);
 
 		CombatManager cM = fluffy.getCombatManager();
@@ -142,13 +162,13 @@ public class PlayerBeginCombatListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void onEntityBlock(EntityDamageEvent event) {
+	private void onEntityBlock(EntityDamageEvent event) {
 		if (!(event.getEntity() instanceof Player player)) {
 			return;
 		}
 		if (event.getCause() == FIRE) {
 			Block nearest = findNearestOwnedBlock(player, Material.FIRE, Material.SOUL_FIRE);
-			if (nearest == null){
+			if (nearest == null) {
 				return;
 			}
 			UUID owner = FluffyCombat.getBlockOwner(nearest);
@@ -162,16 +182,14 @@ public class PlayerBeginCombatListener implements Listener {
 			}
 		} else if (event.getCause() == LAVA) {
 			Block block = FluffyCombat.findNearestOwnedBlock(player, Material.LAVA);
+			if (block == null){
+				return;
+			}
 			UUID owner = FluffyCombat.getBlockOwner(block);
-			if (owner == null){
+			if (owner == null) {
 				return;
 			}
 
-			try {
-				combat.getGlowingBlocks().setGlowing(block, player, ChatColor.RED);
-			} catch (ReflectiveOperationException e) {
-				throw new RuntimeException(e);
-			}
 			OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(owner);
 			handle(player, offlinePlayer, CombatCause.FIRE);
 		}
@@ -179,18 +197,19 @@ public class PlayerBeginCombatListener implements Listener {
 
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void onEntityDamage(EntityDamageByEntityEvent event) {
+	private void onEntityDamage(EntityDamageByEntityEvent event) {
 
 		if (!(event.getEntity() instanceof Player victim)) {
 			return;
 		}
-		if (event.getCause()==FIRE_TICK){
+		if (event.getCause() == FIRE_TICK) {
 			CombatUser user = combat.getUserManager().getUser(victim);
-			if (user.getLastFireDamage() != null){
-				if (!combat.getCombatManager().hasTags(victim)){
+			if (user.getLastFireDamage() != null) {
+				if (!combat.getCombatManager().hasTags(victim)) {
 					return;
 				}
 				handle(victim, Bukkit.getOfflinePlayer(user.getLastFireDamage()), CombatCause.FIRE);
+				return;
 			}
 		}
 		// Ignore so we can handle in custom potion effect check
@@ -199,12 +218,22 @@ public class PlayerBeginCombatListener implements Listener {
 		}
 		OfflinePlayer attacker;
 		if (!(event.getDamager() instanceof Player player)) {
-			if (event.getDamager() instanceof ThrownPotion){
+			if (event.getDamager() instanceof ThrownPotion) {
 				return;
 			}
 			if (event.getDamager() instanceof Projectile projectile) {
 				if (projectile.getShooter() != null && projectile.getShooter() instanceof Player player) {
-					handle(victim, player, CombatCause.PROJECTILE);
+					String nbt = projectile.getPersistentDataContainer().get(PROJECTILE_ITEM_KEY, STRING);
+					ItemStack itemStack = null;
+					if (nbt != null) {
+						itemStack = ItemReflections.fromNBT(nbt);
+					}
+
+					if (projectile instanceof Arrow arrow) {
+						handle(victim, player, CombatCause.PROJECTILE, itemStack, arrow.getFireTicks() > 0);
+						return;
+					}
+					handle(victim, player, CombatCause.PROJECTILE, itemStack);
 					return;
 				} else {
 					return;
@@ -215,7 +244,23 @@ public class PlayerBeginCombatListener implements Listener {
 		} else {
 			attacker = player;
 		}
-		handle(victim, attacker,  CombatCause.MELEE);
+		handle(victim, attacker, CombatCause.MELEE);
 	}
 
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	private void onEntityDamage(ProjectileLaunchEvent event) {
+		ProjectileSource source = event.getEntity().getShooter();
+		Projectile projectile = event.getEntity();
+		if (source instanceof BlockProjectileSource) {
+			// todo Add support for projectiles (dispenser)
+		} else if (source instanceof LivingEntity entity && entity.getEquipment() != null) {
+			ItemStack itemStack = entity.getEquipment().getItemInMainHand();
+			if (itemStack.isEmpty()){
+				return;
+			}
+			String nbt = ItemReflections.toNBT(itemStack);
+
+			projectile.getPersistentDataContainer().set(PROJECTILE_ITEM_KEY, STRING, nbt);
+ 		}
+	}
 }

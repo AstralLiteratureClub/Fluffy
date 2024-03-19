@@ -5,11 +5,16 @@ import lombok.Getter;
 import bet.astral.fluffy.FluffyCombat;
 import org.apache.commons.lang3.EnumUtils;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
+import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Shulker;
+import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.objectweb.asm.tree.LocalVariableAnnotationNode;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -177,10 +182,10 @@ public class CombatConfig {
 		isArmorHotBarEquipAllowed = configuration.getBoolean("armor-change.allow-hotbar-equip", true);
 
 
-		statisticDatabaseType = EnumUtils.getEnumIgnoreCase(AbstractDatabase.DBType.class, "database.statistic.type");
-		if (statisticDatabaseType == null){
-			throw new RuntimeException("Couldn't find a correct database type for database database.statistic.type");
-		}
+//		statisticDatabaseType = EnumUtils.getEnumIgnoreCase(AbstractDatabase.DBType.class, "database.statistic.type");
+//		if (statisticDatabaseType == null){
+//			throw new RuntimeException("Couldn't find a correct database type for database database.statistic.type");
+//		}
 	}
 
 	public FluffyCombat fluffy() {

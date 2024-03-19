@@ -274,6 +274,20 @@ potions:
       - "minecraft:weakness"
       - "minecraft:wither"
 
+dispensers:
+  # Should the game find the owner of arrows put inside a dispenser?
+  # True/False
+  detect-arrows: true
+  # Should arrows in dispensers begin combat, if the block has no source found?
+  # True/False
+  arrows-begin-combat: true
+  # Should the game find the owner of potions put inside a dispenser?
+  # True/False
+  detect-potions: true
+  # Should potions begin combat?
+  #  More options to disable and enable lingering potions in potions.begin-combat.block-sources.dispenser
+  # True/False
+  potions-begin-combat: true
 
 # Cooldowns. What items should be in cooldown in combat
 #TODO fix cooldowns

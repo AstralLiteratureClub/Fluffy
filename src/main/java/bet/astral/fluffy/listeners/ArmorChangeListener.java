@@ -20,7 +20,7 @@ public class ArmorChangeListener implements Listener {
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
-	public void onArmorHotSwapEvent(PlayerInteractEvent event) {
+	private void onArmorHotSwapEvent(PlayerInteractEvent event) {
 		if (PlayerArmorChangeEvent.SlotType.isEquipable(event.getMaterial())) {
 			if (!fluffy.getCombatConfig().isArmorHotSwapAllowed()) {
 				event.setCancelled(true);
@@ -30,7 +30,7 @@ public class ArmorChangeListener implements Listener {
 
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
-	public void onArmorEquipEvent(ArmorEquipEvent event) {
+	private void onArmorEquipEvent(ArmorEquipEvent event) {
 		Set<ArmorEquipEvent.EquipMethod> methods = new HashSet<>(List.of(
 				ArmorEquipEvent.EquipMethod.SHIFT_CLICK,
 				ArmorEquipEvent.EquipMethod.DRAG,

@@ -21,7 +21,7 @@ public class BlockBreakListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	public void onBlockBreak(BlockBreakEvent event){
+	private void onBlockBreak(BlockBreakEvent event){
 		BlockUserManager blockUserManager = fluffy.getBlockUserManager();
 		BlockCombatUser blockCombatUser = blockUserManager.getUser(event.getBlock().getLocation());
 		if (blockCombatUser == null){

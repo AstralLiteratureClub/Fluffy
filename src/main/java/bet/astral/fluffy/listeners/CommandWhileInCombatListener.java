@@ -16,7 +16,7 @@ public class CommandWhileInCombatListener implements Listener {
 		this.fluffy = fluffy;
 	}
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	public void onCommandPrepare(PlayerCommandPreprocessEvent event){
+	private void onCommandPrepare(PlayerCommandPreprocessEvent event){
 		if (!fluffy.getCombatConfig().isCommandsDisabled()){
 			return;
 		}

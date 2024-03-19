@@ -21,7 +21,7 @@ public class PlayerGlowDisableListener implements Listener {
 	}
 
 	@EventHandler
-	public void onCombatEnd(CombatEndEvent event){
+	private void onCombatEnd(CombatEndEvent event){
 		CombatTag tag = event.getCombatTag();
 		CombatUser victim = tag.getVictim();
 		CombatUser attacker = tag.getAttacker();
