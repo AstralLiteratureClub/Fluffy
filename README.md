@@ -49,3 +49,7 @@ Having 1 single plugin is the reason why fluffy was created.
 Having 10 different expansions/addons which should have been built inside the plugin is not ideal for anyone,
 as you need to download multiple jar files for them.
 In fluffy you can just disable features in the config.
+
+### Dependencies
+You're required to publish https://github.com/AstralLiteratureClub/MessageManager to your local host to use fluffy.
+(Building it)
