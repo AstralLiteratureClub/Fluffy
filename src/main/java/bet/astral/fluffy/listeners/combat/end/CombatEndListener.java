@@ -1,23 +1,51 @@
-package bet.astral.fluffy.listeners;
+package bet.astral.fluffy.listeners.combat.end;
 
-import fr.skytasul.glowingentities.GlowingBlocks;
-import fr.skytasul.glowingentities.GlowingEntities;
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.BlockCombatUser;
 import bet.astral.fluffy.api.CombatTag;
 import bet.astral.fluffy.api.CombatUser;
-import bet.astral.fluffy.events.CombatEndEvent;
 import bet.astral.fluffy.configs.CombatConfig;
+import bet.astral.fluffy.events.CombatEndEvent;
+import bet.astral.fluffy.manager.CombatManager;
+import fr.skytasul.glowingentities.GlowingBlocks;
+import fr.skytasul.glowingentities.GlowingEntities;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
 
-public class PlayerGlowDisableListener implements Listener {
+import java.util.List;
+
+public class CombatEndListener implements Listener {
 	private final FluffyCombat fluffy;
-
-	public PlayerGlowDisableListener(FluffyCombat fluffy) {
+	public CombatEndListener(FluffyCombat fluffy){
 		this.fluffy = fluffy;
+	}
+
+	public FluffyCombat fluffy() {
+		return fluffy;
+	}
+
+
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+	private void onDeath(PlayerDeathEvent event){
+		CombatManager combatManager = fluffy.getCombatManager();
+		Player player = event.getEntity();
+		if (combatManager.hasTags(player)){
+			List<CombatTag> tags = combatManager.getTags(player);
+				tags.forEach(tag->{
+					// Set the tag ticks to -1 as it's instantly removed from the player
+					if (tag.getAttacker().getUniqueId().equals(player.getUniqueId())){
+						tag.setDeadAttacker(true);
+						tag.setAttackerTicksLeft(-1);
+					} else {
+						tag.setDeadVictim(true);
+						tag.setVictimTicksLeft(-1);
+					}
+			});
+		}
 	}
 
 	@EventHandler

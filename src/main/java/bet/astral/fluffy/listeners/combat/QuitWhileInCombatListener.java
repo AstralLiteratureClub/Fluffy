@@ -1,4 +1,4 @@
-package bet.astral.fluffy.listeners;
+package bet.astral.fluffy.listeners.combat;
 
 import bet.astral.fluffy.messenger.MessageKey;
 import bet.astral.fluffy.messenger.Placeholders;
@@ -22,10 +22,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Objects;
 
-public class PlayerExitWhileInCombatListener implements Listener {
+public class QuitWhileInCombatListener implements Listener {
 	private final FluffyCombat fluffy;
 
-	public PlayerExitWhileInCombatListener(FluffyCombat fluffy) {
+	public QuitWhileInCombatListener(FluffyCombat fluffy) {
 		this.fluffy = fluffy;
 	}
 
@@ -90,10 +90,10 @@ public class PlayerExitWhileInCombatListener implements Listener {
 		if (FluffyCombat.isStopping){
 			return;
 		}
-		if (!fluffy.getCombatConfig().isCombatLogKillTotemBypass()){
-			event.setCancelled(true);
-		}
 		if (fluffy.getCombatConfig().getCombatLogAction() != CombatConfig.CombatLogAction.KILL) {
+			return;
+		}
+		if (!fluffy.getCombatConfig().isCombatLogKillTotemBypass()){
 			return;
 		}
 		if (event.getEntity() instanceof Player player){

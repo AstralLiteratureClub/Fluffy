@@ -10,10 +10,10 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
-public class PlayerJoinListener implements Listener {
+public class ConnectionListener implements Listener {
 	private final FluffyCombat fluffy;
 
-	public PlayerJoinListener(FluffyCombat combat) {
+	public ConnectionListener(FluffyCombat combat) {
 		this.fluffy = combat;
 	}
 

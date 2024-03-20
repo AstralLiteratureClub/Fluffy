@@ -1,4 +1,4 @@
-package bet.astral.fluffy.listeners;
+package bet.astral.fluffy.listeners.combat.begin;
 
 import bet.astral.fluffy.api.BlockCombatUser;
 import bet.astral.fluffy.api.CombatCause;
@@ -42,10 +42,10 @@ import static org.bukkit.persistence.PersistentDataType.STRING;
  * @since 1.0-SNAPSHOT
  */
 @SuppressWarnings("removal")
-public class PlayerBeginCombatListener implements Listener {
+public class BeginCombatListener implements Listener {
 	private final FluffyCombat combat;
 
-	public PlayerBeginCombatListener(FluffyCombat combat) {
+	public BeginCombatListener(FluffyCombat combat) {
 		this.combat = combat;
 	}
 

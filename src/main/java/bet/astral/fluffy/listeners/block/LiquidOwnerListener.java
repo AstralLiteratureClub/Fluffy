@@ -1,4 +1,4 @@
-package bet.astral.fluffy.listeners;
+package bet.astral.fluffy.listeners.block;
 
 import bet.astral.fluffy.FluffyCombat;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package bet.astral.fluffy.listeners;
+package bet.astral.fluffy.listeners.combat;
 
 import fr.skytasul.glowingentities.GlowingBlocks;
 import bet.astral.fluffy.FluffyCombat;
@@ -9,10 +9,10 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 
-public class BlockBreakListener implements Listener {
+public class BreakCombatTaggedBlockListener implements Listener {
 	private final FluffyCombat fluffy;
 
-	public BlockBreakListener(FluffyCombat fluffyCombat) {
+	public BreakCombatTaggedBlockListener(FluffyCombat fluffyCombat) {
 		this.fluffy = fluffyCombat;
 	}
 

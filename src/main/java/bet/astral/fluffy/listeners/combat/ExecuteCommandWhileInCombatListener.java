@@ -1,4 +1,4 @@
-package bet.astral.fluffy.listeners;
+package bet.astral.fluffy.listeners.combat;
 
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.manager.CombatManager;
@@ -10,9 +10,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
-public class CommandWhileInCombatListener implements Listener {
+public class ExecuteCommandWhileInCombatListener implements Listener {
 	private final FluffyCombat fluffy;
-	public CommandWhileInCombatListener(FluffyCombat fluffy){
+	public ExecuteCommandWhileInCombatListener(FluffyCombat fluffy){
 		this.fluffy = fluffy;
 	}
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

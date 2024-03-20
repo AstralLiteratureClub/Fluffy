@@ -4,7 +4,7 @@ import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.BlockCombatUser;
 import bet.astral.fluffy.api.CombatCause;
 import bet.astral.fluffy.configs.CombatConfig;
-import bet.astral.fluffy.listeners.PlayerBeginCombatListener;
+import bet.astral.fluffy.listeners.combat.begin.BeginCombatListener;
 import bet.astral.fluffy.manager.BlockUserManager;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -77,7 +77,7 @@ public class MagicDetection implements Listener {
 				if (!combatConfig.isDispenserLingeringPotionCombat()) {
 					return;
 				}
-				PlayerBeginCombatListener.handle(player, block, CombatCause.LINGERING_POTION); // Creates combat user for the block
+				BeginCombatListener.handle(player, block, CombatCause.LINGERING_POTION); // Creates combat user for the block
 				BlockCombatUser blockCombatUser = FluffyCombat.getPlugin(FluffyCombat.class).getBlockUserManager().getUser(block.getLocation());
 				assert blockCombatUser != null;
 				handleEffects(blockCombatUser.hashCode(), player, types);
@@ -87,7 +87,7 @@ public class MagicDetection implements Listener {
 		LivingEntity livingEntity = (LivingEntity) source;
 		handleEffects(livingEntity, player, types);
 		if (source instanceof Player attacker) {
-			PlayerBeginCombatListener.handle(player, attacker, CombatCause.LINGERING_POTION);
+			BeginCombatListener.handle(player, attacker, CombatCause.LINGERING_POTION);
 		}
 	}
 	private static boolean isCombat(List<PotionEffectType> types, List<PotionEffectType> combatPotions){
@@ -136,12 +136,12 @@ public class MagicDetection implements Listener {
 		}
 		if (source instanceof BlockProjectileSource projectileSource) {
 			Block block = projectileSource.getBlock();
-			PlayerBeginCombatListener.handle(player, block, CombatCause.SPLASH_POTION);
+			BeginCombatListener.handle(player, block, CombatCause.SPLASH_POTION);
 			BlockCombatUser blockCombatUser = FluffyCombat.getPlugin(FluffyCombat.class).getBlockUserManager().getUser(block.getLocation());
 			assert blockCombatUser != null;
 			handleEffects(blockCombatUser.hashCode(), player, types);
 		} else if (source instanceof Player attacker) {
-			PlayerBeginCombatListener.handle(player, attacker, CombatCause.SPLASH_POTION);
+			BeginCombatListener.handle(player, attacker, CombatCause.SPLASH_POTION);
 			handleEffects(attacker, player, types);
 		}
 	}
@@ -206,10 +206,10 @@ public class MagicDetection implements Listener {
 			if (!blockUser.isAlive()) {
 				return;
 			}
-			PlayerBeginCombatListener.handle(victim, blockUser, CombatCause.EFFECT_STATUS);
+			BeginCombatListener.handle(victim, blockUser, CombatCause.EFFECT_STATUS);
 		} else if (whoGave instanceof UUID uuid) {
 			OfflinePlayer player = fluffy.getServer().getOfflinePlayer(uuid);
-			PlayerBeginCombatListener.handle(victim, player, CombatCause.EFFECT_STATUS);
+			BeginCombatListener.handle(victim, player, CombatCause.EFFECT_STATUS);
 		}
 	}
 
@@ -243,7 +243,7 @@ public class MagicDetection implements Listener {
 					if (combatConfig.isDispenserSplashPotionCombat()){
 						return;
 					}
-					PlayerBeginCombatListener.handle(player, block, CombatCause.SPLASH_POTION); // Creates combat user for the block
+					BeginCombatListener.handle(player, block, CombatCause.SPLASH_POTION); // Creates combat user for the block
 					BlockCombatUser blockCombatUser = fluffy.getBlockUserManager().getUser(block.getLocation());
 					assert blockCombatUser != null;
 
@@ -255,7 +255,7 @@ public class MagicDetection implements Listener {
 			handleEffects(livingEntity, player, types);
 			if (source instanceof Player attacker){
 				if (event.getEntity() instanceof Player victim) {
-					PlayerBeginCombatListener.handle(victim, attacker, CombatCause.SPLASH_POTION);
+					BeginCombatListener.handle(victim, attacker, CombatCause.SPLASH_POTION);
 					return;
 				}
 			}

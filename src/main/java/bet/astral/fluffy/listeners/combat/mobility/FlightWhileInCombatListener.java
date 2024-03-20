@@ -1,4 +1,4 @@
-package bet.astral.fluffy.listeners;
+package bet.astral.fluffy.listeners.combat.mobility;
 
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.CombatUser;
@@ -12,10 +12,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.scheduler.BukkitTask;
 
-public class PlayerFlightListener implements Listener {
+public class FlightWhileInCombatListener implements Listener {
 	private final FluffyCombat fluffy;
 
-	public PlayerFlightListener(FluffyCombat fluffy) {
+	public FlightWhileInCombatListener(FluffyCombat fluffy) {
 		this.fluffy = fluffy;
 	}
 

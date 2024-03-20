@@ -4,7 +4,7 @@ import bet.astral.fluffy.utils.Compatibility;
 import bet.astral.fluffy.api.CombatCause;
 import bet.astral.fluffy.api.CombatTag;
 import bet.astral.fluffy.events.damage.CombatDamageUsingTNTEvent;
-import bet.astral.fluffy.listeners.PlayerBeginCombatListener;
+import bet.astral.fluffy.listeners.combat.begin.BeginCombatListener;
 import bet.astral.fluffy.FluffyCombat;
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
 import org.bukkit.Location;
@@ -332,7 +332,7 @@ public class TNTDetection implements Listener {
 					return;
 				}
 				if (value instanceof OfflinePlayer attacker){
-					PlayerBeginCombatListener.handle(victim, attacker, CombatCause.TNT, null);
+					BeginCombatListener.handle(victim, attacker, CombatCause.TNT, null);
 					CombatTag combatTag = fluffy.getCombatManager().getLatest(victim);
 					CombatDamageUsingTNTEvent damageEvent = new CombatDamageUsingTNTEvent(
 							fluffy, combatTag, victim, attacker, null, tnt);

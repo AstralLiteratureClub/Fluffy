@@ -3,8 +3,18 @@ package bet.astral.fluffy;
 import bet.astral.fluffy.api.CombatUser;
 import bet.astral.fluffy.configs.CombatConfig;
 import bet.astral.fluffy.database.CombinedStatisticDatabase;
+import bet.astral.fluffy.listeners.ArmorChangeListener;
+import bet.astral.fluffy.listeners.ConnectionListener;
+import bet.astral.fluffy.listeners.block.LiquidOwnerListener;
+import bet.astral.fluffy.listeners.combat.BreakCombatTaggedBlockListener;
+import bet.astral.fluffy.listeners.combat.end.CombatEndListener;
+import bet.astral.fluffy.listeners.combat.ExecuteCommandWhileInCombatListener;
+import bet.astral.fluffy.listeners.combat.QuitWhileInCombatListener;
+import bet.astral.fluffy.listeners.combat.begin.BeginCombatListener;
+import bet.astral.fluffy.listeners.combat.mobility.ElytraWhileInCombatListener;
+import bet.astral.fluffy.listeners.combat.mobility.FlightWhileInCombatListener;
+import bet.astral.fluffy.listeners.combat.mobility.TridentWhileInCombatListener;
 import bet.astral.fluffy.listeners.hitdetection.*;
-import bet.astral.fluffy.listeners.*;
 import bet.astral.fluffy.manager.*;
 import bet.astral.fluffy.messenger.MessageKey;
 import bet.astral.fluffy.utils.Compatibility;
@@ -287,19 +297,20 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		new CMDPotions(this).registerCommand();
 		new CMDGlow(this).registerCommand();
 		new CMDBlockOwner(this).registerCommand();
-		registerListeners(new PlayerBeginCombatListener(this));
-		registerListeners(new PlayerGlowDisableListener(this));
-		registerListeners(new PlayerExitWhileInCombatListener(this));
-		registerListeners(new PlayerJoinListener(this));
 		registerListeners(this);
-		registerListeners(new DeathWhileInCombatListener(this));
 		registerListeners(cooldownManager);
 		registerListeners(statisticManager);
-		registerListeners(new TridentWhileInCombatListener(this));
-		registerListeners(new ElytraWhileInCombatListener(this));
 		registerListeners(new LiquidOwnerListener(this));
-		registerListeners(new PlayerFlightListener(this));
-		registerListeners(new ArmorChangeListener(this));
+		registerListeners(new BeginCombatListener(this));
+		registerListeners(new ElytraWhileInCombatListener(this));
+		registerListeners(new FlightWhileInCombatListener(this));
+		registerListeners(new TridentWhileInCombatListener(this));
+		registerListeners(new BreakCombatTaggedBlockListener(this));
+		registerListeners(new CombatEndListener(this));
+		registerListeners(new ExecuteCommandWhileInCombatListener(this));
+		registerListeners(new QuitWhileInCombatListener(this));
+		registerListeners(new LiquidOwnerListener(this));
+		registerListeners(new ConnectionListener(this));
 
 		ArmorEquipEvent.registerListener(this);
 
@@ -313,12 +324,13 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		magicDetection = new MagicDetection(this);
 		fireDetection = new FireDetection(this);
 		lavaDetection = new LiquidOwnerListener(this);
-		registerListeners(anchorDetection,
+		registerListeners(
+				anchorDetection,
 				bedDetection,
 				crystalDetection,
+				fireDetection,
 				tntDetection,
 				magicDetection,
-				fireDetection,
 				lavaDetection
 				);
 

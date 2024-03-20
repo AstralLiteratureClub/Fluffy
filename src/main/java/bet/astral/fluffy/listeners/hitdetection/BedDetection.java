@@ -4,7 +4,7 @@ import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.CombatCause;
 import bet.astral.fluffy.api.CombatTag;
 import bet.astral.fluffy.events.damage.CombatDamageUsingBedEvent;
-import bet.astral.fluffy.listeners.PlayerBeginCombatListener;
+import bet.astral.fluffy.listeners.combat.begin.BeginCombatListener;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -111,7 +111,7 @@ public class BedDetection implements Listener {
 			return;
 		}
 		ItemStack itemStack = bedTag.itemStack;
-		PlayerBeginCombatListener.handle(victim, bedTag.owner, CombatCause.BED, itemStack);
+		BeginCombatListener.handle(victim, bedTag.owner, CombatCause.BED, itemStack);
 		CombatTag tag = fluffy.getCombatManager().getLatest(victim);
 		CombatDamageUsingBedEvent damageEvent = new CombatDamageUsingBedEvent(
 				fluffy, tag, victim, bedTag.owner, bed, event.getDamager(), bedTag.itemStack);

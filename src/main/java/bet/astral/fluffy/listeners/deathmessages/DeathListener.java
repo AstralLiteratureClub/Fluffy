@@ -1,4 +1,4 @@
-package bet.astral.fluffy.listeners;
+package bet.astral.fluffy.listeners.deathmessages;
 
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.CombatTag;

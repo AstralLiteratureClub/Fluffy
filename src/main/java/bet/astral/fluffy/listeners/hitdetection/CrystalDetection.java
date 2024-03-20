@@ -4,7 +4,7 @@ import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.CombatCause;
 import bet.astral.fluffy.api.CombatTag;
 import bet.astral.fluffy.events.damage.CombatDamageUsingEnderCrystalEvent;
-import bet.astral.fluffy.listeners.PlayerBeginCombatListener;
+import bet.astral.fluffy.listeners.combat.begin.BeginCombatListener;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -83,7 +83,7 @@ public class CrystalDetection implements Listener {
 		}
 
 		ItemStack itemStack = tag.itemStack;
-		PlayerBeginCombatListener.handle(victim, attacker, CombatCause.ENDER_CRYSTAL, itemStack);
+		BeginCombatListener.handle(victim, attacker, CombatCause.ENDER_CRYSTAL, itemStack);
 		CombatTag combatTag = fluffy.getCombatManager().getLatest(victim);
 		CombatDamageUsingEnderCrystalEvent damageEvent = new CombatDamageUsingEnderCrystalEvent(
 				fluffy, combatTag, victim, attacker, tag.itemStack, crystal);
