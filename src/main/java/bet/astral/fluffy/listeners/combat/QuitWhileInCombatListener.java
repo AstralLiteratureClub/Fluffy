@@ -13,7 +13,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityResurrectEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -76,47 +75,29 @@ public class QuitWhileInCombatListener implements Listener {
 				//TODO - Make the NPC spawning possible using hooks for the plugin
 				return;
 			} else if (fluffy.getCombatConfig().getCombatLogAction() == CombatConfig.CombatLogAction.KILL) {
+				boolean diedOnce = false;
 				assert user != null;
-				user.setting("logged", true);
-				user.setting("combat-log", true);
-				player.setHealth(0);
-			}
-		}
-	}
-
-	@SuppressWarnings("removal")
-	@EventHandler(priority = EventPriority.HIGHEST)
-	private void onTotemResurrect(EntityResurrectEvent event){
-		if (FluffyCombat.isStopping){
-			return;
-		}
-		if (fluffy.getCombatConfig().getCombatLogAction() != CombatConfig.CombatLogAction.KILL) {
-			return;
-		}
-		if (!fluffy.getCombatConfig().isCombatLogKillTotemBypass()){
-			return;
-		}
-		if (event.getEntity() instanceof Player player){
-			if (player.hasPermission("fluffy.bypass.combat-log")){
-				return;
-			}
-			UserManager uM = fluffy.getUserManager();
-			CombatUser user = uM.getUser(player.getUniqueId());
-			assert user != null;
-			if (user.getTotemCounter() == 0){
-				event.setCancelled(true);
-			}
-			if (user.getTotemCounter()>-1){
-				user.setTotemCounter(user.getTotemCounter());
-			}
-			Object property = user.get("logged");
-			if (property != null){
-				if (property instanceof Boolean && (boolean) property) {
+				while (!player.isDead()){
+					if (diedOnce && fluffy.getCombatConfig().isCombatLogKillTotemBypass()){
+						return;
+					} else if (diedOnce){
+						if (user.getTotemCounter() == 0){
+							return;
+						}
+						if (user.getTotemCounter()>-1) {
+							user.setTotemCounter(user.getTotemCounter()-1);
+						}
+					}
 					player.setHealth(0);
+					if (player.isDead()){
+						user.setting("logged", true);
+					}
+					diedOnce = true;
 				}
 			}
 		}
 	}
+
 
 	@SuppressWarnings("removal")
 	@EventHandler(priority = EventPriority.NORMAL)
@@ -129,9 +110,6 @@ public class QuitWhileInCombatListener implements Listener {
 		}
 
 		Player player = event.getEntity();
-		if (player.hasPermission("fluffy.bypass.combat-log")) {
-			return;
-		}
 		UserManager uM = fluffy.getUserManager();
 		CombatUser user = uM.getUser(player);
 		assert user != null;
@@ -140,10 +118,8 @@ public class QuitWhileInCombatListener implements Listener {
 			if (property instanceof Boolean && (boolean) property) {
 				user.setting("logged", false);
 				CombatConfig config = fluffy.getCombatConfig();
-				if (!config.isCombatLogKillKeepExp())
-					event.setKeepLevel(false);
-				if (!config.isCombatLogKillKeepItem())
-					event.setKeepInventory(false);
+				event.setKeepLevel(config.isCombatLogKillKeepExp());
+				event.setKeepInventory(config.isCombatLogKillKeepItem());
 			}
 		}
 	}

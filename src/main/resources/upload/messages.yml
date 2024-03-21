@@ -21,7 +21,10 @@ combat-logged-rejoin-broadcast:
 combat-logged-rejoin-player: "%prefix% <red>You left the server while in combat last time!"
 
 combat-logged-quit-npc-spawn-broadcast: "%prefix% <white>%player% <red>has left while in combat. You can find a killable NPC at position of <white>%player%<red>."
-combat-logged-quit-broadcast: "%prefix% <white>%player% <red>has left while in combat. Killed the combat logger!"
+combat-logged-quit-broadcast:
+  - ""
+  - "%prefix% <dark_red><bold>%player% <red><bold>has left while in combat. They have been killed!"
+  - ""
 
 combat-enter-victim:
   chat: "%prefix% <red>You are in combat with <white>%attacker%<red>! Don't log out!"

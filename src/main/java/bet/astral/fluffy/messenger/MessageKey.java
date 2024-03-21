@@ -79,9 +79,9 @@ public final class MessageKey
 	 * Combat LOG OUT
 	 */
 	@KeyType(Type.MESSAGE)
-	public static final String COMBAT_LOG_BROADCAST = "combat-logged-quit-npc-spawn-broadcast";
+	public static final String COMBAT_LOG_BROADCAST = "combat-logged-quit-broadcast";
 	@KeyType(Type.MESSAGE)
-	public static final String COMBAT_LOG_NPC_SPAWN_BROADCAST = "combat-logged-quit-broadcast";
+	public static final String COMBAT_LOG_NPC_SPAWN_BROADCAST = "combat-logged-quit-npc-spawn-broadcast";
 	/*
 	 * Combat tagging
 	 */
