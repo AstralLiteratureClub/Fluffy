@@ -113,6 +113,9 @@ public class BedDetection implements Listener {
 		ItemStack itemStack = bedTag.itemStack;
 		BeginCombatListener.handle(victim, bedTag.owner, CombatCause.BED, itemStack);
 		CombatTag tag = fluffy.getCombatManager().getLatest(victim);
+		if (tag == null){
+			return;
+		}
 		CombatDamageUsingBedEvent damageEvent = new CombatDamageUsingBedEvent(
 				fluffy, tag, victim, bedTag.owner, bed, event.getDamager(), bedTag.itemStack);
 		tag.setDamageDealt(bedTag.owner, event.getFinalDamage());

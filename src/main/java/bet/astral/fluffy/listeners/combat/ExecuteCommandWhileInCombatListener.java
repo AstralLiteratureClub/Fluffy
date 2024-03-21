@@ -27,12 +27,7 @@ public class ExecuteCommandWhileInCombatListener implements Listener {
 			if (player.hasPermission("fluffy.bypass.commands")){
 				return;
 			}
-			String command = event.getMessage();
-			if (command.contains(" ")) {
-				command = command.split(" ")[0];
-			}
-			command = command.replace("/", "");
-			final String finalCommand = command;
+			final String finalCommand = event.getMessage();
 			if (fluffy.getCombatConfig().getCommandsToDisable().stream().
 					anyMatch(
 							cmd -> cmd.toLowerCase().startsWith(finalCommand)

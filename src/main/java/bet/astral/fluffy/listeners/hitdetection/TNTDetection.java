@@ -334,7 +334,9 @@ public class TNTDetection implements Listener {
 				if (value instanceof OfflinePlayer attacker){
 					BeginCombatListener.handle(victim, attacker, CombatCause.TNT, null);
 					CombatTag combatTag = fluffy.getCombatManager().getLatest(victim);
-					CombatDamageUsingTNTEvent damageEvent = new CombatDamageUsingTNTEvent(
+					if (combatTag == null){
+						return;
+					}					CombatDamageUsingTNTEvent damageEvent = new CombatDamageUsingTNTEvent(
 							fluffy, combatTag, victim, attacker, null, tnt);
 					combatTag.setDamageDealt(attacker, event.getFinalDamage());
 					damageEvent.callEvent();

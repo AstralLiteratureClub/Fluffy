@@ -68,169 +68,173 @@ public final class CombatManager {
 			 */
 			@Override
 			public void run() {
-				CombatConfig config = main.getCombatConfig();
-				GlowingEntities glowingEntities = main.getGlowingEntities();
-				GlowingBlocks glowingBlocks = main.getGlowingBlocks();
-				List<String> deleteList = new ArrayList<>();
-				List<String> nullList = new ArrayList<>();
-				latest.clear();
-				Map<String, List<CombatTag>> userTags = new HashMap<>();
- 				tags.forEach((key, tag)->{
-					if (tag == null){
-						nullList.add(key);
-					} else {
-						String[] ids = splitId(key);
-						userTags.putIfAbsent(ids[0], new ArrayList<>());
-						userTags.putIfAbsent(ids[1], new ArrayList<>());
-
-						tag.setVictimTicksLeft(tag.getVictimTicksLeft() - 1);
-						tag.setAttackerTicksLeft(tag.getAttackerTicksLeft() - 1);
-						if (tag.getVictimTicksLeft() < 0 && tag.getAttackerTicksLeft() < 0) {
-							deleteList.add(key);
-							return;
-						} else {
-							userTags.get(ids[0]).add(tag);
-							userTags.get(ids[1]).add(tag);
-						}
-						CombatUser combatUser = tag.getVictim();
-						if (combatUser == null){
+				try {
+					CombatConfig config = main.getCombatConfig();
+					GlowingEntities glowingEntities = main.getGlowingEntities();
+					GlowingBlocks glowingBlocks = main.getGlowingBlocks();
+					List<String> deleteList = new ArrayList<>();
+					List<String> nullList = new ArrayList<>();
+					latest.clear();
+					Map<String, List<CombatTag>> userTags = new HashMap<>();
+					tags.forEach((key, tag) -> {
+						if (tag == null) {
 							nullList.add(key);
-							return;
-						}
-						UUID uniqueId = combatUser.getUniqueId();
-						latest.putIfAbsent(uniqueId, tag);
-						int ticksLeft = tag.getVictimTicksLeft();
-						if (latest.get(uniqueId).getTicksLeft(combatUser) < ticksLeft) {
-							latest.put(uniqueId, tag);
-						}
+						} else {
+							String[] ids = splitId(key);
+							userTags.putIfAbsent(ids[0], new ArrayList<>());
+							userTags.putIfAbsent(ids[1], new ArrayList<>());
 
-						if (!(tag.getAttacker() instanceof BlockCombatUser blockCombatUser)) {
-							combatUser = tag.getAttacker();
-							uniqueId = combatUser.getUniqueId();
+							tag.setVictimTicksLeft(tag.getVictimTicksLeft() - 1);
+							tag.setAttackerTicksLeft(tag.getAttackerTicksLeft() - 1);
+							if (tag.getVictimTicksLeft() < 0 && tag.getAttackerTicksLeft() < 0) {
+								deleteList.add(key);
+								return;
+							} else {
+								userTags.get(ids[0]).add(tag);
+								userTags.get(ids[1]).add(tag);
+							}
+							CombatUser combatUser = tag.getVictim();
+							if (combatUser == null) {
+								nullList.add(key);
+								return;
+							}
+							UUID uniqueId = combatUser.getUniqueId();
 							latest.putIfAbsent(uniqueId, tag);
-							{
-								if (latest.get(uniqueId).getTicksLeft(combatUser) < ticksLeft) {
-									latest.put(uniqueId, tag);
+							int ticksLeft = tag.getVictimTicksLeft();
+							if (latest.get(uniqueId).getTicksLeft(combatUser) < ticksLeft) {
+								latest.put(uniqueId, tag);
+							}
+
+							if (!(tag.getAttacker() instanceof BlockCombatUser blockCombatUser)) {
+								combatUser = tag.getAttacker();
+								uniqueId = combatUser.getUniqueId();
+								latest.putIfAbsent(uniqueId, tag);
+								{
+									if (latest.get(uniqueId).getTicksLeft(combatUser) < ticksLeft) {
+										latest.put(uniqueId, tag);
+									}
+								}
+							} else {
+								if (!blockCombatUser.isAlive()) {
+									tag.setAttackerTicksLeft(-1);
+									tag.setVictimTicksLeft(-1);
+								}
+							}
+						}
+					});
+					deleteList.forEach(key -> {
+						CombatTag tag = tags.get(key);
+						if (tag.getAttacker() instanceof BlockCombatUser blockCombatUser) {
+							OfflinePlayer victimOP = tag.getVictim().getPlayer();
+							if (victimOP.isOnline()) {
+								Player victim = (Player) victimOP;
+								Block block = blockCombatUser.getBlock();
+								try {
+									glowingBlocks.unsetGlowing(block, victim);
+								} catch (ReflectiveOperationException e) {
+									throw new RuntimeException(e);
 								}
 							}
 						} else {
-							if (!blockCombatUser.isAlive()){
-								tag.setAttackerTicksLeft(-1);
-								tag.setVictimTicksLeft(-1);
-							}
-						}
-					}
-				});
-				deleteList.forEach(key->{
-					CombatTag tag = tags.get(key);
-					if (tag.getAttacker() instanceof BlockCombatUser blockCombatUser){
-						OfflinePlayer victimOP = tag.getVictim().getPlayer();
-						if (victimOP.isOnline()){
-							Player victim = (Player) victimOP;
-							Block block = blockCombatUser.getBlock();
-							try {
-								glowingBlocks.unsetGlowing(block, victim);
-							} catch (ReflectiveOperationException e) {
-								throw new RuntimeException(e);
-							}
-						}
-					} else {
-						OfflinePlayer victimOP = tag.getVictim().getPlayer();
-						OfflinePlayer attackerOP = tag.getAttacker().getPlayer();
-						if (victimOP.isOnline() && attackerOP.isOnline()){
-							try {
-								glowingEntities.unsetGlowing(attackerOP.getPlayer(), victimOP.getPlayer());
-								glowingEntities.unsetGlowing(victimOP.getPlayer(), attackerOP.getPlayer());
-							} catch (ReflectiveOperationException e) {
-								throw new RuntimeException(e);
-							}
-						}
-					}
-				});
-				nullList.forEach(tags::remove);
-				deleteList.forEach(key->{
-					CombatTag tag = tags.get(key);
-					CombatUser victim = tag.getVictim();
-					CombatUser attacker = tag.getAttacker();
-					tags.remove(key);
-					OfflinePlayer victimPlayer = victim.getPlayer();
-					Set<String> keys = tags.keySet();
-					if (victimPlayer.isOnline()) {
-						if (keys.isEmpty() || keys.stream().noneMatch(id -> id.contains(victimPlayer.getUniqueId().toString()))) {
-							main.getMessageManager().message((Player) victimPlayer, MessageKey.COMBAT_END);
-						}
-					}
-					if (!(attacker instanceof BlockCombatUser)) {
-						OfflinePlayer attackerPlayer = attacker.getPlayer();
-						if (attackerPlayer.isOnline()) {
-							if (keys.isEmpty() || keys.stream().noneMatch(id -> id.contains(attackerPlayer.getUniqueId().toString()))) {
-								main.getMessageManager().message((Player) attackerPlayer, MessageKey.COMBAT_END);
-							}
-						}
-					}
-					CombatEndEvent event = new CombatEndEvent(main, tag);
-					event.callEvent();
-				});
-
-				userTags.forEach((idString, tagList)->{
-					if (tagList.isEmpty()){
-						try {
-							UUID id = UUID.fromString(idString);
-							OfflinePlayer player = main.getServer().getOfflinePlayer(id);
-							CombatFullEndEvent event = new CombatFullEndEvent(true, main, player);
-							event.callEvent();
-						} catch (IllegalArgumentException ignore){
-						}
-					}
-				});
-
-
-				latest.forEach((key, tag)->{
-					if (tag.getAttacker() instanceof BlockCombatUser blockCombatUser){
-						OfflinePlayer victimOP = tag.getVictim().getPlayer();
-						if (victimOP.isOnline()){
-							Player victim = victimOP.getPlayer();
-							Block block = blockCombatUser.getBlock();
-							if (victim != null) {
+							OfflinePlayer victimOP = tag.getVictim().getPlayer();
+							OfflinePlayer attackerOP = tag.getAttacker().getPlayer();
+							if (victimOP.isOnline() && attackerOP.isOnline()) {
 								try {
-									glowingBlocks.setGlowing(block, victim, config.getCombatGlowLatest());
+									glowingEntities.unsetGlowing(attackerOP.getPlayer(), victimOP.getPlayer());
+									glowingEntities.unsetGlowing(victimOP.getPlayer(), attackerOP.getPlayer());
 								} catch (ReflectiveOperationException e) {
 									throw new RuntimeException(e);
 								}
 							}
 						}
-					} else {
-						OfflinePlayer victimOP = tag.getVictim().getPlayer();
-						OfflinePlayer attackerOP = tag.getAttacker().getPlayer();
-						if (config.isCombatGlow() && config.isCombatGlowLatest()
-								&& victimOP.isOnline() && attackerOP.isOnline()) {
-							try {
-								glowingEntities.setGlowing(attackerOP.getPlayer(), victimOP.getPlayer(), config.getCombatGlowLatest());
-								if (!victimOP.equals(attackerOP)){
-									glowingEntities.setGlowing(victimOP.getPlayer(), attackerOP.getPlayer(), config.getCombatGlowLatest());
+					});
+					nullList.forEach(tags::remove);
+					deleteList.forEach(key -> {
+						CombatTag tag = tags.get(key);
+						CombatUser victim = tag.getVictim();
+						CombatUser attacker = tag.getAttacker();
+						tags.remove(key);
+						OfflinePlayer victimPlayer = victim.getPlayer();
+						Set<String> keys = tags.keySet();
+						if (victimPlayer.isOnline()) {
+							if (keys.isEmpty() || keys.stream().noneMatch(id -> id.contains(victimPlayer.getUniqueId().toString()))) {
+								main.getMessageManager().message((Player) victimPlayer, MessageKey.COMBAT_END);
+							}
+						}
+						if (!(attacker instanceof BlockCombatUser)) {
+							OfflinePlayer attackerPlayer = attacker.getPlayer();
+							if (attackerPlayer.isOnline()) {
+								if (keys.isEmpty() || keys.stream().noneMatch(id -> id.contains(attackerPlayer.getUniqueId().toString()))) {
+									main.getMessageManager().message((Player) attackerPlayer, MessageKey.COMBAT_END);
 								}
-							} catch (ReflectiveOperationException e) {
-								throw new RuntimeException(e);
 							}
 						}
+						CombatEndEvent event = new CombatEndEvent(main, tag);
+						event.callEvent();
+					});
 
-						if (victimOP.isOnline() && config.isCombatGlow()
-								&& (config.isCombatGlowAllTagged() || config.isCombatGlowCombatLogRejoin())) {
-							List<CombatTag> tags = getTags(victimOP);
-							for (CombatTag cTag : tags) {
-								makeGlow(main, (Player) victimOP, attackerOP, cTag);
+					userTags.forEach((idString, tagList) -> {
+						if (tagList.isEmpty()) {
+							try {
+								UUID id = UUID.fromString(idString);
+								OfflinePlayer player = main.getServer().getOfflinePlayer(id);
+								CombatFullEndEvent event = new CombatFullEndEvent(true, main, player);
+								event.callEvent();
+							} catch (IllegalArgumentException ignore) {
 							}
 						}
+					});
 
-						if (attackerOP.isOnline() && config.isCombatGlow()
-								&& (config.isCombatGlowAllTagged() || config.isCombatGlowCombatLogRejoin())) {
-							List<CombatTag> tags = getTags(attackerOP);
-							for (CombatTag cTag : tags) {
-								makeGlow(main, (Player) attackerOP, victimOP, cTag);
+
+					latest.forEach((key, tag) -> {
+						if (tag.getAttacker() instanceof BlockCombatUser blockCombatUser) {
+							OfflinePlayer victimOP = tag.getVictim().getPlayer();
+							if (victimOP.isOnline()) {
+								Player victim = victimOP.getPlayer();
+								Block block = blockCombatUser.getBlock();
+								if (victim != null) {
+									try {
+										glowingBlocks.setGlowing(block, victim, config.getCombatGlowLatest());
+									} catch (ReflectiveOperationException e) {
+										throw new RuntimeException(e);
+									}
+								}
+							}
+						} else {
+							OfflinePlayer victimOP = tag.getVictim().getPlayer();
+							OfflinePlayer attackerOP = tag.getAttacker().getPlayer();
+							if (config.isCombatGlow() && config.isCombatGlowLatest()
+									&& victimOP.isOnline() && attackerOP.isOnline()) {
+								try {
+									glowingEntities.setGlowing(attackerOP.getPlayer(), victimOP.getPlayer(), config.getCombatGlowLatest());
+									if (!victimOP.equals(attackerOP)) {
+										glowingEntities.setGlowing(victimOP.getPlayer(), attackerOP.getPlayer(), config.getCombatGlowLatest());
+									}
+								} catch (ReflectiveOperationException e) {
+									throw new RuntimeException(e);
+								}
+							}
+
+							if (victimOP.isOnline() && config.isCombatGlow()
+									&& (config.isCombatGlowAllTagged() || config.isCombatGlowCombatLogRejoin())) {
+								List<CombatTag> tags = getTags(victimOP);
+								for (CombatTag cTag : tags) {
+									makeGlow(main, (Player) victimOP, attackerOP, cTag);
+								}
+							}
+
+							if (attackerOP.isOnline() && config.isCombatGlow()
+									&& (config.isCombatGlowAllTagged() || config.isCombatGlowCombatLogRejoin())) {
+								List<CombatTag> tags = getTags(attackerOP);
+								for (CombatTag cTag : tags) {
+									makeGlow(main, (Player) attackerOP, victimOP, cTag);
+								}
 							}
 						}
-					}
-				});
+					});
+				} catch (Exception e){
+					e.printStackTrace();
+				}
 			}
 		}.runTaskTimerAsynchronously(main, 20, 1);
 	}

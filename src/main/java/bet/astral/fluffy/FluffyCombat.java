@@ -34,6 +34,7 @@ import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -51,6 +52,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.incendo.cloud.SenderMapper;
+import org.incendo.cloud.execution.ExecutionCoordinator;
+import org.incendo.cloud.paper.PaperCommandManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -237,6 +241,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 	private CooldownManager cooldownManager;
 	private CombatLogManager combatLogManager;
 	private StatisticManager statisticManager;
+	private PaperCommandManager<CommandSender> commandManager;
 
 	private CombatConfig combatConfig;
 
@@ -264,6 +269,15 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		debug = getConfig().getBoolean("debug");
 		FileConfiguration configuration = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "messages.yml"));
 		messageManager = new Messenger<>(this, configuration, new HashMap<>());
+		commandManager = new PaperCommandManager<>(
+				this,
+				ExecutionCoordinator.asyncCoordinator(),
+				SenderMapper.identity());
+		commandManager.registerBrigadier();
+		commandManager.registerAsynchronousCompletions();
+
+		messageManager.registerCommandManager(commandManager);
+
 		getLogger().info("Loading placeholders for messages...");
 		Map<String, Placeholder> placeholderMap = messageManager.loadPlaceholders("placeholders");
 		getLogger().info("Loaded placeholders for messages...");
