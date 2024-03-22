@@ -45,7 +45,7 @@ public final class CombatManager {
 	private final FluffyCombat main;
 	private BukkitTask task;
 	private final Map<String, CombatTag> tags = new LinkedHashMap<>();
-	private final Map<UUID, CombatTag> latest = new LinkedHashMap<>();
+	private final Map<UUID, CombatTag> latest = new HashMap<>();
 
 	/**
 	 * Creates new CombatManager instance.
@@ -107,6 +107,9 @@ public final class CombatManager {
 
 							if (!(tag.getAttacker() instanceof BlockCombatUser blockCombatUser)) {
 								combatUser = tag.getAttacker();
+								if (combatUser == null){
+									return;
+								}
 								uniqueId = combatUser.getUniqueId();
 								latest.putIfAbsent(uniqueId, tag);
 								{
@@ -137,6 +140,10 @@ public final class CombatManager {
 							}
 						} else {
 							OfflinePlayer victimOP = tag.getVictim().getPlayer();
+							CombatUser combatUser = tag.getAttacker();
+							if (combatUser == null){
+
+							}
 							OfflinePlayer attackerOP = tag.getAttacker().getPlayer();
 							if (victimOP.isOnline() && attackerOP.isOnline()) {
 								try {
@@ -361,11 +368,18 @@ public final class CombatManager {
 	 */
 	@NotNull
 	public synchronized CombatTag create(Player playerVictim, OfflinePlayer playerAttacker){
-		CombatUser combatUserVictim = main.getUserManager().getUser(playerVictim);
+		@NotNull
+		CombatUser combatUserVictim = Objects.requireNonNull(main.getUserManager().getUser(playerVictim));
+		@Nullable
 		CombatUser combatUserAttacker = main.getUserManager().getUser(playerAttacker.getUniqueId());
+		if (combatUserAttacker == null) {
+			combatUserAttacker = main.getUserManager().createAndLoadASync(playerAttacker);
+		}
+
 		try {
 			CombatTag tag = (CombatTag) combatTagConstructor.newInstance(main, combatUserVictim, combatUserAttacker);
 			tags.remove(toId(playerAttacker, playerVictim));
+			tags.remove(toId(playerVictim, playerAttacker));
 			tags.put(toId(playerVictim, playerAttacker), tag);
 			return tag;
 		} catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {

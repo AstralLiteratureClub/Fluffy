@@ -69,20 +69,18 @@ public class StatisticManager implements Listener {
 					return;
 				}
 			}
-			load(event.getPlayer()).thenAcceptAsync(user -> {
-				loadingUsers.removeIf(us -> us.getUniqueId().equals(user.getUniqueId()));
-				loadingUsers.add(user);
-			});
+			load(event.getPlayer()).thenAcceptAsync(loadingUsers::add);
 		}
 	}
 
 	@EventHandler()
 	public void onQuit(PlayerQuitEvent event){
 		StatisticUser user = users.get(event.getPlayer().getUniqueId());
-		if (user.getRejoinTimer() != null){
+		if (user != null &&  user.getRejoinTimer() != null){
 			user.getRejoinTimer().cancel();
+		} else if (user != null){
+			removingUsers.add(user);
 		}
-		removingUsers.add(user);
 	}
 
 	@Nullable

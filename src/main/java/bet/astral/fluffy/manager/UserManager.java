@@ -92,6 +92,7 @@ public class UserManager {
 					users.put(player.getUniqueId(), new CombatUser(fluffyCombat, player.getUniqueId()));
 					return;
 				}
+				// Load using the given user
 				CombatUser user = new CombatUser(fluffyCombat, player.getUniqueId());
 				users.put(player.getUniqueId(), user);
 			});
@@ -109,5 +110,21 @@ public class UserManager {
 	 * Triggered when plugin disables
 	 */
 	public void onDisable() {
+	}
+
+	public CombatUser createAndLoadASync(OfflinePlayer player) {
+		CombatUser user = new CombatUser(fluffyCombat, player.getUniqueId());
+		fluffyCombat.getServer().getAsyncScheduler().runNow(fluffyCombat, (x)->{
+			CombinedStatisticDatabase database = fluffyCombat.getStatisticDatabase();
+			// Might be null in testing. Database isn't working atm so this fixes it
+			if (database == null){
+				users.put(player.getUniqueId(), user);
+				return;
+			}
+			// Load using the given user
+			users.put(player.getUniqueId(), user);
+		});
+
+		return user;
 	}
 }
