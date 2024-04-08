@@ -88,7 +88,7 @@ public final class CombatManager {
 							tag.setAttackerTicksLeft(tag.getAttackerTicksLeft() - 1);
 							if (tag.getVictimTicksLeft() < 0 && tag.getAttackerTicksLeft() < 0) {
 								deleteList.add(key);
-								return;
+								continue;
 							} else {
 								userTags.get(ids[0]).add(tag);
 								userTags.get(ids[1]).add(tag);
@@ -96,7 +96,7 @@ public final class CombatManager {
 							CombatUser combatUser = tag.getVictim();
 							if (combatUser == null) {
 								nullList.add(key);
-								return;
+								continue;
 							}
 							UUID uniqueId = combatUser.getUniqueId();
 							latest.putIfAbsent(uniqueId, tag);
@@ -108,7 +108,7 @@ public final class CombatManager {
 							if (!(tag.getAttacker() instanceof BlockCombatUser blockCombatUser)) {
 								combatUser = tag.getAttacker();
 								if (combatUser == null){
-									return;
+									continue;
 								}
 								uniqueId = combatUser.getUniqueId();
 								latest.putIfAbsent(uniqueId, tag);
@@ -135,7 +135,8 @@ public final class CombatManager {
 								try {
 									glowingBlocks.unsetGlowing(block, victim);
 								} catch (ReflectiveOperationException e) {
-									throw new RuntimeException(e);
+									e.printStackTrace();
+									continue
 								}
 							}
 						} else {
@@ -150,7 +151,8 @@ public final class CombatManager {
 									glowingEntities.unsetGlowing(attackerOP.getPlayer(), victimOP.getPlayer());
 									glowingEntities.unsetGlowing(victimOP.getPlayer(), attackerOP.getPlayer());
 								} catch (ReflectiveOperationException e) {
-									throw new RuntimeException(e);
+									e.printStackTrace();
+									continue
 								}
 							}
 						}
@@ -203,7 +205,8 @@ public final class CombatManager {
 									try {
 										glowingBlocks.setGlowing(block, victim, config.getCombatGlowLatest());
 									} catch (ReflectiveOperationException e) {
-										throw new RuntimeException(e);
+										e.printStackTrace();
+										continue;
 									}
 								}
 							}
@@ -218,7 +221,8 @@ public final class CombatManager {
 										glowingEntities.setGlowing(victimOP.getPlayer(), attackerOP.getPlayer(), config.getCombatGlowLatest());
 									}
 								} catch (ReflectiveOperationException e) {
-									throw new RuntimeException(e);
+									e.printStackTrace();
+									continue
 								}
 							}
 
