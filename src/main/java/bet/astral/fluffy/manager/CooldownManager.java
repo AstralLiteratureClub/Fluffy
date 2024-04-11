@@ -5,9 +5,10 @@ import bet.astral.fluffy.cooldowns.EnderPearlCooldown;
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.events.player.PlayerCombatFullEndEvent;
 import bet.astral.fluffy.messenger.MessageKey;
-import bet.astral.messenger.Message;
+import bet.astral.messenger.message.message.IMessage;
 import bet.astral.messenger.placeholder.LegacyPlaceholder;
 import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -122,7 +123,7 @@ public class CooldownManager implements Listener {
 				} else {
 					event.setCancelled(true);
 					if (cooldown.message()){
-						Message message = fluffy.getMessageManager().getMessage(MessageKey.itemSpecificItemCooldown(material));
+						IMessage<?, Component> message = fluffy.getMessageManager().getMessage(MessageKey.itemSpecificItemCooldown(material));
 						if (message == null){
 							fluffy.getMessageManager()
 									.message(player, MessageKey.COMBAT_COOLDOWN_DEFAULT,
@@ -165,7 +166,7 @@ public class CooldownManager implements Listener {
 							player.playSound(sound);
 						}
 						if (cooldown.message()){
-							Message message = fluffy.getMessageManager().getMessage(MessageKey.itemSpecificItemCooldown(material));
+							IMessage<?, Component> message = fluffy.getMessageManager().getMessage(MessageKey.itemSpecificItemCooldown(material));
 							if (message == null){
 								fluffy.getMessageManager()
 										.message(player, MessageKey.COMBAT_COOLDOWN_DEFAULT,
