@@ -1,20 +1,14 @@
 package bet.astral.fluffy.configs;
 
-import bet.astral.fluffy.database.AbstractDatabase;
 import lombok.Getter;
 import bet.astral.fluffy.FluffyCombat;
 import org.apache.commons.lang3.EnumUtils;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
-import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Shulker;
-import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.objectweb.asm.tree.LocalVariableAnnotationNode;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -84,8 +78,6 @@ public class CombatConfig {
 
 	private FlightMode flightMode;
 	private int flightTicks;
-
-	private AbstractDatabase.DBType statisticDatabaseType;
 
 	public CombatConfig(FluffyCombat fluffy){
 		this.fluffy = fluffy;

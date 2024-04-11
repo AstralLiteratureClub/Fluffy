@@ -2,7 +2,7 @@ package bet.astral.fluffy.listeners.combat.mobility;
 
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.CombatUser;
-import bet.astral.fluffy.events.CombatFullEndEvent;
+import bet.astral.fluffy.events.player.PlayerCombatFullEndEvent;
 import bet.astral.fluffy.configs.CombatConfig;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -20,7 +20,7 @@ public class FlightWhileInCombatListener implements Listener {
 	}
 
 	@EventHandler
-	private void onCombatEnd(CombatFullEndEvent event){
+	private void onCombatEnd(PlayerCombatFullEndEvent event){
 		OfflinePlayer player = event.player();
 		if (player instanceof Player oPlayer){
 			CombatUser user = fluffy.getUserManager().getUser(oPlayer);

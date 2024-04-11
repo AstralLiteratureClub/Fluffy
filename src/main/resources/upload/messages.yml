@@ -53,3 +53,6 @@ combat-item-cooldown-enchanted_golden_apple: "%prefix% <gray>You're on a cooldow
 combat-item-cooldown-default: "%prefix% <gray>You're on a cooldown for <white>%item_type%<reset><gray>."
 combat-command-cooldown: "%prefix% <red>You're not allowed to use <white>%command%<red> while you are in combat."
 
+
+statistics:
+  usage: "%prefix% As a non player command sender please provide a player to see statistics of!"

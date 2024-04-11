@@ -5,7 +5,7 @@ import bet.astral.fluffy.api.BlockCombatUser;
 import bet.astral.fluffy.api.CombatTag;
 import bet.astral.fluffy.api.CombatUser;
 import bet.astral.fluffy.configs.CombatConfig;
-import bet.astral.fluffy.events.CombatEndEvent;
+import bet.astral.fluffy.events.CombatTagEndEvent;
 import bet.astral.fluffy.manager.CombatManager;
 import fr.skytasul.glowingentities.GlowingBlocks;
 import fr.skytasul.glowingentities.GlowingEntities;
@@ -37,19 +37,19 @@ public class CombatEndListener implements Listener {
 			List<CombatTag> tags = combatManager.getTags(player);
 				tags.forEach(tag->{
 					// Set the tag ticks to -1 as it's instantly removed from the player
+					tag.setAttackerTicksLeft(-1);
+					tag.setVictimTicksLeft(-1);
 					if (tag.getAttacker().getUniqueId().equals(player.getUniqueId())){
 						tag.setDeadAttacker(true);
-						tag.setAttackerTicksLeft(-1);
 					} else {
 						tag.setDeadVictim(true);
-						tag.setVictimTicksLeft(-1);
 					}
 			});
 		}
 	}
 
 	@EventHandler
-	private void onCombatEnd(CombatEndEvent event){
+	private void onCombatEnd(CombatTagEndEvent event){
 		CombatTag tag = event.getCombatTag();
 		CombatUser victim = tag.getVictim();
 		CombatUser attacker = tag.getAttacker();

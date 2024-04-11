@@ -9,13 +9,16 @@ import bet.astral.fluffy.configs.CombatConfig;
 import bet.astral.fluffy.manager.CombatManager;
 import bet.astral.fluffy.manager.UserManager;
 import bet.astral.messenger.placeholder.Placeholder;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityResurrectEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -75,24 +78,43 @@ public class QuitWhileInCombatListener implements Listener {
 				//TODO - Make the NPC spawning possible using hooks for the plugin
 				return;
 			} else if (fluffy.getCombatConfig().getCombatLogAction() == CombatConfig.CombatLogAction.KILL) {
-				boolean diedOnce = false;
-				assert user != null;
-				while (!player.isDead()){
-					if (diedOnce && fluffy.getCombatConfig().isCombatLogKillTotemBypass()){
-						return;
-					} else if (diedOnce){
-						if (user.getTotemCounter() == 0){
-							return;
-						}
-						if (user.getTotemCounter()>-1) {
-							user.setTotemCounter(user.getTotemCounter()-1);
-						}
+				boolean destroyed = false;
+				user.setting("logged", true);
+				while (true){
+					if (destroyed){
+						player.setHealth(0.0D);
+						fluffy.getCombatManager().getTags(player)
+								.forEach(tag->{
+									if (tag.getVictim().getUniqueId().equals(player.getUniqueId())){
+										tag.setVictimTicksLeft(-1);
+										tag.setDeadVictim(true);
+									} else {
+										tag.setAttackerTicksLeft(-1);
+										tag.setDeadAttacker(true);
+									}
+								});
+						break;
 					}
-					player.setHealth(0);
-					if (player.isDead()){
-						user.setting("logged", true);
+					if (player.getInventory().getItemInMainHand().getType() == Material.TOTEM_OF_UNDYING){
+						EntityResurrectEvent entityResurrectEvent = new EntityResurrectEvent(player , EquipmentSlot.HAND);
+						if (!entityResurrectEvent.callEvent()){
+							break;
+						}
+						player.getInventory().setItemInMainHand(null);
+						continue;
+					} else if (player.getInventory().getItemInOffHand().getType()==Material.TOTEM_OF_UNDYING){
+						EntityResurrectEvent entityResurrectEvent = new EntityResurrectEvent(player , EquipmentSlot.OFF_HAND);
+						if (!entityResurrectEvent.callEvent()){
+							break;
+						}
+						player.getInventory().setItemInOffHand(null);
+						Location location = event.getPlayer().getEyeLocation();
+						World world = location.getWorld();
+						world.spawnParticle(Particle.TOTEM, location, 1);
+						world.playSound(location, Sound.ITEM_TOTEM_USE, 1, 1);
+						continue;
 					}
-					diedOnce = true;
+					destroyed = true;
 				}
 			}
 		}
@@ -116,7 +138,7 @@ public class QuitWhileInCombatListener implements Listener {
 		Object property = user.get("logged");
 		if (property != null) {
 			if (property instanceof Boolean && (boolean) property) {
-				user.setting("logged", false);
+				user.setting("logged", null);
 				CombatConfig config = fluffy.getCombatConfig();
 				event.setKeepLevel(config.isCombatLogKillKeepExp());
 				event.setKeepInventory(config.isCombatLogKillKeepItem());

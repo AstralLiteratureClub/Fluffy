@@ -29,19 +29,7 @@ public final class MessageKey
 				}
 				field.setAccessible(true);
 				Object value = field.get(null);
-				if (value instanceof String key){
-					switch (type.value()){
-						case PLACEHOLDER -> {
-							Map<String, Placeholder> placeholders = messenger.loadPlaceholders(key);
-							if (placeholders.isEmpty()){
-								continue;
-							}
-							placeholders.forEach(messenger::overrideDefaultPlaceholder);
-						}
-						case MESSAGE -> {
-							messenger.loadMessage(key);
-						}
-					}
+				if (value instanceof String key) {
 					messenger.loadMessage(key);
 				}
 			} catch (IllegalAccessException e) {
@@ -50,67 +38,65 @@ public final class MessageKey
 
 		}
 	}
-	@KeyType(Type.PLACEHOLDER)
-	public static final String DEFAULT_PLACEHOLDER = "placeholders";
 
-	@KeyType(Type.MESSAGE)
+	@KeyType()
 	public static final String COMBAT_ILLEGAL_COMMAND = "combat-execute-illegal-command";
-	@KeyType(Type.MESSAGE)
+	@KeyType()
 	public static final String COMBAT_END = "combat-end";
 	/*
 	 * Rejoin - NPC
 	 */
-	@KeyType(Type.MESSAGE)
+	@KeyType()
 	public static final String COMBAT_REJOIN_NPC_REPLACEMENT_ALIVE_BROADCAST = "combat-logged-rejoin-npc-replacement-alive-broadcast";
-	@KeyType(Type.MESSAGE)
+	@KeyType()
 	public static final String COMBAT_REJOIN_NPC_REPLACEMENT_ALIVE = "combat-logged-rejoin-npc-replacement-alive-player";
-	@KeyType(Type.MESSAGE)
+	@KeyType()
 	public static final String COMBAT_REJOIN_NPC_REPLACEMENT_DEAD_BROADCAST = "combat-logged-rejoin-npc-replacement-alive-broadcast";
-	@KeyType(Type.MESSAGE)
+	@KeyType()
 	public static final String COMBAT_REJOIN_NPC_REPLACEMENT_DEAD = "combat-logged-rejoin-npc-replacement-alive-player";
 	/*
 	 * Rejoin
 	 */
-	@KeyType(Type.MESSAGE)
+	@KeyType()
 	public static final String COMBAT_REJOIN_BROADCAST = "combat-logged-rejoin-broadcast";
-	@KeyType(Type.MESSAGE)
+	@KeyType()
 	public static final String COMBAT_REJOIN_PLAYER = "combat-logged-rejoin-player";
 	/*
 	 * Combat LOG OUT
 	 */
-	@KeyType(Type.MESSAGE)
+	@KeyType()
 	public static final String COMBAT_LOG_BROADCAST = "combat-logged-quit-broadcast";
-	@KeyType(Type.MESSAGE)
+	@KeyType()
 	public static final String COMBAT_LOG_NPC_SPAWN_BROADCAST = "combat-logged-quit-npc-spawn-broadcast";
 	/*
 	 * Combat tagging
 	 */
-	@KeyType(Type.MESSAGE)
+	@KeyType()
 	public static final String COMBAT_ENTER_VICTIM = "combat-enter-victim";
-	@KeyType(Type.MESSAGE)
+	@KeyType()
 	public static final String COMBAT_ENTER_ATTACKER = "combat-enter-attacker";
 
 
 	/*
 	 * 1 second messages
 	 */
-	@KeyType(Type.MESSAGE)
+	@KeyType()
 	public static final String COMBAT_1_SECOND_MESSAGE = "combat-every-1-second";
 	/*
 	 * Item restrictions
 	 */
-	@KeyType(Type.MESSAGE)
+	@KeyType()
 	public static final String COMBAT_USE_ITEM_ELYTRA_GLIDE = "combat-use-item-elytra-glide";
-	@KeyType(Type.MESSAGE)
+	@KeyType()
 	public static final String COMBAT_USE_ITEM_ELYTRA_ROCKET_BOOST = "combat-use-item-elytra-rocket-boost";
-	@KeyType(Type.MESSAGE)
+	@KeyType()
 	public static final String COMBAT_USE_ITEM_TRIDENT_RIPTIDE = "combat-use-item-trident-riptide";
 	/*
 	 * Cooldowns - Item
 	 */
-	@KeyType(Type.MESSAGE)
+	@KeyType()
 	public static final String COMBAT_COOLDOWN_DEFAULT = "combat-item-cooldown-default";
-	@KeyType(value = Type.MESSAGE, autoLoad = false)
+	@KeyType(autoLoad = false)
 	public static final String COMBAT_COOLDOWN_ITEM_SPECIFIC = "combat-item-cooldown-%item%";
 
 	@NotNull
@@ -123,7 +109,7 @@ public final class MessageKey
 	 */
 
 
-	@KeyType(Type.MESSAGE)
+	@KeyType()
 	public static final String COMBAT_COOLDOWN_COMMAND = "combat-command-cooldown";
 
 
@@ -134,10 +120,15 @@ public final class MessageKey
 	 */
 
 
-	@KeyType(value = Type.MESSAGE, autoLoad = false)
+	@KeyType(autoLoad = false)
 	public static final String DEATH_ENTITY_EXPLOSION_COMBAT = "entity_explosion.combat.*";
 
-
+	/*
+	 * Commands
+	 */
+	public static final String STATS_CONSOLE = "stats.usage";
+	public static final String STATS_OTHER = "stats.other";
+	public static final String STATS_SELF = "stats.self";
 
 
 
@@ -151,12 +142,6 @@ public final class MessageKey
 	@Target(ElementType.FIELD)
 	@Retention(RetentionPolicy.RUNTIME)
 	public @interface KeyType {
-		Type value() default Type.MESSAGE;
 		boolean autoLoad() default true;
-	}
-
-	public enum Type {
-		PLACEHOLDER,
-		MESSAGE,
 	}
 }

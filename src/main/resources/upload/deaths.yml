@@ -20,26 +20,28 @@ placeholders:
   - name: firework
     value: "<color:#f52525><u>Firework<reset>"
 
-# These can be used by "fluffy:swords", "fluffy:shovels"
+# These can be used by fluffy_item:sword, fluffy_item:shovel
 item-definitions:
-  swords:
+  sword:
     - "minecraft:netherite_sword"
     - "minecraft:diamond_sword"
     - "minecraft:iron_sword"
     - "minecraft:stone"
     - "minecraft:gold_sword"
     - "minecraft:wooden_sword"
-  shovels:
+  shovel:
     - "minecraft:netherite_hoe"
     - "minecraft:diamond_hoe"
     - "minecraft:iron_hoe"
     - "minecraft:stone"
     - "minecraft:gold_hoe"
     - "minecraft:wooden_hoe"
-  bows:
+  bow:
     - "minecraft:bow"
     - "minecraft:crossbow"
-  zombies:
+# fluffy_entity:zombie
+entity-definitions:
+  zombie:
     - "minecraft:drowned"
     - "minecraft:zombie"
     - "minecraft:husk"
@@ -108,17 +110,29 @@ void:
       "minecraft:wither_skull": "%death% <color:#ff3636>%victim% <color:#5be359>blown to abyss by <color:#fbff26>%attacker% <color:#5be359>using <yellow>Wither Skull<color:#5be359>."
   projectile:
     combat:
-      default:
-        displayname: "%death% <color:#ff3636>%victim% <color:#5be359>was propelled to void by <color:#fbff26>%attacker%<color:#5be359>. <gray>| [%attacker_tool_displayname%<reset><gray>]"
-        default: "%death% <color:#ff3636>%victim% <color:#5be359>was propelled to void by <color:#fbff26>%attacker%<color:#5be359>."
-      "minecraft:arrow":
-        displayname: "%death% <color:#ff3636>%victim% <color:#5be359>was propelled to void by <color:#fbff26>%attacker%<color:#5be359>. <gray>| [%attacker_tool_displayname%<reset><gray>]"
-        default: "%death% <color:#ff3636>%victim% <color:#5be359>was propelled to void by <color:#fbff26>%attacker%<color:#5be359>."
-      "minecraft:fireball": "%death% <color:#fbff26>%attacker% <color:#5be359>launched <color:#ff3636>%victim%<color:#5be359> using their fireball."
+      "fluffy_items:bow": "Died to some bow"
+      "fluffy_entities:zombie": "Died to some entity in the list"
+
+      "entity=fluffy:skeleton,minecraft:bow,displayname=true": "Died to skeleton with a bow which is named"
+      "entity=fluffy:skeleton,displayname=true": "Died to skeleton with any item with a displayname"
+      "entity=fluffy:skeleton,item_displayname=true": "Option 2 for item displaynames"
+
+      "fluffy:skeleton,entity_has_displayname=true,item_has_displayname=true": "More options, but still died to a skeleton. Has entity has displayname and item has a displayname"
+      "default,entity_has_displayname=true,item_has_displayname=false": "Checks if item only has a displayname"
+      "default,entity_has_displayname=true,item_displayname=PLAIN_TEXT_NAME": "Checks if item has PLAIN_TEXT_NAME"
+
+      minecraft:arrow: "%death% <color:#ff3636>%victim% <color:#5be359>was propelled to void by <color:#fbff26>%attacker%<color:#5be359>."
+      minecraft:arrow,displayname:true: "%death% <color:#ff3636>%victim% <color:#5be359>was propelled to void by <color:#fbff26>%attacker%<color:#5be359>. <gray>| [%attacker_tool_displayname%<reset><gray>]"
+      minecraft:fireball: "%death% <color:#fbff26>%attacker% <color:#5be359>launched <color:#ff3636>%victim%<color:#5be359> using their fireball."
+
       "minecraft:ender_pearl": "%death% <color:#ff3636>%victim% <color:#5be359>was warped to abyss by <color:#fbff26>%attacker%<color:#fbff26>."
       "minecraft:trident": "%death% <color:#fbff26>%attacker% <color:#5be359>used pocket lightning to knock <color:#ff3636>%victim% <color:#5be359>to the void."
       "minecraft:potion": "%death% <color:#ff3636>%victim% <color:#5be359>was cast to the void by <color:#fbff26>%attacker%<color:#5be359>."
       "minecraft:wither_skull": "%death% <color:#ff3636>%victim% <color:#5be359>tried to catch <color:#fbff26>%attacker%<color:#5be359>'s wither skull."
+
+      default: "%death% <color:#ff3636>%victim% <color:#5be359>was propelled to void by <color:#fbff26>%attacker%<color:#5be359>."
+      default,displayname=true: "%death% <color:#ff3636>%victim% <color:#5be359>was propelled to void by <color:#fbff26>%attacker%<color:#5be359>. <gray>| [%attacker_tool_displayname%<reset><gray>]"
+
     no-combat:
       default: "%death% <color:#fbff26>%attacker% <color:#5be359>was knocked to the void."
 
@@ -193,9 +207,12 @@ suffocation:
 fall:
   combat:
     jumped: "%death% Jumped while fighting"
-    default: "%death% "
-    displayname: "%death% <color:#ff3636>%victim%<color:#5be359> was punched of the edge by <color:#fbff26>%attacker%<color:#5be359>. <gray>| [%attacker_tool_displayname%<reset><gray>]"
+
+    astral:sword: "%death% <color:#ff3636>%victim%<color:#5be359> was poked to the void by <color:#fbff26>%attacker%<color:#5be359>."
+    astral:sword,displayname=true: "<color:#ff3636>%victim%<color:#5be359> was poked to the void by <color:#fbff26>%attacker%<color:#5be359>. <gray>| [%attacker_tool_displayname%<reset><gray>]"
+    default,default=true: "<color:#ff3636>%victim%<color:#5be359> was punched of the edge by <color:#fbff26>%attacker%<color:#5be359>. <gray>| [%attacker_tool_displayname%<reset><gray>]"
     default: "%death% <color:#ff3636>%victim%<color:#5be359> was punched of the edge by <color:#fbff26>%attacker%<color:#5be359>."
+
   default: "%death% <color:#ff3636>%victim%<color:#5be359> suffocated."
 fire:
   player: "%death% <color:#ff3636>%victim%<color:#5be359> turned in to <color:#fbff26>%attacker%<color:#5be359>'s BBQ."

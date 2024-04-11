@@ -16,6 +16,8 @@ import java.util.UUID;
  * @author Antritus
  * @since 1.0-SNAPSHOT
  */
+@Getter
+@Setter
 public class CombatTag {
 	private static final int ticks;
 	static {
@@ -27,39 +29,21 @@ public class CombatTag {
 	private final CombatUser victim;
 	@NotNull
 	private final CombatUser attacker;
-	@Getter
-	@Setter
 	private int victimTicksLeft = ticks;
-	@Getter
-	@Setter
 	private int attackerTicksLeft = ticks;
 	private boolean isDeadVictim = false;
 	private boolean isDeadAttacker = false;
-	@Getter
-	@Setter
 	private CombatCause victimCombatCause;
-	@Getter
-	@Setter
 	private CombatCause attackerCombatCause;
-	@Setter
-	@Getter
 	private ItemStack victimWeapon;
-	@Setter
-	@Getter
 	private ItemStack attackerWeapon;
 
-	@Getter
-	@Setter
 	private int victimRejoinTimer;
-	@Getter
-	@Setter
 	private int attackerRejoinTimer;
-	@Getter
-	@Setter
 	private double victimDamageDealt;
-	@Getter
-	@Setter
 	private double attackerDamageDealt;
+	private boolean isVictimFalling = true;
+	private boolean isAttackerFalling = true;
 
 	/**
 	 * Creates new instance of the class.

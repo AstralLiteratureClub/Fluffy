@@ -69,7 +69,7 @@ public class CMDDebug extends CoreCommand {
 							.append(
 									mm.deserialize(
 													(
-															Objects.requireNonNull(tag.getAttacker().getPlayer().getName())))
+															Objects.requireNonNull(player.getUniqueId().equals(tag.getVictim().getUniqueId()) ? player.getName() : tag.getAttacker().getPlayer().getName())))
 							.append(									mm.deserialize(
 									("<gray> | <green>Millis: <white>"+millis+" <green>Ticks: <white>"+ticks+" <green>Seconds: <white>"+seconds))));
 				}
