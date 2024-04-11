@@ -3,6 +3,7 @@ package bet.astral.fluffy.manager;
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.CombatUser;
 import bet.astral.fluffy.database.CombinedStatisticDatabase;
+import bet.astral.fluffy.database.CoreDatabase;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -86,7 +87,7 @@ public class UserManager {
 	public void load(OfflinePlayer player) {
 		if (users.get(player.getUniqueId()) == null){
 			fluffyCombat.getServer().getAsyncScheduler().runNow(fluffyCombat, (x)->{
-				CombinedStatisticDatabase database = fluffyCombat.getStatisticDatabase();
+				CoreDatabase database = fluffyCombat.getDatabase();
 				// Might be null in testing. Database isn't working atm so this fixes it
 				if (database == null){
 					users.put(player.getUniqueId(), new CombatUser(fluffyCombat, player.getUniqueId()));

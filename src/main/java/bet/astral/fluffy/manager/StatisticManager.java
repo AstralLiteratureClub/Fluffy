@@ -65,7 +65,7 @@ public class StatisticManager implements Listener {
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
 	public void onLogin(PlayerLoginEvent event) {
 		if (event.getResult() == PlayerLoginEvent.Result.ALLOWED) {
-			load(event.getPlayer()).thenAcceptAsync(loadingUsers::add);
+			load(event.getPlayer());
 		}
 	}
 
