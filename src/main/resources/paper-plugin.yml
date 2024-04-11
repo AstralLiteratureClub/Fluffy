@@ -1,5 +1,6 @@
 name: Fluffy
 version: '1.0'
 main: bet.astral.fluffy.FluffyCombat
+loader: bet.astral.fluffy.FluffyLoader
 api-version: '1.20'
 authors: [Antritus]

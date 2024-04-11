@@ -25,6 +25,7 @@ import bet.astral.fluffy.statistic.Statistic;
 import bet.astral.fluffy.statistic.Statistics;
 import bet.astral.fluffy.utils.Pair;
 import bet.astral.messenger.Messenger;
+import bet.astral.messenger.adventure.AdventurePlaceholderMessenger;
 import bet.astral.messenger.message.adventure.serializer.ComponentTypeSerializer;
 import bet.astral.messenger.placeholder.PlaceholderManager;
 import com.jeff_media.armorequipevent.ArmorEquipEvent;
@@ -290,7 +291,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 
 		FileConfiguration configuration = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "messages.yml"));
 		messageManager = new Messenger<>(this, commandManager, new HashMap<>(), new ComponentTypeSerializer(), configuration);
-		PlaceholderManager placeholderManager = new PlaceholderManager();
+		PlaceholderManager placeholderManager = new AdventurePlaceholderMessenger();
 		placeholderManager.setDefaults(placeholderManager.loadPlaceholders("placeholders", configuration));
 		messageManager.setPlaceholderManager(placeholderManager);
 

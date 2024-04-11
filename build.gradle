@@ -73,9 +73,6 @@ shadowJar {
     archiveClassifier = null
 
     relocate 'bet.astral.messenger', 'bet.astral.fluffy.libs.messenger'
-    relocate 'fr.skytasul.glowingentities', 'bet.astral.fluffy.libs.fr.skytasul.glowingentities'
-    relocate 'org.incendo.cloud', 'bet.astral.fluffy.libs.org.incendo.cloud'
-    relocate 'com.jeff-media', 'bet.astral.fluffy.libs.com.jeff-media'
 }
 
 tasks.assemble {
