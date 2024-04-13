@@ -15,11 +15,12 @@ public interface Account extends Placeholderable {
 	Map<Statistic, Integer> getAllStatistics();
 	int getStatistic(Statistic statistic);
 	void increment(Statistic statistic);
-	void add(Statistic statistic, @Range(from = 0, to = Integer.MAX_VALUE) int amount);
+	void add(Statistic statistic, @Range(from = -1, to = Integer.MAX_VALUE) int amount);
 	void decrement(Statistic statistic);
-	void remove(Statistic statistic, @Range(from = 0, to = Integer.MAX_VALUE) int amount);
+	void remove(Statistic statistic, @Range(from = -1, to = Integer.MAX_VALUE) int amount);
 	void reset(Statistic statistic);
-	void set(Statistic statistic, @Range(from = 0, to = Integer.MAX_VALUE) int amount);
+	void set(Statistic statistic, @Range(from = -1, to = Integer.MAX_VALUE) int amount);
+	void setDefault(Statistic statistic, @Range(from = -1, to = Integer.MAX_VALUE) int amount);
 	CompletableFuture<Void> delete(Statistic statistic);
 	CompletableFuture<Void> save();
 
@@ -32,7 +33,8 @@ public interface Account extends Placeholderable {
 		for (Map.Entry<Statistic, Integer> entry : getAllStatistics().entrySet()){
 			Statistic statistic = entry.getKey();
 			int amount = entry.getValue() != null ? entry.getValue() : 0;
-			placeholders.add(PlaceholderUtils.createPlaceholder(s, statistic.getName().replace(".", "_"), amount));
+			placeholders.add(PlaceholderUtils.createPlaceholder(s, statistic.getName(), amount));
+			System.out.println(s+"_"+statistic.getName()+ " "+ amount);
 		}
 		return placeholders;
 	}

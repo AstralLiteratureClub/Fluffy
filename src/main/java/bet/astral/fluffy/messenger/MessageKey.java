@@ -1,15 +1,11 @@
 package bet.astral.fluffy.messenger;
 
 import bet.astral.messenger.Messenger;
-import bet.astral.messenger.placeholder.Placeholder;
-import net.minecraft.server.commands.GiveCommand;
-import net.minecraft.server.commands.SummonCommand;
 import org.bukkit.Material;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.*;
 import java.lang.reflect.Field;
-import java.util.Map;
 
 public final class MessageKey
 {
@@ -126,14 +122,20 @@ public final class MessageKey
 	/*
 	 * Commands
 	 */
-	public static final String STATS_CONSOLE = "stats.usage";
-	public static final String STATS_OTHER = "stats.other";
-	public static final String STATS_SELF = "stats.self";
+	public static final String STATS_CONSOLE = "statistics.usage";
+	public static final String STATS_OTHER = "statistics.other";
+	public static final String STATS_SELF = "statistics.self";
 
+	public static final String EDIT_STATS_RESET = "editstatistics.reset";
+	public static final String EDIT_STATS_SET = "editstatistics.reset";
+	public static final String EDIT_STATS_ADD = "editstatistics.reset";
+	public static final String EDIT_STATS_REMOVE = "editstatistics.reset";
 
-
-
-
+	public static final String EDIT_STATS_HELP = "editstatistics.help.main";
+	public static final String EDIT_STATS_HELP_RESET = "editstatistics.help.reset";
+	public static final String EDIT_STATS_HELP_SET = "editstatistics.help.set";
+	public static final String EDIT_STATS_HELP_ADD = "editstatistics.help.add";
+	public static final String EDIT_STATS_HELP_REMOVE = "editstatistics.help.remove";
 
 
 

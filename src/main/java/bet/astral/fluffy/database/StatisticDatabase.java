@@ -4,6 +4,7 @@ import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.statistic.Account;
 import bet.astral.fluffy.statistic.Statistic;
 import lombok.Getter;
+import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import org.javatuples.Pair;
 
 import java.util.*;
@@ -29,5 +30,9 @@ public abstract class StatisticDatabase {
 	public abstract CompletableFuture<Void> save(Account account);
 	public abstract CompletableFuture<Void> delete(UUID account);
 	public abstract CompletableFuture<Account> get(Account account);
+
+	public ComponentLogger getLogger(){
+		return fluffyCombat.getComponentLogger();
+	}
 
 }

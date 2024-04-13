@@ -47,6 +47,12 @@ public class FluffyLoader implements PluginLoader {
 		// JDA
 		resolver.addDependency(new Dependency(new DefaultArtifact("net.dv8tion:JDA:5.0.0-beta.10"), null));
 
+		// H2 Database
+		resolver.addDependency(new Dependency(new DefaultArtifact("com.h2database:h2:2.2.224"), null));
+
+		// ormlite
+		resolver.addDependency(new Dependency(new DefaultArtifact("com.j256:ormlite:3.0"), null));
+
 		// Database stuff (mysql)
 		resolver.addDependency(new Dependency(new DefaultArtifact("com.zaxxer:HikariCP:5.1.0"), null));
 		pluginClasspathBuilder.addLibrary(resolver);

@@ -1,11 +1,12 @@
 package bet.astral.fluffy.statistic;
 
+import bet.astral.messenger.placeholder.PlaceholderValue;
 import org.incendo.cloud.description.Description;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public interface Statistic {
+public interface Statistic extends PlaceholderValue {
 	@NotNull
 	String getName();
 
@@ -16,6 +17,11 @@ public interface Statistic {
 	@NotNull
 	static Statistic of(@NotNull String name, @NotNull Description description){
 		return new StatisticDescriptionImpl(name, description);
+	}
+
+	@Override
+	default @NotNull String getValue() {
+		return getName();
 	}
 
 	class StatisticImpl implements Statistic {

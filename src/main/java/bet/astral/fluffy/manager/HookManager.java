@@ -3,7 +3,7 @@ package bet.astral.fluffy.manager;
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.hooks.*;
 import lombok.Getter;
-//import me.clip.placeholderapi.PlaceholderAPIPlugin;
+import me.clip.placeholderapi.PlaceholderAPIPlugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,16 +19,16 @@ public class HookManager {
 	private final FluffyCombat fluffyCombat;
 	public HookManager(FluffyCombat fluffyCombat){
 		this.fluffyCombat = fluffyCombat;
-//		hookPlaceholderAPI();
+		hookPlaceholderAPI();
 	}
 
 
-//	private void hookPlaceholderAPI() {
-//		try {
-//			Class.forName("me.clip.placeholderapi.PlaceholderAPI");
-//			hook("placeholderapi", PlaceholderAPIPlugin.class, PlaceholderAPIHook.class);
-//		} catch (ClassNotFoundException ignore) {}
-//	}
+	private void hookPlaceholderAPI() {
+		try {
+			Class.forName("me.clip.placeholderapi.PlaceholderAPI");
+			hook("placeholderapi", PlaceholderAPIPlugin.class, PlaceholderAPIHook.class);
+		} catch (ClassNotFoundException ignore) {}
+	}
 
 
 

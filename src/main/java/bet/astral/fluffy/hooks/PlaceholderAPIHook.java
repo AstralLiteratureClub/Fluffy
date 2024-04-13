@@ -1,5 +1,4 @@
 package bet.astral.fluffy.hooks;
-/*
 
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.BlockCombatUser;
@@ -7,6 +6,8 @@ import bet.astral.fluffy.api.CombatTag;
 import bet.astral.fluffy.api.CombatUser;
 import bet.astral.fluffy.manager.CombatManager;
 import bet.astral.fluffy.manager.UserManager;
+import bet.astral.fluffy.statistic.Account;
+import bet.astral.fluffy.statistic.Statistics;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.PlaceholderAPIPlugin;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
@@ -170,34 +171,28 @@ public class PlaceholderAPIHook extends PlaceholderExpansion implements Hook {
 	}
 	private int handleStat(OfflinePlayer player, String stat, String type) {
 		UserManager userManager = fluffy.getUserManager();
-		CombatUser user = userManager.getUser(player.getUniqueId());
-		if (user == null){
-			userManager.load(player);
-			user = userManager.getUser(player.getUniqueId());
-		}
-		if (user == null){
+		Account account = fluffy.getStatisticManager().get(player.getUniqueId());
+
+		if (account == null){
 			return 0;
 		}
 		switch (stat.toLowerCase()) {
 			case "kills"-> {
 				switch (type.toLowerCase()) {
 					case "total" -> {
-						return user.getTotalKills();
+						return account.getStatistic(Statistics.KILLS_GLOBAL);
 					}
 					case "anchor"-> {
-						return user.getAnchorKills();
+						return account.getStatistic(Statistics.KILLS_ANCHOR);
 					}
 					case "tnt"->{
-						return user.getTntKills();
+						return account.getStatistic(Statistics.KILLS_TNT);
 					}
 					case "crystal"->{
-						return user.getCrystalKills();
+						return account.getStatistic(Statistics.KILLS_CRYSTAL);
 					}
 					case "bed"->{
-						return user.getBedKills();
-					}
-					case "totem", "totems" ->{
-						return user.getTotemKills();
+						return account.getStatistic(Statistics.KILLS_BED);
 					}
 					default -> {
 						return 0;
@@ -206,25 +201,34 @@ public class PlaceholderAPIHook extends PlaceholderExpansion implements Hook {
 			}
 			case "deaths"->{
 				switch (type.toLowerCase()){
-					case "total"->{
-						return user.getTotalDeaths();
+					case "total" -> {
+						return account.getStatistic(Statistics.DEATHS_GLOBAL);
 					}
-					case "totem", "totems" -> {
-						return user.getTotemDeaths();
+					case "anchor"-> {
+						return account.getStatistic(Statistics.DEATHS_ANCHOR);
+					}
+					case "tnt"->{
+						return account.getStatistic(Statistics.DEATHS_TNT);
+					}
+					case "crystal"->{
+						return account.getStatistic(Statistics.DEATHS_CRYSTAL);
+					}
+					case "bed"->{
+						return account.getStatistic(Statistics.DEATHS_BED);
+					}
+					default -> {
+						return 0;
 					}
 				}
 			}
 			case "killstreak"->{
-				return user.getKillstreak();
+				return account.getStatistic(Statistics.STREAK_KILLS);
 			}
 			case "deathstreak"->{
-				return user.getDeathStreak();
+				return account.getStatistic(Statistics.STREAK_DEATHS);
 			}
-			case "totem_activated"->{
-				return user.getTotemKills();
-			}
-			case "totem_resurrections"->{
-				return user.getTotemDeaths();
+			case "totem_activated", "totem_resurrections" ->{
+				return 0;
 			}
 		}
  		return 0;
@@ -298,4 +302,3 @@ public class PlaceholderAPIHook extends PlaceholderExpansion implements Hook {
 		return true;
 	}
 }
-*/

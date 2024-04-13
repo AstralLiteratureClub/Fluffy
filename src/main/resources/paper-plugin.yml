@@ -1,6 +1,13 @@
 name: Fluffy
-version: '1.0'
+version: '1.1'
 main: bet.astral.fluffy.FluffyCombat
 loader: bet.astral.fluffy.FluffyLoader
 api-version: '1.20'
 authors: [Antritus]
+
+dependencies:
+  server:
+    PlaceholderAPI:
+      # Load order is relative to the dependency. So here PlaceholderAPI loads before our plugin.
+      load: BEFORE
+      required: false

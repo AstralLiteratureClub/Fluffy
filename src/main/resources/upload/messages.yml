@@ -56,3 +56,30 @@ combat-command-cooldown: "%prefix% <red>You're not allowed to use <white>%comman
 
 statistics:
   usage: "%prefix% As a non player command sender please provide a player to see statistics of!"
+  other:
+    - ""
+    - "<yellow>%player%<white>'s statistics"
+    - "<hover:show_text:'<gold><bold>KILLS <!bold>\n<dark_gray> | <dark_red>Global: <white>%statistic_kills_global%\n<dark_gray> | <light_purple>Respawn Anchor<white>: <white>%statistic_kills_anchor%\n<dark_gray> | <light_purple>End Crystal<white>: <white>%statistic_kills_crystal%\n<dark_gray> | <yellow>TNT<white>: <white>%statistic_kills_tnt%\n<dark_gray> | <yellow>Bed<white>: <white>%statistic_kills_bed%'><dark_gray> | <yellow>Kills: <white>%statistic_kills_global%"
+    - "<hover:show_text:'<gold><bold>DEATHS <!bold>\n<dark_gray> | <dark_red>Global: <white>%statistic_deaths_global%\n<dark_gray> | <light_purple>Respawn Anchor<white>: <white>%statistic_deaths_anchor%\n<dark_gray> | <light_purple>End Crystal<white>: <white>%statistic_deaths_crystal%\n<dark_gray> | <yellow>TNT<white>: <white>%statistic_deaths_tnt%\n<dark_gray> | <yellow>Bed<white>: <white>%statistic_deaths_bed%'><dark_gray> | <yellow>Deaths: <white>%statistic_deaths_global%"
+    - "<dark_gray> | <yellow>Killstreak: <white>%statistic_streak_kills%"
+    - "<dark_gray> | <yellow>Deathstreak: <white>%statistic_streak_deaths%"
+    - ""
+  self:
+    - ""
+    - "<yellow>Your<white> statistics"
+    - "<hover:show_text:'<gold><bold>KILLS <!bold>\n<dark_gray> | <dark_red>Global: <white>%statistic_kills_global%\n<dark_gray> | <light_purple>Respawn Anchor<white>: <white>%statistic_kills_anchor%\n<dark_gray> | <light_purple>End Crystal<white>: <white>%statistic_kills_crystal%\n<dark_gray> | <yellow>TNT<white>: <white>%statistic_kills_tnt%\n<dark_gray> | <yellow>Bed<white>: <white>%statistic_kills_bed%'><dark_gray> | <yellow>Kills: <white>%statistic_kills_global%"
+    - "<hover:show_text:'<gold><bold>DEATHS <!bold>\n<dark_gray> | <dark_red>Global: <white>%statistic_deaths_global%\n<dark_gray> | <light_purple>Respawn Anchor<white>: <white>%statistic_deaths_anchor%\n<dark_gray> | <light_purple>End Crystal<white>: <white>%statistic_deaths_crystal%\n<dark_gray> | <yellow>TNT<white>: <white>%statistic_deaths_tnt%\n<dark_gray> | <yellow>Bed<white>: <white>%statistic_deaths_bed%'><dark_gray> | <yellow>Deaths: <white>%statistic_deaths_global%"
+    - "<dark_gray> | <yellow>Killstreak: <white>%statistic_streak_kills%"
+    - "<dark_gray> | <yellow>Deathstreak: <white>%statistic_streak_deaths%"
+    - ""
+
+editstatistics:
+  help:
+    set: "%prefix% <white>/editstatistics set <player> <statistic> <amount> <gray>| <yellow>Set the amount of given statistic."
+    reset: "%prefix% <white>/editstatistics set <player> <statistic> <amount> <gray>| <yellow>Resets the given statistic/statistics."
+    add: "%prefix% <white>/editstatistics add <player> <statistic> <amount> <gray>| <yellow>Add the amount to the given statistic."
+    remove: "%prefix% <white>/editstatistics set <player> <statistic> <amount> <gray>| <yellow>Set the amount of given statistic."
+  set: "%prefix% <white>Set the statistic <yellow>%statistic_name% <white> to <yellow>%new_value% <white>from <yellow>%old_value%<white>."
+  reset: "%prefix% <white>Reset the statistic <yellow>%statistic_name% <white> to <yellow>%new_value% <white>from <yellow>%old_value%<white>."
+  add: "%prefix% <white>Added <yellow>%new_value% <white>to <yellow>%statistic_name% <white> <gray>(Before: <yellow>%old_value%)"
+  removed: "%prefix% <white>Removed <yellow>%new_value% <white>from <yellow>%statistic_name% <white> <gray>(Before: <yellow>%old_value%)"

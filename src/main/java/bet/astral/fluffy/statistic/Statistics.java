@@ -8,20 +8,20 @@ import java.util.Collection;
 import java.util.HashSet;
 
 public final class Statistics {
-	public static final Statistic KILLS_GLOBAL = Statistic.of("kills.global");
-	public static final Statistic KILLS_ANCHOR = Statistic.of("kills.anchor");
-	public static final Statistic KILLS_CRYSTAL= Statistic.of("kills.crystal");
-	public static final Statistic KILLS_TNT = Statistic.of("kills.tnt");
-	public static final Statistic KILLS_BED = Statistic.of("kills.bed");
+	public static final Statistic KILLS_GLOBAL = Statistic.of("kills_global");
+	public static final Statistic KILLS_ANCHOR = Statistic.of("kills_anchor");
+	public static final Statistic KILLS_CRYSTAL= Statistic.of("kills_crystal");
+	public static final Statistic KILLS_TNT = Statistic.of("kills_tnt");
+	public static final Statistic KILLS_BED = Statistic.of("kills_bed");
 
-	public static final Statistic DEATHS_GLOBAL = Statistic.of("deaths.global");
-	public static final Statistic DEATHS_ANCHOR = Statistic.of("deaths.anchor");
-	public static final Statistic DEATHS_CRYSTAL= Statistic.of("deaths.crystal");
-	public static final Statistic DEATHS_TNT = Statistic.of("deaths.tnt");
-	public static final Statistic DEATHS_BED = Statistic.of("deaths.bed");
+	public static final Statistic DEATHS_GLOBAL = Statistic.of("deaths_global");
+	public static final Statistic DEATHS_ANCHOR = Statistic.of("deaths_anchor");
+	public static final Statistic DEATHS_CRYSTAL= Statistic.of("deaths_crystal");
+	public static final Statistic DEATHS_TNT = Statistic.of("deaths_tnt");
+	public static final Statistic DEATHS_BED = Statistic.of("deaths_bed");
 
-	public static final Statistic STREAK_KILLS = Statistic.of("streaks.kills");
-	public static final Statistic STREAK_DEATHS = Statistic.of("streaks.deaths");
+	public static final Statistic STREAK_KILLS = Statistic.of("streak_kills");
+	public static final Statistic STREAK_DEATHS = Statistic.of("streak_deaths");
 
 	private static final Statistic[] statistics;
 	static {
@@ -45,7 +45,7 @@ public final class Statistics {
 
 	public static Statistic valueOf(String key) {
 		for (Statistic statistic : statistics){
-			if (statistic.getName().equals(key)){
+			if (statistic.getName().equalsIgnoreCase(key)){
 				return statistic;
 			}
 		}

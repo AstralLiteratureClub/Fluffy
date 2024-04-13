@@ -3,8 +3,10 @@ package bet.astral.fluffy.manager;
 import bet.astral.fluffy.FluffyCombat;
 
 
-import bet.astral.fluffy.api.AccountImpl;
+import bet.astral.fluffy.events.AccountLoadEvent;
 import bet.astral.fluffy.statistic.Account;
+import bet.astral.fluffy.statistic.AccountImpl;
+import net.minecraft.world.level.entity.LevelCallback;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -18,36 +20,14 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 public class StatisticManager implements Listener {
 	private final Map<UUID, Account> users = new HashMap<>();
-	private final Set<Account> loadingUsers = new HashSet<>();
-	private final Set<Account> savingUsers = new HashSet<>();
-	private final Set<Account> removingUsers = new HashSet<>();
 	private final FluffyCombat fluffy;
 
 
 	public StatisticManager(FluffyCombat fluffyCombat) {
 		this.fluffy = fluffyCombat;
-
-		fluffy.getServer().getAsyncScheduler().runAtFixedRate(fluffyCombat,
-				(task) -> {
-					for (Account user : removingUsers) {
-						users.remove(user.getId());
-					}
-					removingUsers.clear();
-
-					for (Account user : loadingUsers) {
-						users.put(user.getId(), user);
-					}
-
-					for (Account user : savingUsers) {
-						fluffy.getDatabase().save(user);
-					}
-				},
-				10, 30,
-				TimeUnit.SECONDS);
 	}
 
 	public void onEnable() {
@@ -57,9 +37,6 @@ public class StatisticManager implements Listener {
 	}
 
 	public void onDisable() {
-		for (Account user : savingUsers) {
-			fluffy.getDatabase().save(user);
-		}
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
@@ -72,9 +49,7 @@ public class StatisticManager implements Listener {
 	@EventHandler()
 	public void onQuit(PlayerQuitEvent event) {
 		Account user = users.get(event.getPlayer().getUniqueId());
-		if (user != null) {
-			removingUsers.add(user);
-		}
+		user.save().thenRun(() -> users.remove(user.getId())).thenRun(()->fluffy.getComponentLogger().info("Saved user "+ event.getPlayer().getName()));
 	}
 
 	@Nullable
@@ -88,9 +63,11 @@ public class StatisticManager implements Listener {
 	}
 
 	public CompletableFuture<Void> load(OfflinePlayer player) {
-		return CompletableFuture
-				.runAsync(() -> fluffy.getDatabase().get(new AccountImpl(fluffy, player.getUniqueId()), (user) -> {
-					users.put(user.getId(), user);
-				}));
+		return fluffy.getDatabase()
+				.get(new AccountImpl(fluffy, player.getUniqueId()), (account) -> {
+					AccountLoadEvent event = new AccountLoadEvent(true, account);
+					event.callEvent();
+					users.put(account.getId(), account);
+				});
 	}
 }

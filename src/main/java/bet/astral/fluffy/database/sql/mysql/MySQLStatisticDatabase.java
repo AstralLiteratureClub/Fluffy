@@ -7,6 +7,7 @@ import bet.astral.fluffy.statistic.Account;
 import bet.astral.fluffy.statistic.Statistic;
 import com.zaxxer.hikari.HikariDataSource;
 import org.javatuples.Pair;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.sql.Connection;
@@ -22,74 +23,96 @@ import java.util.function.Function;
 public class MySQLStatisticDatabase extends StatisticDatabase implements SQLDatabase {
 	private final HikariDataSource dataSource;
 	private final String table;
+
+
 	public MySQLStatisticDatabase(FluffyCombat fluffyCombat, Statistic[] statistics, HikariDataSource hikariDataSource, String table, Function<Pair<Account, Map<String, Integer>>, Account> function) {
 		super(fluffyCombat, statistics, function);
 		this.dataSource = hikariDataSource;
 		this.table = table;
+		createTable();
 	}
 
-	private void createTable(){
-		PreparedStatement statement = null;
+	private void createTable() {
+		getConnection().thenAccept((connection) -> {
+			PreparedStatement statement = null;
 
-		try {
-			StringBuilder builder = new StringBuilder();
-			for (String key : getAllowedKeys()){
-				if (!builder.isEmpty()){
-					builder.append(", ");
+			try {
+				StringBuilder builder = new StringBuilder();
+				for (String key : getAllowedKeys()) {
+					if (!builder.isEmpty()) {
+						builder.append(", ");
+					}
+					builder.append(key).append(" INT");
 				}
-				builder.append(key).append(" INT");
+				String query = "CREATE TABLE IF NOT EXISTS " + table + "(uniqueId VARCHAR(36), " + builder + ", PRIMARY KEY (uniqueId));";
+				getFluffyCombat()
+						.getComponentLogger().info("Executing query: " + query);
+				statement = connection.prepareStatement(query);
+				statement.execute();
+				getFluffyCombat()
+						.getComponentLogger().info("Executed query!");
+			} catch (SQLException e) {
+				getFluffyCombat()
+						.getComponentLogger()
+						.error("Couldn't create a table properly!", e);
+			} finally {
+				tryAndClose(statement);
+				tryAndClose(connection);
 			}
-			statement = getConnection().prepareStatement("CREATE TABLE IF NOT EXISTS "+ table+ "(uniqueId VARCHAR(36)"+ builder+", PRIMARY KEY (uniqueId));");
-			statement.execute();
-		} catch (SQLException e) {
-			throw new RuntimeException(e);
-		} finally {
-			tryAndClose(statement);
-		}
+		});
 	}
 
 	@Nullable
-	private PreparedStatement createUpdateQuery(Account account) throws SQLException {
-		if (account.getAllStatistics().isEmpty()){
+	private PreparedStatement createUpdateQuery(Connection connection, @NotNull Account account) throws SQLException {
+		if (account.getAllStatistics().isEmpty()) {
+			getLogger().error("All statistics for user "+ account.getId()+ " found to be empty.");
 			return null;
 		}
 		Map<String, Integer> stats = new HashMap<>();
-		account.getAllStatistics().forEach((statistic, value)-> stats.put(statistic.getName(), value));
+		account.getAllStatistics().forEach((statistic, value) -> stats.put(statistic.getName(), value));
 
 		StringBuilder builder = new StringBuilder();
 
-		for (String key : getAllowedKeys()){
-			if (!builder.isEmpty()){
+		for (String key : getAllowedKeys()) {
+			if (!builder.isEmpty()) {
 				builder.append(", ");
 			}
 			builder.append(key).append(" = ?");
 		}
 
-		Connection connection = getConnection();
-
-		PreparedStatement statement = connection.prepareStatement("UPDATE "+table+ " SET "+ builder + " WHERE uniqueId = ?");
-		int i;
-		for (i = 0; i < getAllowedKeys().length; i++){
-			statement.setInt(i, stats.get(getAllowedKeys()[i]));
+		String query = "UPDATE " + table + " SET " + builder + " WHERE uniqueId = ?";
+		getLogger().info("Preparing statement...");
+		PreparedStatement statement = connection.prepareStatement(query);
+		int i = 0;
+		for (String ignored : getAllowedKeys()){
+			i++;
+			Integer amount = stats.get(getAllowedKeys()[i]);
+			if (amount == null){
+				amount = 0;
+			}
+			statement.setInt(i, amount);
 		}
+		getLogger().info("Working..!");
 		i++;
 		statement.setString(i, account.getId().toString());
+		getLogger().info("Working..! 2");
+		getLogger().info("");
 		return statement;
 	}
 
 	@Nullable
-	public PreparedStatement createInsertQuery(Account account) throws SQLException{
-		if (account.getAllStatistics().isEmpty()){
+	public PreparedStatement createInsertQuery(Connection connection, @NotNull Account account) throws SQLException {
+		if (account.getAllStatistics().isEmpty()) {
 			return null;
 		}
 		Map<String, Integer> stats = new HashMap<>();
-		account.getAllStatistics().forEach((statistic, value)-> stats.put(statistic.getName(), value));
+		account.getAllStatistics().forEach((statistic, value) -> stats.put(statistic.getName(), value));
 
 		StringBuilder keys = new StringBuilder();
 		StringBuilder values = new StringBuilder();
 
-		for (String key : getAllowedKeys()){
-			if (!keys.isEmpty()){
+		for (String key : getAllowedKeys()) {
+			if (!keys.isEmpty()) {
 				keys.append(", ");
 				values.append(", ");
 			}
@@ -97,77 +120,96 @@ public class MySQLStatisticDatabase extends StatisticDatabase implements SQLData
 			values.append("?");
 		}
 
-		Connection connection = getConnection();
-
-		PreparedStatement statement = connection.prepareStatement("INSERT INTO "+table + "("+ "uniqueId, "+ keys+") VALUES (" + "?, "+ values + ")");
-		int i = 0;
+		PreparedStatement statement = connection.prepareStatement("INSERT INTO " + table + "(" + "uniqueId, " + keys + ") VALUES (" + "?, " + values + ")");
+		int i = 1;
 		statement.setString(i, account.getId().toString());
-
-		for (i = 1; i < getAllowedKeys().length+1; i++){
-			statement.setInt(i, stats.get(getAllowedKeys()[i]));
+		for (String ignored : getAllowedKeys()){
+			i++;
+			Integer amount = stats.get(getAllowedKeys()[i]);
+			if (amount == null){
+				amount = 0;
+			}
+			statement.setInt(i, amount);
 		}
 		return statement;
 	}
 
 	@Override
-	public CompletableFuture<Void> save(Account account) {
-		return CompletableFuture.runAsync(()->{
-			PreparedStatement statement = null;
-			try {
-				if (exists(account.getId())) {
-					statement = createUpdateQuery(account);
-					if (statement == null){
-						return;
-					}
-					statement.executeUpdate();
-				} else {
-					statement = createInsertQuery(account);
-					if (statement == null){
-						return;
-					}
-					statement.executeUpdate();
-				}
-			} catch (SQLException e) {
-				throw new RuntimeException(e);
-			} finally {
-				tryAndClose(statement);
-			}
-		});
+	public CompletableFuture<Void> save(@NotNull Account account) {
+		return exists(account.getId())
+				.thenAccept(exists -> {
+					Connection connection = getConnectionUnsafe();
+					PreparedStatement statement = null;
+					try {
+						if (exists) {
+							statement = createUpdateQuery(connection, account);
+							if (statement == null) {
+								getLogger().error("Couldn't get update statement for "+ account.getId());
+								return;
+							}
+							statement.executeUpdate();
+						} else {
+							statement = createInsertQuery(connection, account);
+							if (statement == null) {
+								getLogger().error("Couldn't get insert statement for "+ account.getId());
+								return;
+							}
+							statement.executeUpdate();
+						}
+					} catch (SQLException e) {
+						getFluffyCombat()
+								.getComponentLogger()
+								.error("Couldn't save an account properly!", e);
+					} finally {
+						tryAndClose(statement);
+						tryAndClose(connection);
+					}});
 	}
 
 	@Override
 	public CompletableFuture<Void> delete(UUID account) {
-		return CompletableFuture.runAsync(()->{
+
+		return getConnection().thenAccept(connection -> {
 			PreparedStatement statement = null;
 			try {
 
-				if (exists(account)){
-					statement = getConnection().prepareStatement("DELETE FROM " + table + " WHERE uniqueId = ?");
-					statement.setString(1, account.toString());
-					statement.executeUpdate();
-				}
+				statement = connection.prepareStatement("DELETE FROM " + table + " WHERE uniqueId = ?");
+				statement.setString(1, account.toString());
+				statement.executeUpdate();
 			} catch (SQLException e) {
-				throw new RuntimeException(e);
+				getFluffyCombat()
+						.getComponentLogger()
+						.error("Couldn't delete an account properly!", e);
 			} finally {
 				tryAndClose(statement);
+				tryAndClose(connection);
 			}
 		});
 	}
 
 	@Override
-	public CompletableFuture<Account> get(Account accountId) {
-		return CompletableFuture.supplyAsync(() -> {
+	public CompletableFuture<Account> get(@NotNull Account accountId) {
+		getLogger().info("Account: "+ accountId);
+		getLogger().info("Account Id: "+ accountId.getId().toString());
+		return getConnection().thenApplyAsync((connection) -> {
+			try {
+				if (connection.isClosed()){
+					getLogger().error("Connection is closed!");
+				}
+			} catch (SQLException e) {
+				getLogger().error("Connection is closed!", e);
+				return null;
+			}
 			PreparedStatement statement = null;
 			ResultSet resultSet = null;
 			try {
-				Connection connection = getConnection();
-
-				statement = connection.prepareStatement("GET * FROM " + table + " WHERE uniqueId = ?");
+				String query = "SELECT * FROM " + table + " WHERE uniqueId = ?";
+				statement = connection.prepareStatement(query);
 				statement.setString(1, accountId.getId().toString());
 				resultSet = statement.executeQuery();
-				if (resultSet != null && resultSet.next()){
+				if (resultSet != null && resultSet.next()) {
 					Map<String, Integer> stats = new HashMap<>();
-					for (String key : getAllowedKeys()){
+					for (String key : getAllowedKeys()) {
 						int val = resultSet.getInt(key);
 						stats.put(key, val);
 					}
@@ -175,13 +217,18 @@ public class MySQLStatisticDatabase extends StatisticDatabase implements SQLData
 				}
 				return null;
 			} catch (SQLException e) {
-				throw new RuntimeException(e);
+				getFluffyCombat()
+						.getComponentLogger()
+						.error("Couldn't load an account properly!", e);
 			} finally {
 				tryAndClose(statement);
 				tryAndClose(resultSet);
+				tryAndClose(connection);
 			}
+			return null;
 		});
 	}
+
 
 	@Override
 	public HikariDataSource getDataSource() {
@@ -189,21 +236,26 @@ public class MySQLStatisticDatabase extends StatisticDatabase implements SQLData
 	}
 
 	@Override
-	public boolean exists(UUID uniqueId) {
-		PreparedStatement statement = null;
-		ResultSet resultSet = null;
-		try {
-			Connection connection = getConnection();
-
-			statement = connection.prepareStatement("GET * FROM "+ table + " WHERE uniqueId = ?");
-			statement.setString(1, uniqueId.toString());
-			resultSet = statement.executeQuery();
-			return resultSet != null && resultSet.next();
-		} catch (SQLException e) {
-			throw new RuntimeException(e);
-		} finally {
-			tryAndClose(statement);
-			tryAndClose(resultSet);
-		}
+	public CompletableFuture<Boolean> exists(UUID uniqueId) {
+		return getConnection()
+				.thenApplyAsync((connection) -> {
+					PreparedStatement statement = null;
+					ResultSet resultSet = null;
+					try {
+						statement = connection.prepareStatement("SELECT * FROM " + table + " WHERE uniqueId = ?");
+						statement.setString(1, uniqueId.toString());
+						resultSet = statement.executeQuery();
+						return resultSet != null && resultSet.next();
+					} catch (SQLException e) {
+						getFluffyCombat()
+								.getComponentLogger()
+								.error("Couldn't load an account properly!", e);
+					} finally {
+						tryAndClose(statement);
+						tryAndClose(resultSet);
+						tryAndClose(connection);
+					}
+					return false;
+				});
 	}
 }

@@ -29,7 +29,6 @@ public class StatisticCommand {
 						.handler((context)->{
 							CommandSender sender = context.sender();
 							OfflinePlayer player = (OfflinePlayer) context.optional("who").orElse(sender instanceof Player p ? p : null);
-
 							if (player == null){
 								fluffy.getMessageManager()
 										.message(sender, MessageKey.STATS_CONSOLE);
@@ -47,23 +46,22 @@ public class StatisticCommand {
 												info(MessageKey.STATS_OTHER, sender, acc, player);
 											}
 										});
-							} else {
-								if (player instanceof Player p && p.equals(sender)){
-									info(MessageKey.STATS_SELF, sender, account, player);
-								} else {
-									info(MessageKey.STATS_OTHER, sender, account, player);
-								}
+								return;
 							}
-						})
+							if (player instanceof Player p && p.equals(sender)){
+								info(MessageKey.STATS_SELF, sender, account, player);
+							} else {
+								info(MessageKey.STATS_OTHER, sender, account, player);
+							}						})
 		);
 	}
 
-	private void info(String key, CommandSender sender, Account account, OfflinePlayer player){
+	private static void info(String key, CommandSender sender, Account account, OfflinePlayer player){
 		PlaceholderList placeholders = new PlaceholderList();
-		placeholders.addAll(account.asPlaceholder("stats"));
+		placeholders.addAll(account.asPlaceholder("statistic"));
 		placeholders.addAll(account.asPlaceholder("statistics"));
 		placeholders.addAll(PlaceholderUtils.createPlaceholders("player", player));
-		fluffy.getMessageManager()
+		FluffyCombat.getPlugin(FluffyCombat.class).messenger()
 				.message(sender,
 						key,
 						placeholders

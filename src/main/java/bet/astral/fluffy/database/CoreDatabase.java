@@ -12,14 +12,16 @@ import java.util.function.Consumer;
 public class CoreDatabase {
 	private final FluffyCombat fluffy;
 	private final Set<StatisticDatabase> databases = new HashSet<>();
+
 	public CoreDatabase(FluffyCombat fluffyCombat) {
 		this.fluffy = fluffyCombat;
 	}
 
-	public void addDatabase(StatisticDatabase database){
+	public void addDatabase(StatisticDatabase database) {
 		databases.add(database);
 	}
-	public void removeDatabase(StatisticDatabase database){
+
+	public void removeDatabase(StatisticDatabase database) {
 		databases.remove(database);
 	}
 
@@ -30,6 +32,7 @@ public class CoreDatabase {
 		});
 		return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
 	}
+
 	public CompletableFuture<Void> delete(UUID account) {
 		Collection<CompletableFuture<Void>> futures = new HashSet<>();
 		databases.forEach(database -> {
@@ -37,13 +40,14 @@ public class CoreDatabase {
 		});
 		return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
 	}
-	public void get(Account account, Consumer<Account> lastTask) {
+
+	public CompletableFuture<Void> get(Account account, Consumer<Account> lastTask) {
 		Collection<CompletableFuture<Account>> futures = new HashSet<>();
 		databases.forEach(database -> {
 			futures.add(database.get(account));
 		});
 
-		CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new))
-				.thenRunAsync(()->lastTask.accept(account));
+		return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new))
+				.thenRunAsync(() -> lastTask.accept(account)).thenRun(() -> System.out.println("Returning...!"));
 	}
 }

@@ -6,6 +6,8 @@ import bet.astral.fluffy.commands.StatisticCommand;
 import bet.astral.fluffy.configs.CombatConfig;
 import bet.astral.fluffy.database.CoreDatabase;
 import bet.astral.fluffy.database.sql.mysql.MySQLStatisticDatabase;
+import bet.astral.fluffy.hooks.PlaceholderAPIHook;
+import bet.astral.fluffy.listeners.AccountLoadListener;
 import bet.astral.fluffy.listeners.ConnectionListener;
 import bet.astral.fluffy.listeners.ArmorChangeListener;
 import bet.astral.fluffy.listeners.block.LiquidOwnerListener;
@@ -270,6 +272,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 
 	private GlowingEntities glowingEntities;
 	private GlowingBlocks glowingBlocks;
+	private HikariDataSource dataSource;
 
 	@Override
 	public void onEnable() {
@@ -301,18 +304,24 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		database = new CoreDatabase(this);
 
 		final HikariConfig config = new HikariConfig();
-		config.setMaximumPoolSize(10);
-		config.setIdleTimeout(2000L);
+		config.setConnectionTimeout(3000);
+		config.setMaximumPoolSize(15);
+		config.setPoolName("FluffyStats");
+
+		config.setDriverClassName("com.mysql.cj.jdbc.Driver");
 		config.setJdbcUrl(getConfig().getString("database.url"));
 		config.setPassword(getConfig().getString("database.password"));
 		config.setUsername(getConfig().getString("database.username"));
-		final HikariDataSource hikariDataSource = new HikariDataSource(config);
+
+		dataSource = new HikariDataSource(config);
+
 		Function<org.javatuples.Pair<Account, Map<String, Integer>>, Account> function = (pair)-> {
 			Account account = pair.getValue0();
 			Map<String, Integer> stats = pair.getValue1();
 			for (Map.Entry<String, Integer> entry : stats.entrySet()) {
 				Statistic statistic = Statistics.valueOf(entry.getKey());
 				if (statistic == null){
+					getComponentLogger().info("Couldn't find statistic for name "+ entry.getKey());
 					continue;
 				}
 				account.set(statistic, entry.getValue());
@@ -328,7 +337,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 								Statistics.KILLS_BED,
 								Statistics.KILLS_TNT
 						},
-						hikariDataSource,
+						dataSource,
 						"fluffy_kills",
 						function
 				)
@@ -342,7 +351,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 								Statistics.DEATHS_BED,
 								Statistics.DEATHS_TNT
 						},
-						hikariDataSource,
+						dataSource,
 						"fluffy_deaths",
 						function
 				)
@@ -353,7 +362,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 								Statistics.STREAK_KILLS,
 								Statistics.STREAK_DEATHS,
 						},
-						hikariDataSource,
+						dataSource,
 						"fluffy_streak",
 						function
 				)
@@ -393,6 +402,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		registerListeners(new LiquidOwnerListener(this));
 		registerListeners(new ConnectionListener(this));
 		registerListeners(new ArmorChangeListener(this));
+		registerListeners(new AccountLoadListener(this));
 
 		ArmorEquipEvent.registerListener(this);
 
@@ -459,6 +469,9 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		statisticManager.onDisable();
 		glowingEntities.disable();
 		glowingBlocks.disable();
+		if (dataSource != null){
+			dataSource.close();
+		}
 	}
 
 
@@ -536,5 +549,12 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		return YamlConfiguration.loadConfiguration(file);
 	}
 
+	@Deprecated(forRemoval = true)
+	public Messenger<FluffyCombat> getMessageManager() {
+		return messageManager;
+	}
 
+	public Messenger<FluffyCombat> messenger(){
+		return messageManager;
+	}
 }

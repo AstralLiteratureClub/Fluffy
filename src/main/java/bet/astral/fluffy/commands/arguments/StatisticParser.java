@@ -4,7 +4,6 @@ import bet.astral.fluffy.commands.suggestions.TooltipSuggestion;
 import bet.astral.fluffy.statistic.Statistic;
 import bet.astral.fluffy.statistic.StatisticDescription;
 import bet.astral.fluffy.statistic.Statistics;
-import org.apiguardian.api.API;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.incendo.cloud.component.CommandComponent;
 import org.incendo.cloud.context.CommandContext;
@@ -17,6 +16,7 @@ import org.incendo.cloud.parser.ArgumentParser;
 import org.incendo.cloud.parser.ParserDescriptor;
 import org.incendo.cloud.suggestion.Suggestion;
 import org.incendo.cloud.suggestion.SuggestionProvider;
+import org.jetbrains.annotations.Contract;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -34,25 +34,18 @@ public class StatisticParser<C> implements ArgumentParser<C, Statistic>, Suggest
 	}
 
 
-	@API(
-			status = API.Status.STABLE,
-			since = "2.0.0"
-	)
+	@Contract(" -> new")
 	public static <C> @NonNull ParserDescriptor<C, Statistic> statisticParser() {
 		return ParserDescriptor.of(new StatisticParser<>(), Statistic.class);
 	}
 
-	@API(
-			status = API.Status.STABLE,
-			since = "2.0.0"
-	)
 	public static <C> CommandComponent.@NonNull Builder<C, Statistic> statisticComponent() {
 		return CommandComponent.<C, Statistic>builder().parser(statisticParser());
 	}
 
 	@Override
 	public @NonNull ArgumentParseResult<@NonNull Statistic> parse(@NonNull CommandContext<@NonNull C> commandContext, @NonNull CommandInput commandInput) {
-		String input = commandInput.readInput();
+		String input = commandInput.readString();
 		if (statistics.stream().noneMatch(stat -> stat.getName().equalsIgnoreCase(input))) {
 			return ArgumentParseResult.failure(new IllegalArgumentException("Couldn't find statistic for name " + input));
 		}

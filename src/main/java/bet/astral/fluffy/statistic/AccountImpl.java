@@ -1,8 +1,6 @@
-package bet.astral.fluffy.api;
+package bet.astral.fluffy.statistic;
 
 import bet.astral.fluffy.FluffyCombat;
-import bet.astral.fluffy.statistic.Account;
-import bet.astral.fluffy.statistic.Statistic;
 import lombok.Getter;
 import org.jetbrains.annotations.Range;
 
@@ -24,12 +22,12 @@ public class AccountImpl implements Account {
 
 	@Override
 	public Map<Statistic, Integer> getAllStatistics() {
-		return null;
+		return statistics;
 	}
 
 	@Override
 	public int getStatistic(Statistic statistic) {
-		return statistics.get(statistic);
+		return statistics.get(statistic) != null ? statistics.get(statistic) : 0;
 	}
 
 	private boolean has(Statistic statistic){
@@ -84,20 +82,26 @@ public class AccountImpl implements Account {
 		statistics.put(statistic, amount);
 	}
 
+	@Override
+	public void setDefault(Statistic statistic, @Range(from = 0, to = Integer.MAX_VALUE) int amount) {
+		statistics.putIfAbsent(statistic, amount);
+	}
+
 
 	@Override
 	public CompletableFuture<Void> delete(Statistic statistic) {
-		return null;
+		statistics.remove(statistic);
+		return save();
 	}
 
 	@Override
 	public CompletableFuture<Void> save() {
-		return null;
+		return fluffyCombat.getDatabase().save(this);
 	}
 
 	@Override
 	public UUID getId() {
-		return null;
+		return uniqueId;
 	}
 
 }
