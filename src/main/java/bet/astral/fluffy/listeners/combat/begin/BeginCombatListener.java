@@ -10,7 +10,6 @@ import bet.astral.fluffy.manager.CombatManager;
 import bet.astral.fluffy.messenger.MessageKey;
 import bet.astral.fluffy.messenger.Placeholders;
 import bet.astral.fluffy.FluffyCombat;
-import bet.astral.fluffy.nms.ItemReflections;
 import bet.astral.messenger.Messenger;
 import bet.astral.messenger.placeholder.Placeholder;
 import org.bukkit.Bukkit;
@@ -35,7 +34,7 @@ import java.util.UUID;
 
 import static bet.astral.fluffy.FluffyCombat.*;
 import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.*;
-import static org.bukkit.persistence.PersistentDataType.STRING;
+import static org.bukkit.persistence.PersistentDataType.BYTE_ARRAY;
 
 /**
  * @author Antritus
@@ -107,7 +106,7 @@ public class BeginCombatListener implements Listener {
 			CombatUser user = tag.getUser(victim);
 			user.setLastFireDamage(attacker.getUniqueId());
 		} else if (itemStack != null && (itemStack.containsEnchantment(Enchantment.FIRE_ASPECT) && combatCause == CombatCause.MELEE
-				|| itemStack.getType() == Material.BOW && itemStack.containsEnchantment(Enchantment.ARROW_FIRE))) {
+				|| itemStack.getType() == Material.BOW && itemStack.containsEnchantment(Enchantment.FLAME))) {
 			CombatUser user = tag.getUser(victim);
 			user.setLastFireDamage(attacker.getUniqueId());
 		} else if (fireTicks) {
@@ -223,10 +222,10 @@ public class BeginCombatListener implements Listener {
 			}
 			if (event.getDamager() instanceof Projectile projectile) {
 				if (projectile.getShooter() != null && projectile.getShooter() instanceof Player player) {
-					String nbt = projectile.getPersistentDataContainer().get(PROJECTILE_ITEM_KEY, STRING);
+					byte[] bytes = projectile.getPersistentDataContainer().get(PROJECTILE_ITEM_KEY, BYTE_ARRAY);
 					ItemStack itemStack = null;
-					if (nbt != null) {
-						itemStack = ItemReflections.fromNBT(nbt);
+					if (bytes != null) {
+						itemStack = ItemStack.deserializeBytes(bytes);
 					}
 
 					if (projectile instanceof Arrow arrow) {
@@ -258,9 +257,7 @@ public class BeginCombatListener implements Listener {
 			if (itemStack.isEmpty()){
 				return;
 			}
-			String nbt = ItemReflections.toNBT(itemStack);
-
-			projectile.getPersistentDataContainer().set(PROJECTILE_ITEM_KEY, STRING, nbt);
+			projectile.getPersistentDataContainer().set(PROJECTILE_ITEM_KEY, BYTE_ARRAY, itemStack.serializeAsBytes());
  		}
 	}
 }
