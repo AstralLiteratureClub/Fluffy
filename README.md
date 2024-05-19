@@ -17,7 +17,7 @@ Fluffy is designed to detect multiple types of damages here are the currently (h
 - Dispenser lingering and splash potions
 
 ## Statistics counted
-Fluffy tracks few explosion specific kills and totems (and ofcourse kills, deaths, killstreak, deathstreak)
+Fluffy tracks few explosion-specific kills and totems (and of course kills, deaths, killstreak, deathstreak)
 
 ### Explosions
 - Respawn Anchor kills
@@ -34,11 +34,18 @@ Fluffy tracks few explosion specific kills and totems (and ofcourse kills, death
 - Totem deaths (Another player-activated player's own totem of undying)
 
 # Glowing
-Fluffy allows players to glow when they are tagged. Players by default will glow red, if the player is latest in combat tag list. Other players will glow orange (which have combat tag with the player).
-### TAB (Plugin)
-When a server is using TAB plugin, it's advised to turn off the glowing feature.
-TAB plugin makes the glowing colors not work correctly and only displays them as white.
-TAB is using custom teams for each player and doesn't like the current glowing system.
+Fluffy works with [Apollo (Lunar Client)](https://lunarclient.dev/) to attackers glow.
+Lunar client supports different glowing colors compared to vanilla minecraft.
+Using Apollo Fluffy can send any combat tag color to the lunar client player.
+
+Fluffy also has the ability
+to use [Glowing Entities](https://www.spigotmc.org/threads/glowing-entities-and-blocks-1-17-1-20.558927/)
+to make players glow,
+but using glowing entities has less support for colors
+and using [TAB (plugin)](https://www.spigotmc.org/resources/tab-1-5-1-20-6.57806/) will break the glowing colors
+and will only send white glowing colors.
+There is no way to use TAB and Fluffy with glowing entities.
+Using Lunar Client is much easier to provide glowing colors for own combat-tagged players. 
 
 # Expansions? Addons?
 Fluffy will not custom expansions/addons to the plugin.
@@ -51,5 +58,11 @@ as you need to download multiple jar files for them.
 In fluffy you can just disable features in the config.
 
 ### Dependencies
-You're required to publish https://github.com/AstralLiteratureClub/MessageManager to your local host to use fluffy.
-(Building it)
+Fluffy uses [Messenger](https://github.com/AstralLiteratureClub/MessageManager) to parse and send messages to players.
+It's a local host dependency and is required to be published to the local host.
+(Fluffy will be switching to messenger 2.0 soon when 2.0 is ready for testing) **(Needs to be published to maven local)**
+
+Fluffy uses [Shine](https://github.com/AstralLiteratureClub/Shine)
+to handle glowing effects automatically between [Glowing Entities](https://www.spigotmc.org/threads/glowing-entities-and-blocks-1-17-1-20.558927/) and [Apollo (Lunar Client)](https://lunarclient.dev/)
+(lunar client glowing support to 1.7 and custom colors).
+**(Needs to be published to maven local)**
