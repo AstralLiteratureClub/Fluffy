@@ -10,11 +10,11 @@ import bet.astral.fluffy.api.BlockCombatUser;
 import bet.astral.fluffy.api.CombatTag;
 import bet.astral.fluffy.api.CombatUser;
 import bet.astral.fluffy.events.player.PlayerCombatFullEndEvent;
-import fr.skytasul.glowingentities.GlowingBlocks;
-import fr.skytasul.glowingentities.GlowingEntities;
-import org.bukkit.ChatColor;
+import bet.astral.shine.Shine;
+import bet.astral.shine.ShineColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -72,8 +72,6 @@ public final class CombatManager {
 			public void run() {
 				try {
 					CombatConfig config = main.getCombatConfig();
-					GlowingEntities glowingEntities = main.getGlowingEntities();
-					GlowingBlocks glowingBlocks = main.getGlowingBlocks();
 					List<String> deleteList = new ArrayList<>();
 					List<String> nullList = new ArrayList<>();
 					latest.clear();
@@ -141,22 +139,14 @@ public final class CombatManager {
 							if (victimOP.isOnline()) {
 								Player victim = (Player) victimOP;
 								Block block = blockCombatUser.getBlock();
-								try {
-									glowingBlocks.unsetGlowing(block, victim);
-								} catch (ReflectiveOperationException e) {
-									e.printStackTrace();
-								}
+								removeGlow(main, victim, block);
 							}
 						} else {
 							OfflinePlayer victimOP = tag.getVictim().getPlayer();
 							OfflinePlayer attackerOP = tag.getAttacker().getPlayer();
 							if (victimOP.isOnline() && attackerOP.isOnline()) {
-								try {
-									glowingEntities.unsetGlowing(attackerOP.getPlayer(), victimOP.getPlayer());
-									glowingEntities.unsetGlowing(victimOP.getPlayer(), attackerOP.getPlayer());
-								} catch (ReflectiveOperationException e) {
-									e.printStackTrace();
-								}
+								removeGlow(main, attackerOP.getPlayer(), victimOP.getPlayer());
+								removeGlow(main, victimOP.getPlayer(), attackerOP.getPlayer());
 							}
 						}
 					});
@@ -219,13 +209,8 @@ public final class CombatManager {
 							OfflinePlayer victimOP = tag.getVictim().getPlayer();
 							if (victimOP.isOnline()) {
 								Player victim = victimOP.getPlayer();
-								Block block = blockCombatUser.getBlock();
 								if (victim != null) {
-									try {
-										glowingBlocks.setGlowing(block, victim, config.getCombatGlowLatest());
-									} catch (ReflectiveOperationException e) {
-										e.printStackTrace();
-									}
+									makeGlow(main, victim, victim, tag);
 								}
 							}
 						} else {
@@ -233,13 +218,9 @@ public final class CombatManager {
 							OfflinePlayer attackerOP = tag.getAttacker().getPlayer();
 							if (config.isCombatGlow() && config.isCombatGlowLatest()
 									&& victimOP.isOnline() && attackerOP.isOnline()) {
-								try {
-									glowingEntities.setGlowing(attackerOP.getPlayer(), victimOP.getPlayer(), config.getCombatGlowLatest());
-									if (!victimOP.equals(attackerOP)) {
-										glowingEntities.setGlowing(victimOP.getPlayer(), attackerOP.getPlayer(), config.getCombatGlowLatest());
-									}
-								} catch (ReflectiveOperationException e) {
-									throw new RuntimeException(e);
+								makeGlow(main, victimOP.getPlayer(), attackerOP.getPlayer(), tag);
+								if (!victimOP.equals(attackerOP)) {
+									makeGlow(main, attackerOP.getPlayer(), victimOP.getPlayer(), tag);
 								}
 							}
 
@@ -268,35 +249,62 @@ public final class CombatManager {
 	}
 
 	public static void makeGlow(@NotNull FluffyCombat fluffy, @NotNull Player whoSees, @NotNull OfflinePlayer ignore, @NotNull CombatTag tag){
-		boolean isVictim = tag.getVictim().getUniqueId().equals(whoSees.getUniqueId());
-		CombatUser attacker = isVictim ? tag.getAttacker() : tag.getVictim();
+		CombatConfig combatConfig = fluffy.getCombatConfig();
+		if (!combatConfig.isCombatGlow()){
+			return;
+		}
+
+		final Shine shine = fluffy.getShine();
+		final boolean isLatest = fluffy.getCombatManager().isLatest(whoSees, tag);
+		final boolean isVictim = tag.getVictim().getUniqueId().equals(whoSees.getUniqueId());
+		final CombatUser attacker = isVictim ? tag.getAttacker() : tag.getVictim();
+		final CombatUser victim = isVictim ? tag.getVictim() : tag.getAttacker();
 		if (attacker.getUniqueId().equals(ignore.getUniqueId())){
 			return;
 		}
 		if (tag instanceof BlockCombatTag){
 			Block block = ((BlockCombatUser) tag.getAttacker()).getBlock();
+			ShineColor shineColor = victim.getTaggedGlowColor().orElse(combatConfig.getCombatGlowAllTagged());
+			if (isLatest && combatConfig.isCombatGlowLatest()){
+				shineColor = victim.getLatestGlowColor().orElse(combatConfig.getCombatGlowLatest());
+			}
 			try {
-				fluffy.getGlowingBlocks().setGlowing(block, whoSees, fluffy.getCombatConfig().getCombatGlowAllTagged());
+				shine.setGlowing(whoSees, block, shineColor);
 			} catch (ReflectiveOperationException e) {
 				throw new RuntimeException(e);
 			}
 		} else {
-			OfflinePlayer p = attacker.getPlayer();
-			if (p instanceof Player online) {
-				ChatColor color = fluffy.getCombatConfig().getCombatGlowAllTagged();
-				boolean isTimer = attacker.getRejoinTimer() >= 0;
-				if (isTimer && fluffy.getCombatConfig().isCombatGlowCombatLogRejoin()){
-					color = fluffy.getCombatConfig().getCombatGlowTagRejoin();
-				}
-				if (!isTimer && !fluffy.getCombatConfig().isCombatGlowAllTagged()){
-					return;
+			OfflinePlayer attackerPlayer = attacker.getPlayer();
+			if (attackerPlayer instanceof Player attackerOnline) {
+				ShineColor color = victim.getTaggedGlowColor().orElse(combatConfig.getCombatGlowAllTagged());
+				boolean isRejoin = attacker.getRejoinTimer()>0;
+				if (isRejoin && combatConfig.isCombatGlowCombatLogRejoin()){
+					color = victim.getRejoinedGlowColor().orElse(combatConfig.getCombatGlowTagRejoin());
+				} else if (isLatest && combatConfig.isCombatGlowLatest()){
+					color = victim.getLatestGlowColor().orElse(combatConfig.getCombatGlowLatest());
 				}
 				try {
-					fluffy.getGlowingEntities().setGlowing(online, whoSees, color);
+					shine.setGlowing(whoSees, attackerOnline, color);
 				} catch (ReflectiveOperationException e) {
 					throw new RuntimeException(e);
 				}
 			}
+		}
+	}
+	public static void removeGlow(@NotNull FluffyCombat fluffyCombat, Player whoSees, Entity entity){
+		Shine shine = fluffyCombat.getShine();
+		try {
+			shine.removeGlowing(whoSees, entity);
+		} catch (ReflectiveOperationException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	public static void removeGlow(@NotNull FluffyCombat fluffyCombat, Player whoSees, Block block){
+		Shine shine = fluffyCombat.getShine();
+		try {
+			shine.removeGlowing(whoSees, block);
+		} catch (ReflectiveOperationException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -315,6 +323,13 @@ public final class CombatManager {
 	@Nullable
 	public CombatTag getLatest(OfflinePlayer player){
 		return latest.get(player.getUniqueId());
+	}
+
+	public boolean isLatest(@NotNull Player whoSees, @NotNull CombatTag tag) {
+		if (getLatest(whoSees) == null){
+			return false;
+		}
+		return getLatest(whoSees).equals(tag);
 	}
 
 	/**
