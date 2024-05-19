@@ -2,13 +2,18 @@ package bet.astral.fluffy;
 
 import bet.astral.fluffy.astrolminiapi.CoreCommand;
 import bet.astral.fluffy.configs.CombatConfig;
+import bet.astral.shine.Shine;
+import bet.astral.shine.ShineColor;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 
+@ApiStatus.ScheduledForRemoval(inVersion = "1.3")
+@Deprecated(forRemoval = true)
 public class CMDGlow extends CoreCommand {
 	private final FluffyCombat fluffy;
 	protected CMDGlow(FluffyCombat main) {
@@ -27,15 +32,10 @@ public class CMDGlow extends CoreCommand {
 	 */
 	@Override
 	public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
-		CombatConfig combatConfig = fluffy.getCombatConfig();
-		if (!combatConfig.isPotionStartCombat()){
-			sender.sendRichMessage("<red>Potions do not begin combat.");
-			return true;
-		}
-		ChatColor color = ChatColor.AQUA;
+		ShineColor shineColor = ShineColor.RED;
 		Player player = (Player) sender;
 		try {
-			fluffy.getGlowingEntities().setGlowing(player, player, color);
+			fluffy.getShine().setGlowing(player, player, shineColor);
 		} catch (ReflectiveOperationException e) {
 			throw new RuntimeException(e);
 		}
