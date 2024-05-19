@@ -8,13 +8,15 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
-@Deprecated
+@ApiStatus.ScheduledForRemoval(inVersion = "1.3")
+@Deprecated(forRemoval = true)
 public class CMDDebug extends CoreCommand {
 	private final FluffyCombat combat;
 	protected CMDDebug(FluffyCombat main) {

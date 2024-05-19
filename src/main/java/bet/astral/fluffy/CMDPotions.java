@@ -3,8 +3,11 @@ package bet.astral.fluffy;
 import bet.astral.fluffy.astrolminiapi.CoreCommand;
 import bet.astral.fluffy.configs.CombatConfig;
 import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
+@ApiStatus.ScheduledForRemoval(inVersion = "1.3")
+@Deprecated(forRemoval = true)
 public class CMDPotions extends CoreCommand {
 	private final FluffyCombat combat;
 	protected CMDPotions(FluffyCombat main) {

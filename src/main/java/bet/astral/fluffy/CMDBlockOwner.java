@@ -9,10 +9,13 @@ import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
+@ApiStatus.ScheduledForRemoval(inVersion = "1.3")
+@Deprecated(forRemoval = true)
 public class CMDBlockOwner extends CoreCommand {
 	protected CMDBlockOwner(JavaPlugin main) {
 		super(main, "fluffy-block");
