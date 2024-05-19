@@ -1,10 +1,11 @@
 package bet.astral.fluffy.configs;
 
+import bet.astral.shine.ShineColor;
 import lombok.Getter;
 import bet.astral.fluffy.FluffyCombat;
 import org.apache.commons.lang3.EnumUtils;
-import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
@@ -56,9 +57,9 @@ public class CombatConfig {
 	private boolean isCombatGlowLatest;
 	private boolean isCombatGlowAllTagged;
 	private boolean isCombatGlowCombatLogRejoin;
-	private ChatColor combatGlowLatest;
-	private ChatColor combatGlowAllTagged;
-	private ChatColor combatGlowTagRejoin;
+	private ShineColor combatGlowLatest;
+	private ShineColor combatGlowAllTagged;
+	private ShineColor combatGlowTagRejoin;
 
 	private ElytraMode elytraMode;
 	private boolean isElytraBoostAllowed;
@@ -116,9 +117,12 @@ public class CombatConfig {
 		isCombatGlowLatest = configuration.getBoolean("glowing.latest.enabled");
 		isCombatGlowAllTagged = configuration.getBoolean("glowing.regular.enabled");
 		isCombatGlowCombatLogRejoin = configuration.getBoolean("glowing.combat-log.enabled");
-		combatGlowLatest = EnumUtils.getEnumIgnoreCase(ChatColor.class, configuration.getString("glowing.latest.color"), ChatColor.RED);
-		combatGlowAllTagged = EnumUtils.getEnumIgnoreCase(ChatColor.class, configuration.getString("glowing.regular.color"), ChatColor.GOLD);
-		combatGlowTagRejoin = EnumUtils.getEnumIgnoreCase(ChatColor.class, configuration.getString("glowing.combat-log.color"), ChatColor.BLUE);
+//		combatGlowLatest = EnumUtils.getEnumIgnoreCase(ChatColor.class, configuration.getString("glowing.latest.color"), ChatColor.RED);
+//		combatGlowAllTagged = EnumUtils.getEnumIgnoreCase(ChatColor.class, configuration.getString("glowing.regular.color"), ChatColor.GOLD);
+//		combatGlowTagRejoin = EnumUtils.getEnumIgnoreCase(ChatColor.class, configuration.getString("glowing.combat-log.color"), ChatColor.BLUE);
+		combatGlowLatest = ShineColor.RED;
+		combatGlowAllTagged = ShineColor.GRAY;
+		combatGlowTagRejoin = ShineColor.GOLD;
 
 		isCommandsDisabled = configuration.getBoolean("commands.combat.enabled", true);
 		commandsToDisable = configuration.getStringList("commands.combat.disabled-list");
@@ -159,7 +163,7 @@ public class CombatConfig {
 				key = NamespacedKey.minecraft(potionString);
 			}
 			@Nullable
-			PotionEffectType type = PotionEffectType.getByKey(key);
+			PotionEffectType type = Registry.POTION_EFFECT_TYPE.get(key);
 			if (type == null) {
 				continue;
 			}
