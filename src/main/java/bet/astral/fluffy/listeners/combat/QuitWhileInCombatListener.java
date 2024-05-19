@@ -110,7 +110,7 @@ public class QuitWhileInCombatListener implements Listener {
 						player.getInventory().setItemInOffHand(null);
 						Location location = event.getPlayer().getEyeLocation();
 						World world = location.getWorld();
-						world.spawnParticle(Particle.TOTEM, location, 1);
+						world.spawnParticle(Particle.TOTEM_OF_UNDYING, location, 1);
 						world.playSound(location, Sound.ITEM_TOTEM_USE, 1, 1);
 						continue;
 					}

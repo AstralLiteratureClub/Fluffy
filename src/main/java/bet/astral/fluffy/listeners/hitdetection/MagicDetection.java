@@ -181,7 +181,7 @@ public class MagicDetection implements Listener {
 		PotionEffectType effectType;
 		switch (event.getCause()) {
 			case POISON -> effectType = PotionEffectType.POISON;
-			case MAGIC -> effectType = PotionEffectType.HARM;
+			case MAGIC -> effectType = PotionEffectType.INSTANT_DAMAGE;
 			case WITHER -> effectType = PotionEffectType.WITHER;
 			default -> effectType = null;
 		}
@@ -193,7 +193,7 @@ public class MagicDetection implements Listener {
 			return;
 		}
 
-		if (whoGave.get(PotionEffectType.HARM).get(event.getEntity().getUniqueId()) == null) {
+		if (whoGave.get(PotionEffectType.INSTANT_DAMAGE).get(event.getEntity().getUniqueId()) == null) {
 			return;
 		}
 		Object whoGave = this.whoGave.get(effectType).get(event.getEntity().getUniqueId());
