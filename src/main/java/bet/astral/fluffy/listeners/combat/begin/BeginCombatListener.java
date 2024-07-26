@@ -80,8 +80,8 @@ public class BeginCombatListener implements Listener {
 			mm.message(victim, Translations.COMBAT_ENTER_VICTIM, placeholders);
 		}
 		if (!cM.hasTags(attacker)) {
-			if (attacker instanceof Player attackerPlayer) {
-				mm.message(attackerPlayer, Translations.COMBAT_ENTER_ATTACKER, placeholders);
+			if (attacker.isOnline()){
+			mm.message(attacker, Translations.COMBAT_ENTER_ATTACKER, placeholders);
 			}
 		}
 

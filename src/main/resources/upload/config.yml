@@ -1,10 +1,10 @@
 # Enables debugging features, as self combat tagging
-debug: false
+debug: true
 
 database:
-  url: "jcdb:mysql:https://"
-  password: "BassPassword"
-  username: "root"
+  url: jcdb:mysql:https://
+  password: BassPassword
+  username: root
 
 # Changing this requires the restart of the server (or if you are unsafe, reload of the plugin)
 # How long should combat last for?
@@ -129,14 +129,60 @@ combat-log:
       # action = SPAWN_NPC
       npc:
         # JSON STRING
-        spawn: {"type": "EMBED", "title": "You have quit in combat in ASTRAL!", "color": "#b40000", "description": "You have left **astral** in combat. Leaving the server in combat will spawn a NPC at your position and it can be killed! Log back in and defend yourself or risk yourself dying!", "footer": {"footer":  "Astral", "imageURL": "https://cdn.discordapp.com/attachments/1096866323314774028/1147850032956047391/astral.png"}, "timestamp": "%%HH:mm:ss DD:MM:yyyy"}
-        death: {"type": "EMBED", "title": "You have quit in combat in ASTRAL!", "color": "#2b0000", "description": "You have left **astral** in combat. Your NPC was killed! Your items have dropped to the ground!", "footer": {"footer":  "Astral", "imageURL": "https://cdn.discordapp.com/attachments/1096866323314774028/1147850032956047391/astral.png"}, "timestamp": "%%HH:mm:ss DD:MM:yyyy"}
-        safe: {"type": "EMBED", "title": "You have quit in combat in ASTRAL!", "color": "#13a100", "description": "You have left **astral** in combat. Your NPC was lucky and was not killed in the combat timer!!", "footer": {"footer":  "Astral", "imageURL": "https://cdn.discordapp.com/attachments/1096866323314774028/1147850032956047391/astral.png"}, "timestamp": "%%HH:mm:ss DD:MM:yyyy"}
+        spawn:
+          type: EMBED
+          title: You have quit in combat in ASTRAL!
+          color: '#b40000'
+          description: You have left **astral** in combat. Leaving the server in combat
+            will spawn a NPC at your position and it can be killed! Log back in and
+            defend yourself or risk yourself dying!
+          footer:
+            footer: Astral
+            imageURL: https://cdn.discordapp.com/attachments/1096866323314774028/1147850032956047391/astral.png
+          timestamp: '%%HH:mm:ss DD:MM:yyyy'
+        death:
+          type: EMBED
+          title: You have quit in combat in ASTRAL!
+          color: '#2b0000'
+          description: You have left **astral** in combat. Your NPC was killed! Your
+            items have dropped to the ground!
+          footer:
+            footer: Astral
+            imageURL: https://cdn.discordapp.com/attachments/1096866323314774028/1147850032956047391/astral.png
+          timestamp: '%%HH:mm:ss DD:MM:yyyy'
+        safe:
+          type: EMBED
+          title: You have quit in combat in ASTRAL!
+          color: '#13a100'
+          description: You have left **astral** in combat. Your NPC was lucky and
+            was not killed in the combat timer!!
+          footer:
+            footer: Astral
+            imageURL: https://cdn.discordapp.com/attachments/1096866323314774028/1147850032956047391/astral.png
+          timestamp: '%%HH:mm:ss DD:MM:yyyy'
 
       # action = Kill
-      death: {"type": "EMBED", "title": "You have quit in combat in ASTRAL!", "color": "#b20000", "description": "You have left **astral** in combat. You were instantly killed! Next time do not log out in combat!", "footer": {"footer":  "Astral", "imageURL": "https://cdn.discordapp.com/attachments/1096866323314774028/1147850032956047391/astral.png"}, "timestamp": "%%HH:mm:ss DD:MM:yyyy"}
+      death:
+        type: EMBED
+        title: You have quit in combat in ASTRAL!
+        color: '#b20000'
+        description: You have left **astral** in combat. You were instantly killed!
+          Next time do not log out in combat!
+        footer:
+          footer: Astral
+          imageURL: https://cdn.discordapp.com/attachments/1096866323314774028/1147850032956047391/astral.png
+        timestamp: '%%HH:mm:ss DD:MM:yyyy'
       # action = NOTHING
-      none: {"type": "EMBED", "title": "You have quit in combat in ASTRAL!", "color": "#b20000", "description": "You have left **astral** in combat. Remember combat logging is ruining the fun for everyone!", "footer": {"footer":  "Astral", "imageURL": "https://cdn.discordapp.com/attachments/1096866323314774028/1147850032956047391/astral.png"}, "timestamp": "%%HH:mm:ss DD:MM:yyyy"}
+      none:
+        type: EMBED
+        title: You have quit in combat in ASTRAL!
+        color: '#b20000'
+        description: You have left **astral** in combat. Remember combat logging is
+          ruining the fun for everyone!
+        footer:
+          footer: Astral
+          imageURL: https://cdn.discordapp.com/attachments/1096866323314774028/1147850032956047391/astral.png
+        timestamp: '%%HH:mm:ss DD:MM:yyyy'
     # What should happen when player combat logs?
     # SPAWN_NPC <- Requires citizens
     # NOTHING, KILL, SPAWN_NPC
@@ -195,12 +241,12 @@ commands:
     # Bypass permission: fluffy.bypass.combat-commands
     #
     disabled-list:
-      - "fixall"
-      - "fix"
-      - "repair"
-      - "repairall"
-      - "spawn"
-      - "warp"
+      - fixall
+      - fix
+      - repair
+      - repairall
+      - spawn
+      - warp
 
 #
 anchors:
@@ -261,10 +307,10 @@ potions:
     # namespace:key
     # Vanilla effects don't require "minecraft:"
     types:
-      - "minecraft:poison"
-      - "minecraft:instant_damage"
-      - "minecraft:weakness"
-      - "minecraft:wither"
+      - minecraft:poison
+      - minecraft:instant_damage
+      - minecraft:weakness
+      - minecraft:wither
 
 dispensers:
   # Should the game find the owner of arrows put inside a dispenser?
@@ -282,7 +328,7 @@ dispensers:
   potions-begin-combat: true
 
 # Cooldowns. What items should be in cooldown in combat
-#TODO fix cooldowns
+# TODO fix cooldowns
 cooldowns:
   # Enabled?
   # True/False
@@ -290,16 +336,15 @@ cooldowns:
   reset-on-combat-end: true
   # Bypass: fluffy.bypass.combat-cooldown.%material%
   cooldowns:
-    - material: ENDER_PEARL # Required
-      cooldown: 10.5 # seconds # Required
-      message: false # Not required
-      sounds: # Required if using sounds
-        #TODO
-        use: "minecraft:entity.enderman.hurt" # Maybe add on click: playsound # Not required
-    - material: ENCHANTED_GOLDEN_APPLE
-      cooldown: 95 # seconds
+    - material: minecraft:ender_pearl
+      cooldown: 10.5
+      message: false
+      sounds:
+        use: minecraft:entity.enderman.hurt
+    - material: minecraft:enchanted_golden_apple
+      cooldown: 95
       message: true
-    - material: GOLDEN_APPLE
-      cooldown: 2.5 # seconds
-    - material: CHORUS_FRUIT
+    - material: minecraft:golden_apple
+      cooldown: 2.5
+    - material: minecraft:chorus_fruit
       cooldown: 10.0

@@ -22,6 +22,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class AnchorDetection implements Listener {
 	public final Map<Location, AnchorTag> detectionMap = new HashMap<>();
@@ -63,18 +64,15 @@ public class AnchorDetection implements Listener {
 		Location location = block.getLocation().toBlockLocation();
 		if (itemStack.getType() == Material.GLOWSTONE
 				|| charges > 0) {
-			if (charges == anchor.getMaximumCharges()) {
-				AnchorTag anchorTag = new AnchorTag(location, player, itemStack, charges);
-				detectionMap.put(location, anchorTag);
-			}
+			AnchorTag anchorTag = new AnchorTag(location, player, itemStack, charges);
+			detectionMap.put(location, anchorTag);
 		}
 		if (detectionMap.get(location) != null) {
-			fluffyCombat.getServer().getScheduler().runTaskLaterAsynchronously(fluffyCombat,
+			fluffyCombat.getServer().getAsyncScheduler().runDelayed(fluffyCombat,
 					(x) -> {
 						detectionMap.remove(location);
 					},
-					40
-			);
+					100, TimeUnit.MILLISECONDS);
 		}
 	}
 
@@ -94,6 +92,10 @@ public class AnchorDetection implements Listener {
 		location.setWorld(victim.getWorld());
 		AnchorTag tag = detectionMap.get(location);
 		if (tag == null) {
+			return;
+		}
+
+		if (tag.owner==victim){
 			return;
 		}
 

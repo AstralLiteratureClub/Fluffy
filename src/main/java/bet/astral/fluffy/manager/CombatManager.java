@@ -13,6 +13,7 @@ import bet.astral.fluffy.messenger.Translations;
 import bet.astral.shine.Shine;
 import bet.astral.shine.ShineColor;
 import bet.astral.tuples.Quartet;
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -48,6 +49,7 @@ public final class CombatManager {
 	private BukkitTask task;
 	private final Map<String, CombatTag> tags = new LinkedHashMap<>();
 	private final Map<UUID, CombatTag> latest = new HashMap<>();
+	private final Map<UUID, Boolean> alreadyEnded = new HashMap<>();
 
 	/**
 	 * Creates new CombatManager instance.
@@ -63,14 +65,25 @@ public final class CombatManager {
 	 * Called from FluffyCommand enable() method
 	 * @see FluffyCombat#onEnable()
 	 */
-	public void onEnable(){
+	public void onEnable() {
 		task = new BukkitRunnable() {
+			final Set<UUID> ended = new HashSet<>();
 			/**
 			 * Maybe switching to a thread per player would be possible, but it's not something in my mind currently.
 			 */
 			@Override
 			public void run() {
 				try {
+					for (UUID uniqueId : List.copyOf(ended)) {
+						if (!hasTags(Bukkit.getOfflinePlayer(uniqueId)) && (alreadyEnded.get(uniqueId)==null||!alreadyEnded.get(uniqueId))) {
+							OfflinePlayer player = main.getServer().getOfflinePlayer(uniqueId);
+							PlayerCombatFullEndEvent event = new PlayerCombatFullEndEvent(true, main, player);
+							event.callEvent();
+							alreadyEnded.put(uniqueId, true);
+							ended.remove(uniqueId);
+						}
+					}
+
 					CombatConfig config = main.getCombatConfig();
 					List<String> deleteList = new ArrayList<>();
 					List<String> nullList = new ArrayList<>();
@@ -86,8 +99,8 @@ public final class CombatManager {
 							userTags.putIfAbsent(ids[0], new ArrayList<>());
 							userTags.putIfAbsent(ids[1], new ArrayList<>());
 
-							tag.setVictimTicksLeft(tag.getVictimTicksLeft() - 1);
-							tag.setAttackerTicksLeft(tag.getAttackerTicksLeft() - 1);
+							tag.setVictimTicksLeft(tag.getVictimTicksLeft() - 5);
+							tag.setAttackerTicksLeft(tag.getAttackerTicksLeft() - 5);
 							if (tag.getVictimTicksLeft() < 0 && tag.getAttackerTicksLeft() < 0) {
 								deleteList.add(key);
 							} else {
@@ -95,8 +108,8 @@ public final class CombatManager {
 								userTags.get(ids[1]).add(tag);
 
 								// Checking combat timers
-								combatEnded.put(tag, Quartet.immutable(tag.getVictim().getUniqueId(), tag.getVictimTicksLeft()<0,
-										tag.getAttacker() instanceof BlockCombatUser ? null : tag.getAttacker().getUniqueId(), tag.getAttackerTicksLeft()<0));
+								combatEnded.put(tag, Quartet.immutable(tag.getVictim().getUniqueId(), tag.getVictimTicksLeft() < 0,
+										tag.getAttacker() instanceof BlockCombatUser ? null : tag.getAttacker().getUniqueId(), tag.getAttackerTicksLeft() < 0));
 
 								// Setting the victim's latest tag
 								CombatUser combatUser = tag.getVictim();
@@ -175,34 +188,24 @@ public final class CombatManager {
 						event.callEvent();
 					});
 
-					Map<UUID, Boolean> fullyEnded = new HashMap<>();
-					combatEnded.forEach((key, value)->{
+					combatEnded.forEach((key, value) -> {
 						UUID victim = value.getFirst();
 						UUID attacker = value.getThird();
-						fullyEnded.put(victim, value.getSecond());
-						if (value.getSecond()){
+						if (value.getSecond()) {
 							OfflinePlayer player = main.getServer().getOfflinePlayer(victim);
 							PlayerCombatEndEvent event = new PlayerCombatEndEvent(main, key, player);
 							event.callEvent();
 						}
 						if (attacker != null) {
-							fullyEnded.put(attacker, value.getFourth());
 							if (value.getFourth()) {
 								OfflinePlayer player = main.getServer().getOfflinePlayer(attacker);
 								PlayerCombatEndEvent event = new PlayerCombatEndEvent(main, key, player);
 								event.callEvent();
 							}
+							ended.add(value.getThird());
 						}
+						ended.add(value.getFirst());
 					});
-
-					fullyEnded.forEach((key, value)->{
-						if (value){
-							OfflinePlayer player = main.getServer().getOfflinePlayer(key);
-							PlayerCombatFullEndEvent event = new PlayerCombatFullEndEvent(true, main, player);
-							event.callEvent();
-						}
-					});
-
 
 					latest.forEach((key, tag) -> {
 						if (tag.getAttacker() instanceof BlockCombatUser blockCombatUser) {
@@ -241,11 +244,11 @@ public final class CombatManager {
 							}
 						}
 					});
-				} catch (Exception e){
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
-		}.runTaskTimerAsynchronously(main, 20, 1);
+		}.runTaskTimerAsynchronously(main, 20, 10);
 	}
 
 	public static void makeGlow(@NotNull FluffyCombat fluffy, @NotNull Player whoSees, @NotNull OfflinePlayer ignore, @NotNull CombatTag tag){
@@ -412,6 +415,9 @@ public final class CombatManager {
 			combatUserAttacker = main.getUserManager().createAndLoadASync(playerAttacker);
 		}
 
+		alreadyEnded.remove(playerVictim.getUniqueId());
+		alreadyEnded.remove(playerAttacker.getUniqueId());
+
 		try {
 			CombatTag tag = (CombatTag) combatTagConstructor.newInstance(main, combatUserVictim, combatUserAttacker);
 			tags.remove(toId(playerAttacker, playerVictim));
@@ -431,6 +437,7 @@ public final class CombatManager {
 	 */
 	@NotNull
 	public synchronized CombatTag create(Player playerVictim, BlockCombatUser block){
+		alreadyEnded.remove(playerVictim.getUniqueId());
 		CombatUser combatUserVictim = main.getUserManager().getUser(playerVictim);
 		try {
 			BlockCombatTag tag = blockCombatTagConstructor.newInstance(main, combatUserVictim, block);

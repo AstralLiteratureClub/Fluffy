@@ -110,6 +110,10 @@ public class BedDetection implements Listener {
 		if (bedTag == null){
 			return;
 		}
+		if (bedTag.owner.getUniqueId().equals(victim.getUniqueId())){
+			return;
+		}
+
 		ItemStack itemStack = bedTag.itemStack;
 		BeginCombatListener.handle(victim, bedTag.owner, CombatCause.BED, itemStack);
 		CombatTag tag = fluffy.getCombatManager().getLatest(victim);

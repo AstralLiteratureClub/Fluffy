@@ -14,7 +14,6 @@ import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.incendo.cloud.bukkit.parser.location.LocationParser;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.paper.PaperCommandManager;
 import org.incendo.cloud.permission.Permission;
@@ -28,9 +27,8 @@ public class BlockOwnerCommand extends FluffyCommand {
 		super(registerer, commandManager);
 		command("block-owner", Translations.COMMAND_BLOCK_OWNER_DESCRIPTION,
 				b -> b.permission(Permission.of("fluffy.block-owner"))
-						.senderType(Player.class)
-						.optional(LocationParser.locationComponent().name("location")
-								.description(description(Translations.COMMAND_BLOCK_OWNER_LOCATION_DESCRIPTION)))
+						//.optional(LocationParser.locationComponent().name("location"))
+						//		.description(description(Translations.COMMAND_BLOCK_OWNER_LOCATION_DESCRIPTION)))
 						.handler(this::handle)).register();
 	}
 
@@ -39,11 +37,11 @@ public class BlockOwnerCommand extends FluffyCommand {
 		player.getScheduler().run(fluffy(), t->{
 			Optional<Location> locationOptional = handler.optional("location");
 			if (locationOptional.isEmpty()){
-				if (player.getTargetBlock(35) == null){
+				if (player.getTargetBlockExact(35) == null){
 					messenger.message(player, Translations.COMMAND_BLOCK_OWNER_TARGET_BLOCk);
 					return;
 				}
-				locationOptional = Optional.of(player.getTargetBlock(35).getLocation());
+				locationOptional = Optional.of(player.getTargetBlockExact(35).getLocation());
 
 			}
 			Location location = locationOptional.get();

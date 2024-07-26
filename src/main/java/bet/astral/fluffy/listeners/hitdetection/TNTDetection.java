@@ -1,6 +1,5 @@
 package bet.astral.fluffy.listeners.hitdetection;
 
-import bet.astral.fluffy.utils.Compatibility;
 import bet.astral.fluffy.api.CombatCause;
 import bet.astral.fluffy.api.CombatTag;
 import bet.astral.fluffy.events.damage.CombatDamageUsingTNTEvent;
@@ -134,10 +133,10 @@ public class TNTDetection implements Listener {
 		Object obj = getPrimer(tntPrimed);
 		if (obj instanceof Block block) {
 			BlockData blockData = block.getBlockData();
-			if (blockData instanceof RespawnAnchor  && Compatibility.RESPAWN_ANCHOR.isCompatible()) {
+			if (blockData instanceof RespawnAnchor) {
 				UUID anchorOwner = tntDetection.anchorOwners.get(tntPrimed);
 				return fluffy.getServer().getOfflinePlayer(anchorOwner);
-			} else if (block instanceof Bed && Compatibility.BED.isCompatible()){
+			} else if (block instanceof Bed){
 				UUID bedOwner = tntDetection.bedOwners.get(tntPrimed);
 				return fluffy.getServer().getOfflinePlayer(bedOwner);
 			} else if (block.getType() == Material.FIRE || block.getType() == Material.SOUL_FIRE){
@@ -155,7 +154,7 @@ public class TNTDetection implements Listener {
 				return source;
 			} else if (entity instanceof TNTPrimed tnt) {
 				return tntDetection.tntOwners.get(tnt);
-			} else if (entity instanceof EnderCrystal enderCrystal && Compatibility.ENDER_CRYSTAL.isCompatible()) {
+			} else if (entity instanceof EnderCrystal enderCrystal) {
 				CrystalDetection crystalDetect = fluffy.getCrystalDetection();
 				CrystalDetection.CrystalTag detected = crystalDetect.detectionMap.get(enderCrystal);
 				if (detected == null) {
@@ -196,9 +195,9 @@ public class TNTDetection implements Listener {
 				Location location = block.getLocation();
 				Location blockLocation = location.toBlockLocation();
 				blockPrimers.put(event.getBlock().getLocation().toBlockLocation(), block);
-				if (Compatibility.RESPAWN_ANCHOR.isCompatible() && blockData instanceof RespawnAnchor){
+				if (blockData instanceof RespawnAnchor){
 					blockPrimers.put(blockLocation, block);
-				} if (Compatibility.BED.isCompatible() && blockData instanceof Bed){
+				} if (blockData instanceof Bed){
 					blockPrimers.put(blockLocation, block);
 				}
 			}
@@ -206,7 +205,7 @@ public class TNTDetection implements Listener {
 			if (entity == null){
 				return;
 			}
-			if (entity instanceof EnderCrystal crystal && Compatibility.ENDER_CRYSTAL.isCompatible() ) {
+			if (entity instanceof EnderCrystal crystal) {
 				primers.put(event.getBlock().getLocation().toBlockLocation(), crystal);
 			} else if (entity instanceof TNTPrimed tnt){
 				primers.put(event.getBlock().getLocation().toBlockLocation(), tnt);
@@ -239,42 +238,40 @@ public class TNTDetection implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	private void onTNTSPawn(EntitySpawnEvent event){
-		if (event.getEntity() instanceof TNTPrimed tnt){
+	private void onTNTSPawn(EntitySpawnEvent event) {
+		if (event.getEntity() instanceof TNTPrimed tnt) {
 			Location location = tnt.getLocation().toBlockLocation();
 			tnt.setMetadata("fluffy_location", new FixedMetadataValue(fluffy, location));
 			Entity entity = primers.get(location);
-			if (entity == null){
+			if (entity == null) {
 				Block block = blockPrimers.get(location);
-				if (block == null){
+				if (block == null) {
 					return;
 				}
 				Location mid = block.getLocation().toBlockLocation();
-				if (Compatibility.RESPAWN_ANCHOR.isCompatible()){
-					if (block.getBlockData() instanceof RespawnAnchor) {
-						AnchorDetection anchorDetection = fluffy.getAnchorDetection();
-						AnchorDetection.AnchorTag owner = anchorDetection.detectionMap.get(mid);
-						anchorOwners.put(tnt, owner.owner().getUniqueId());
-						fluffy.getServer().getAsyncScheduler().runDelayed(fluffy,
-								scheduledTask -> {
-									anchorOwners.remove(tnt);
-								}, 5, TimeUnit.SECONDS);
-					}
-				} else if (Compatibility.BED.isCompatible()){
-					if (block.getBlockData() instanceof Bed) {
-						blockPrimers.put(mid, block);
-						BedDetection bedDetection = fluffy.getBedDetection();
-						BedDetection.BedTag owner = bedDetection.detectionMap.get(mid);
-						bedOwners.put(tnt, owner.owner().getUniqueId());
-						fluffy.getServer().getAsyncScheduler().runDelayed(fluffy,
-								scheduledTask -> {
-									bedOwners.remove(tnt);
-								}, 5, TimeUnit.SECONDS);
-					}
-				} else if (block.getBlockData().getMaterial()== Material.FIRE ||
-						block.getBlockData().getMaterial()== Material.SOUL_FIRE){
+				if (block.getBlockData() instanceof RespawnAnchor) {
+					AnchorDetection anchorDetection = fluffy.getAnchorDetection();
+					AnchorDetection.AnchorTag owner = anchorDetection.detectionMap.get(mid);
+					anchorOwners.put(tnt, owner.owner().getUniqueId());
+					fluffy.getServer().getAsyncScheduler().runDelayed(fluffy,
+							scheduledTask -> {
+								anchorOwners.remove(tnt);
+							}, 5, TimeUnit.SECONDS);
+				}
+				if (block.getBlockData() instanceof Bed) {
+					blockPrimers.put(mid, block);
+					BedDetection bedDetection = fluffy.getBedDetection();
+					BedDetection.BedTag owner = bedDetection.detectionMap.get(mid);
+					bedOwners.put(tnt, owner.owner().getUniqueId());
+					fluffy.getServer().getAsyncScheduler().runDelayed(fluffy,
+							scheduledTask -> {
+								bedOwners.remove(tnt);
+							}, 5, TimeUnit.SECONDS);
+				}
+				if (block.getBlockData().getMaterial() == Material.FIRE ||
+						block.getBlockData().getMaterial() == Material.SOUL_FIRE) {
 					@Nullable UUID owner = FluffyCombat.getBlockOwner(block);
-					if (owner == null){
+					if (owner == null) {
 						return;
 					}
 					fireOwners.put(tnt, owner);
@@ -288,10 +285,10 @@ public class TNTDetection implements Listener {
 			}
 			if (entity instanceof TNTPrimed tntPrimed) {
 				tntOwners.put(tnt, tntPrimed);
-				fluffy.getServer().getAsyncScheduler().runDelayed(fluffy, (x)->{
+				fluffy.getServer().getAsyncScheduler().runDelayed(fluffy, (x) -> {
 					tntOwners.remove(tnt);
 				}, 5, TimeUnit.SECONDS);
-			} else if (entity instanceof EnderCrystal crystal){
+			} else if (entity instanceof EnderCrystal crystal) {
 				CrystalDetection.CrystalTag owner = crystalDetection.detectionMap.get(crystal);
 				crystalOwners.put(entity.getUniqueId(), owner.entity().getUniqueId());
 				UUID id = entity.getUniqueId();

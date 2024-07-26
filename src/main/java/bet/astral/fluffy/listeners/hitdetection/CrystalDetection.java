@@ -82,6 +82,10 @@ public class CrystalDetection implements Listener {
 			return;
 		}
 
+		if (attacker.getUniqueId().equals(victim.getUniqueId())){
+			return;
+		}
+
 		ItemStack itemStack = tag.itemStack;
 		BeginCombatListener.handle(victim, attacker, CombatCause.ENDER_CRYSTAL, itemStack);
 		CombatTag combatTag = fluffy.getCombatManager().getLatest(victim);

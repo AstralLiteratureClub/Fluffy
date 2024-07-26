@@ -18,6 +18,7 @@ import bet.astral.fluffy.listeners.combat.mobility.TridentWhileInCombatListener;
 import bet.astral.fluffy.listeners.hitdetection.*;
 import bet.astral.fluffy.manager.*;
 import bet.astral.fluffy.messenger.FluffyMessenger;
+import bet.astral.messenger.v2.paper.PaperMessenger;
 import bet.astral.shine.Shine;
 import bet.astral.shine.ShinePlugin;
 import bet.astral.tuples.Pair;
@@ -192,7 +193,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		clone.setItemMeta(original.getItemMeta());
 
 		ItemMeta meta = original.getItemMeta();
-		if (elytraMode== CombatConfig.ElytraMode.DENY_CHESTPLATE) {
+		if (elytraMode == CombatConfig.ElytraMode.DENY_CHESTPLATE) {
 			Component displayname = meta.displayName();
 			if (displayname == null)
 				displayname = miniMessage.deserialize("<Yellow>Elytra Placeholder").decoration(TextDecoration.ITALIC, false);
@@ -214,7 +215,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 
 		if (elytraMode== CombatConfig.ElytraMode.DENY_CHESTPLATE) {
 			meta.removeAttributeModifier(Attribute.GENERIC_ARMOR);
-			meta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier("FluffyElytraReplacer", -3, AttributeModifier.Operation.ADD_NUMBER));
+			meta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier(new NamespacedKey("fluffy", "elytra_replacer"), -3, AttributeModifier.Operation.ADD_NUMBER));
 			meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 			if (!meta.hasEnchants()) {
 				meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
@@ -259,6 +260,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 
 	@Override
 	public void onEnable() {
+		PaperMessenger.init(this);
 		handler.init();
 		uploadUploads();
 		configuration = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "config.yml"));
@@ -269,7 +271,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		statisticManager = new StatisticManager(this);
 		statisticManager.onEnable();
 
-		shine = ShinePlugin.getPlugin(ShinePlugin.class).getShine();
+		shine = new Shine(this);
 		combatManager = new CombatManager(this);
 		userManager = new UserManager(this);
 		blockUserManager = new BlockUserManager(this);
@@ -322,6 +324,9 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		getServer().getScheduler().runTaskTimerAsynchronously(this, () -> {
 			for (Player player : Bukkit.getOnlinePlayers()) {
 				CombatUser user = userManager.getUser(player.getUniqueId());
+				if (user==null) {
+					continue;
+				}
 				if (user.getLastFireDamage() != null && player.getFireTicks() == 0) {
 					user.setLastFireDamage(null);
 				}

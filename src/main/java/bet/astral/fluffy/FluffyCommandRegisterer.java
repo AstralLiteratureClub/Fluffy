@@ -25,6 +25,11 @@ public class FluffyCommandRegisterer implements BootstrapCommandRegisterer<Comma
 				.executionCoordinator(ExecutionCoordinator.asyncCoordinator())
 				.buildBootstrapped(context);
 		this.messenger = messenger;
+		try {
+			registerCommands("bet.astral.fluffy.commands.commands");
+		} catch (Exception e){
+			logger.error("e: ", e);
+		}
 	}
 
 	@Override

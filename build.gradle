@@ -64,6 +64,7 @@ shadowJar {
     archiveClassifier = null
     relocate 'bet.astral.messenger', 'bet.astral.fluffy.libs.messenger'
     relocate 'bet.astral.tuples', 'bet.astral.fluffy.libs.tuples'
+    relocate 'bet.astral.shine', 'bet.astral.fluffy.libs.shine'
     relocate 'bet.astral.cloudplusplus', 'bet.astral.fluffy.libs.cloudplusplus'
     relocate 'bet.astral.guiman', 'bet.astral.fluffy.libs.guiman'
 }

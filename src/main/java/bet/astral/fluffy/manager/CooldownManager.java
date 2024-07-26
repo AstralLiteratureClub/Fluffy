@@ -12,6 +12,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
@@ -49,8 +50,12 @@ public class CooldownManager implements Listener {
 		}
 		@SuppressWarnings("removal") FileConfiguration configuration = fluffy.getConfig();
 		List<Map<?, ?>> cooldownListMap = configuration.getMapList("cooldowns.cooldowns");
+		Registry<Material> materials = Registry.MATERIAL;
 		for (Map<?, ?> cooldownMap : cooldownListMap){
-			Material material = Material.valueOf((String) cooldownMap.get("material"));
+			Material material = materials.get(Objects.requireNonNull(NamespacedKey.fromString((String) cooldownMap.get("material"))));
+			if (material==null){
+				continue;
+			}
 			Object objTime = cooldownMap.get("cooldown");
 			double seconds;
 			if (objTime instanceof Integer){
@@ -92,7 +97,6 @@ public class CooldownManager implements Listener {
 		}));
 	}
 
-
 	@EventHandler
 	public void onEat(PlayerItemConsumeEvent event) {
 		if (!fluffy.getCombatConfig().isCustomCooldowns()){
@@ -107,7 +111,6 @@ public class CooldownManager implements Listener {
 					return;
 				}
 				Cooldown cooldown = cooldowns.get(material);
-				player.sendMessage("You have cooldown: " + cooldown.hasCooldown(player) + ".");
 				if (!cooldown.hasCooldown(player)) {
 					cooldown.handleCooldown(player);
 					if (cooldown.sound() != null){

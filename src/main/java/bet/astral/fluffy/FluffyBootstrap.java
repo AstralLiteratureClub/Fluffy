@@ -14,7 +14,9 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
@@ -25,8 +27,19 @@ public class FluffyBootstrap implements PluginBootstrap {
 	private FluffyCommandRegisterer commandRegisterer;
 	@Override
 	public void bootstrap(@NotNull BootstrapContext context) {
-		File file = new File(context.getDataDirectory().toFile(), "messages/en_us.json");
 		try {
+			File file = new File(context.getDataDirectory().toFile(), "messages/en_us.json");
+			if (!file.exists()){
+				if (!file.getParentFile().exists()){
+					file.getParentFile().mkdirs();
+				}
+				file.createNewFile();
+			}
+			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+			writer.write(Translations.GSON.toJson(Translations.getDefaults()));
+			writer.flush();
+			writer.close();
+
 			LanguageSource source = FileLanguageSource.gson(messenger, Locale.US, file, MiniMessage.miniMessage());
 			LanguageTable table = LanguageTable.of(source);
 			messenger.setDefaultLocale(source);
