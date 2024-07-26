@@ -111,26 +111,22 @@ public class CombatTag {
 
 
 	@ApiStatus.Internal
-	@ApiStatus.NonExtendable
-	public boolean isDeadVictim() {
+	public final boolean isDeadVictim() {
 		return isDeadVictim;
 	}
 
 	@ApiStatus.Internal
-	@ApiStatus.NonExtendable
 	public boolean isDeadAttacker() {
 		return isDeadAttacker;
 	}
 
 	@ApiStatus.Internal
-	@ApiStatus.NonExtendable
-	public void setDeadVictim(boolean deadVictim) {
+	public final void setDeadVictim(boolean deadVictim) {
 		isDeadVictim = deadVictim;
 	}
 
 	@ApiStatus.Internal
-	@ApiStatus.NonExtendable
-	public void setDeadAttacker(boolean deadAttacker) {
+	public final void setDeadAttacker(boolean deadAttacker) {
 		isDeadAttacker = deadAttacker;
 	}
 
@@ -156,8 +152,8 @@ public class CombatTag {
 		return isActive(player.getUniqueId());
 	}
 
-	public CombatUser getUser(Player victim) {
-		return victim.getUniqueId().equals(this.victim.getUniqueId()) ? this.victim : attacker;
+	public CombatUser getUser(Player player) {
+		return player.getUniqueId().equals(this.victim.getUniqueId()) ? this.victim : attacker;
 	}
 
 	public double getDamageDealt(OfflinePlayer player){
@@ -169,5 +165,12 @@ public class CombatTag {
 		} else {
 			this.attackerDamageDealt = amount;
 		}
+	}
+
+	public CombatUser getOpposite(@NotNull Player player){
+		return player.getUniqueId().equals(this.victim.getUniqueId()) ? this.attacker : victim;
+	}
+	public CombatUser getOpposite(@NotNull UUID uniqueId){
+		return uniqueId.equals(this.victim.getUniqueId()) ? this.attacker : victim;
 	}
 }

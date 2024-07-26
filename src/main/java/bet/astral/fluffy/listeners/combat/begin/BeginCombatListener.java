@@ -7,11 +7,11 @@ import bet.astral.fluffy.api.CombatUser;
 import bet.astral.fluffy.events.*;
 import bet.astral.fluffy.manager.BlockUserManager;
 import bet.astral.fluffy.manager.CombatManager;
-import bet.astral.fluffy.messenger.MessageKey;
 import bet.astral.fluffy.messenger.Placeholders;
 import bet.astral.fluffy.FluffyCombat;
-import bet.astral.messenger.Messenger;
-import bet.astral.messenger.placeholder.Placeholder;
+import bet.astral.fluffy.messenger.Translations;
+import bet.astral.messenger.v2.Messenger;
+import bet.astral.messenger.v2.placeholder.Placeholder;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -74,14 +74,14 @@ public class BeginCombatListener implements Listener {
 		}
 		FluffyCombat fluffy = FluffyCombat.getPlugin(FluffyCombat.class);
 		CombatManager cM = fluffy.getCombatManager();
-		Messenger<?> mm = fluffy.getMessageManager();
+		Messenger mm = fluffy.getMessenger();
 		List<Placeholder> placeholders = new LinkedList<>(Placeholders.combatPlaceholders(victim, attacker, combatCause, itemStack));
 		if (!cM.hasTags(victim)) {
-			mm.message(victim, MessageKey.COMBAT_ENTER_VICTIM, placeholders);
+			mm.message(victim, Translations.COMBAT_ENTER_VICTIM, placeholders);
 		}
 		if (!cM.hasTags(attacker)) {
 			if (attacker instanceof Player attackerPlayer) {
-				mm.message(attackerPlayer, MessageKey.COMBAT_ENTER_ATTACKER, placeholders);
+				mm.message(attackerPlayer, Translations.COMBAT_ENTER_ATTACKER, placeholders);
 			}
 		}
 
@@ -145,10 +145,10 @@ public class BeginCombatListener implements Listener {
 		FluffyCombat fluffy = FluffyCombat.getPlugin(FluffyCombat.class);
 
 		CombatManager cM = fluffy.getCombatManager();
-		Messenger<?> mm = fluffy.getMessageManager();
+		Messenger mm = fluffy.getMessenger();
 		if (!cM.hasTags(victim)) {
 			Placeholder[] placeholders = Placeholders.combatPlaceholders(victim, null, combatCause, itemStack).toArray(Placeholder[]::new);
-			mm.message(victim, MessageKey.COMBAT_ENTER_VICTIM, placeholders);
+			mm.message(victim, Translations.COMBAT_ENTER_VICTIM, placeholders);
 		}
 		CombatTag tag = cM.getTag(victim, attacker);
 		if (tag == null) {

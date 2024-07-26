@@ -3,22 +3,22 @@ package bet.astral.fluffy.manager;
 import bet.astral.fluffy.events.CombatTagEndEvent;
 import bet.astral.fluffy.configs.CombatConfig;
 import bet.astral.fluffy.events.player.PlayerCombatEndEvent;
-import bet.astral.fluffy.messenger.MessageKey;
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.BlockCombatTag;
 import bet.astral.fluffy.api.BlockCombatUser;
 import bet.astral.fluffy.api.CombatTag;
 import bet.astral.fluffy.api.CombatUser;
 import bet.astral.fluffy.events.player.PlayerCombatFullEndEvent;
+import bet.astral.fluffy.messenger.Translations;
 import bet.astral.shine.Shine;
 import bet.astral.shine.ShineColor;
+import bet.astral.tuples.Quartet;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import org.javatuples.Quartet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -95,7 +95,7 @@ public final class CombatManager {
 								userTags.get(ids[1]).add(tag);
 
 								// Checking combat timers
-								combatEnded.put(tag, new Quartet<>(tag.getVictim().getUniqueId(), tag.getVictimTicksLeft()<0,
+								combatEnded.put(tag, Quartet.immutable(tag.getVictim().getUniqueId(), tag.getVictimTicksLeft()<0,
 										tag.getAttacker() instanceof BlockCombatUser ? null : tag.getAttacker().getUniqueId(), tag.getAttackerTicksLeft()<0));
 
 								// Setting the victim's latest tag
@@ -160,14 +160,14 @@ public final class CombatManager {
 						Set<String> keys = tags.keySet();
 						if (victimPlayer.isOnline()) {
 							if (keys.isEmpty() || keys.stream().noneMatch(id -> id.contains(victimPlayer.getUniqueId().toString()))) {
-								main.getMessageManager().message((Player) victimPlayer, MessageKey.COMBAT_END);
+								main.getMessenger().message(victimPlayer, Translations.COMBAT_END);
 							}
 						}
 						if (!(attacker instanceof BlockCombatUser)) {
 							OfflinePlayer attackerPlayer = attacker.getPlayer();
 							if (attackerPlayer.isOnline()) {
 								if (keys.isEmpty() || keys.stream().noneMatch(id -> id.contains(attackerPlayer.getUniqueId().toString()))) {
-									main.getMessageManager().message((Player) attackerPlayer, MessageKey.COMBAT_END);
+									main.getMessenger().message(attackerPlayer, Translations.COMBAT_END);
 								}
 							}
 						}
@@ -177,17 +177,17 @@ public final class CombatManager {
 
 					Map<UUID, Boolean> fullyEnded = new HashMap<>();
 					combatEnded.forEach((key, value)->{
-						UUID victim = value.getValue0();
-						UUID attacker = value.getValue2();
-						fullyEnded.put(victim, value.getValue1());
-						if (value.getValue1()){
+						UUID victim = value.getFirst();
+						UUID attacker = value.getThird();
+						fullyEnded.put(victim, value.getSecond());
+						if (value.getSecond()){
 							OfflinePlayer player = main.getServer().getOfflinePlayer(victim);
 							PlayerCombatEndEvent event = new PlayerCombatEndEvent(main, key, player);
 							event.callEvent();
 						}
 						if (attacker != null) {
-							fullyEnded.put(attacker, value.getValue3());
-							if (value.getValue3()) {
+							fullyEnded.put(attacker, value.getFourth());
+							if (value.getFourth()) {
 								OfflinePlayer player = main.getServer().getOfflinePlayer(attacker);
 								PlayerCombatEndEvent event = new PlayerCombatEndEvent(main, key, player);
 								event.callEvent();

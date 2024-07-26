@@ -1,6 +1,7 @@
 package bet.astral.fluffy.statistic;
 
-import bet.astral.messenger.placeholder.PlaceholderValue;
+import bet.astral.messenger.v2.placeholder.values.PlaceholderValue;
+import net.kyori.adventure.text.Component;
 import org.incendo.cloud.description.Description;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,8 +21,8 @@ public interface Statistic extends PlaceholderValue {
 	}
 
 	@Override
-	default @NotNull String getValue() {
-		return getName();
+	default @NotNull Component getValue() {
+		return Component.text(getName());
 	}
 
 	class StatisticImpl implements Statistic {

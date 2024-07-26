@@ -7,8 +7,8 @@ import bet.astral.fluffy.api.CombatUser;
 import bet.astral.fluffy.configs.CombatConfig;
 import bet.astral.fluffy.events.CombatTagEndEvent;
 import bet.astral.fluffy.manager.CombatManager;
-import fr.skytasul.glowingentities.GlowingBlocks;
-import fr.skytasul.glowingentities.GlowingEntities;
+import bet.astral.shine.Shine;
+import bet.astral.shine.receiver.ShineReceiver;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -54,10 +54,9 @@ public class CombatEndListener implements Listener {
 		CombatUser victim = tag.getVictim();
 		CombatUser attacker = tag.getAttacker();
 		if (attacker instanceof BlockCombatUser blockAttacker){
-			if (victim.getPlayer() instanceof Player player){
-				GlowingBlocks glowingBlocks = fluffy.getGlowingBlocks();
+			if (victim.getPlayer() instanceof Player player) {
 				try {
-					glowingBlocks.unsetGlowing(blockAttacker.getLocation(), player);
+					fluffy.getShine().removeGlowing(ShineReceiver.of(blockAttacker.getBlock()), player);
 				} catch (ReflectiveOperationException e) {
 					throw new RuntimeException(e);
 				}
@@ -72,10 +71,10 @@ public class CombatEndListener implements Listener {
 			OfflinePlayer attackerOP = attacker.getPlayer();
 			OfflinePlayer victimOP = victim.getPlayer();
 			if (victimOP instanceof Player victimP && attackerOP instanceof Player attackerP) {
-				GlowingEntities glowingEntities = fluffy.getGlowingEntities();
+				Shine glowingEntities = fluffy.getShine();
 				try {
-					glowingEntities.unsetGlowing(attackerP, victimP);
-					glowingEntities.unsetGlowing(victimP, attackerP);
+					glowingEntities.removeGlowing(attackerP, victimP);
+					glowingEntities.removeGlowing(victimP, attackerP);
 				} catch (ReflectiveOperationException e) {
 					throw new RuntimeException(e);
 				}

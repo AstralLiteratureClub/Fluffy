@@ -6,7 +6,6 @@ import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.events.AccountLoadEvent;
 import bet.astral.fluffy.statistic.Account;
 import bet.astral.fluffy.statistic.AccountImpl;
-import net.minecraft.world.level.entity.LevelCallback;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;

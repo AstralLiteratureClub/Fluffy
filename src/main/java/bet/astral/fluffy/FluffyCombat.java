@@ -1,13 +1,9 @@
 package bet.astral.fluffy;
 
+import bet.astral.cloudplusplus.paper.bootstrap.BootstrapHandler;
 import bet.astral.fluffy.api.CombatUser;
-import bet.astral.fluffy.commands.EditStatisticsCommand;
-import bet.astral.fluffy.commands.StatisticCommand;
 import bet.astral.fluffy.configs.CombatConfig;
 import bet.astral.fluffy.database.CoreDatabase;
-import bet.astral.fluffy.database.sql.mysql.MySQLStatisticDatabase;
-import bet.astral.fluffy.hooks.PlaceholderAPIHook;
-import bet.astral.fluffy.listeners.AccountLoadListener;
 import bet.astral.fluffy.listeners.ConnectionListener;
 import bet.astral.fluffy.listeners.ArmorChangeListener;
 import bet.astral.fluffy.listeners.block.LiquidOwnerListener;
@@ -21,26 +17,17 @@ import bet.astral.fluffy.listeners.combat.mobility.FlightWhileInCombatListener;
 import bet.astral.fluffy.listeners.combat.mobility.TridentWhileInCombatListener;
 import bet.astral.fluffy.listeners.hitdetection.*;
 import bet.astral.fluffy.manager.*;
-import bet.astral.fluffy.messenger.MessageKey;
-import bet.astral.fluffy.statistic.Account;
-import bet.astral.fluffy.statistic.Statistic;
-import bet.astral.fluffy.statistic.Statistics;
-import bet.astral.fluffy.utils.Pair;
-import bet.astral.messenger.Messenger;
-import bet.astral.messenger.adventure.AdventurePlaceholderManager;
-import bet.astral.messenger.message.adventure.serializer.ComponentTypeSerializer;
-import bet.astral.messenger.placeholder.PlaceholderManager;
+import bet.astral.fluffy.messenger.FluffyMessenger;
+import bet.astral.shine.Shine;
+import bet.astral.shine.ShinePlugin;
+import bet.astral.tuples.Pair;
 import com.jeff_media.armorequipevent.ArmorEquipEvent;
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
-import fr.skytasul.glowingentities.GlowingBlocks;
-import fr.skytasul.glowingentities.GlowingEntities;
 import lombok.AccessLevel;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.Validate;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -63,8 +50,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.incendo.cloud.SenderMapper;
-import org.incendo.cloud.execution.ExecutionCoordinator;
 import org.incendo.cloud.paper.PaperCommandManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -72,7 +57,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static bet.astral.fluffy.utils.Resource.loadResourceAsTemp;
@@ -88,6 +72,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 	public static ItemStack elytraReplacer = new ItemStack(Material.LEATHER_CHESTPLATE);
 	@Getter(AccessLevel.NONE)
 	private static Map<Chunk, Map<Location, Pair<UUID, Material>>> blockOwners = new HashMap<>();
+
 	public static Pair<UUID, Material> getBlockData(Block block){
 		if (blockOwners.get(block.getChunk()) == null){
 			return null;
@@ -97,7 +82,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		if (data == null){
 			return null;
 		}
-		if (data.value2() != block.getType()){
+		if (data.getSecond() != block.getType()){
 			return null;
 		}
 		return data;
@@ -110,10 +95,10 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		if (blockData == null){
 			return null;
 		}
-		if (blockData.value2() != block.getType()){
+		if (blockData.getSecond() != block.getType()){
 			return null;
 		}
-		return blockData.value();
+		return blockData.getFirst();
 	}
 	public static @Nullable Block findNearestOwnedBlock(Player player, Material... allowedMaterials) {
 		Validate.notNull(player, "Player cannot be null.");
@@ -164,11 +149,11 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		List<Block> remove = new ArrayList<>();
 		if (blockOwners.get(chunk) != null) {
 			for (Location location : blockOwners.get(chunk).keySet()) {
-				if (blockOwners.get(chunk).get(location).value2()!=location.getBlock().getType()){
-					if (blockOwners.get(chunk).get(location).value2()==Material.FIRE && location.getBlock().getType() == Material.SOUL_FIRE){
+				if (blockOwners.get(chunk).get(location).getSecond()!=location.getBlock().getType()){
+					if (blockOwners.get(chunk).get(location).getSecond()==Material.FIRE && location.getBlock().getType() == Material.SOUL_FIRE){
 						continue;
 					}
-					if (blockOwners.get(chunk).get(location).value2()==Material.SOUL_FIRE && location.getBlock().getType() == Material.FIRE){
+					if (blockOwners.get(chunk).get(location).getSecond()==Material.SOUL_FIRE && location.getBlock().getType() == Material.FIRE){
 						continue;
 					}
 					remove.add(location.getBlock());
@@ -181,11 +166,11 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 	}
 	public static void setBlockOwner(OfflinePlayer player, Block block){
 		blockOwners.putIfAbsent(block.getChunk(), new HashMap<>());
-		blockOwners.get(block.getChunk()).put(block.getLocation(), new Pair<>(player.getUniqueId(), block.getType()));
+		blockOwners.get(block.getChunk()).put(block.getLocation(), Pair.immutable(player.getUniqueId(), block.getType()));
 	}
 	public static void setBlockOwner(OfflinePlayer player, Block block, Material material) {
 		blockOwners.putIfAbsent(block.getChunk(), new HashMap<>());
-		blockOwners.get(block.getChunk()).put(block.getLocation(), new Pair<>(player.getUniqueId(), material));
+		blockOwners.get(block.getChunk()).put(block.getLocation(), Pair.immutable(player.getUniqueId(), material));
 	}
 
 
@@ -245,7 +230,8 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 	public static boolean isPaper = false;
 	public static boolean isStopping = false;
 	public static boolean debug = false;
-	private Messenger<FluffyCombat> messageManager;
+	private Shine shine;
+	private FluffyMessenger messenger;
 	private CombatManager combatManager;
 	private UserManager userManager;
 	private BlockUserManager blockUserManager;
@@ -254,9 +240,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 	private CombatLogManager combatLogManager;
 	private StatisticManager statisticManager;
 	private PaperCommandManager<CommandSender> commandManager;
-
 	private CombatConfig combatConfig;
-
 	private AnchorDetection anchorDetection;
 	private BedDetection bedDetection;
 	private CrystalDetection crystalDetection;
@@ -264,117 +248,28 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 	private MagicDetection magicDetection;
 	private LiquidOwnerListener lavaDetection;
 	private FireDetection fireDetection;
-
 	private FileConfiguration configuration;
-
-	@Getter
 	private CoreDatabase database;
+	private BootstrapHandler handler;
 
-	private GlowingEntities glowingEntities;
-	private GlowingBlocks glowingBlocks;
-	private HikariDataSource dataSource;
+	public FluffyCombat(@NotNull BootstrapHandler handler, FluffyMessenger messenger) {
+		this.handler = handler;
+		this.messenger = messenger;
+	}
 
 	@Override
 	public void onEnable() {
+		handler.init();
 		uploadUploads();
 		configuration = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "config.yml"));
 		combatConfig = new CombatConfig(this);
 		reloadConfig();
 		debug = getConfig().getBoolean("debug");
-
-		commandManager = new PaperCommandManager<>(
-				this,
-				ExecutionCoordinator.asyncCoordinator(),
-				SenderMapper.identity());
-		commandManager.registerBrigadier();
-		commandManager.registerAsynchronousCompletions();
-
-		new StatisticCommand(this, commandManager);
-		new EditStatisticsCommand(this, commandManager);
-
-		FileConfiguration configuration = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "messages.yml"));
-		messageManager = new Messenger<>(this, commandManager, new HashMap<>(), new ComponentTypeSerializer(), configuration);
-		PlaceholderManager placeholderManager = new AdventurePlaceholderManager();
-		placeholderManager.setDefaults(placeholderManager.loadPlaceholders("placeholders", configuration));
-		messageManager.setPlaceholderManager(placeholderManager);
-
-		// Just loading the plugin-specific messages.
-		MessageKey.loadMessages(messageManager);
-
 		database = new CoreDatabase(this);
-
-		final HikariConfig config = new HikariConfig();
-		config.setConnectionTimeout(3000);
-		config.setMaximumPoolSize(15);
-		config.setPoolName("FluffyStats");
-
-		config.setDriverClassName("com.mysql.cj.jdbc.Driver");
-		config.setJdbcUrl(getConfig().getString("database.url"));
-		config.setPassword(getConfig().getString("database.password"));
-		config.setUsername(getConfig().getString("database.username"));
-
-		dataSource = new HikariDataSource(config);
-
-		Function<org.javatuples.Pair<Account, Map<String, Integer>>, Account> function = (pair)-> {
-			Account account = pair.getValue0();
-			Map<String, Integer> stats = pair.getValue1();
-			for (Map.Entry<String, Integer> entry : stats.entrySet()) {
-				Statistic statistic = Statistics.valueOf(entry.getKey());
-				if (statistic == null){
-					getComponentLogger().info("Couldn't find statistic for name "+ entry.getKey());
-					continue;
-				}
-				account.set(statistic, entry.getValue());
-			}
-			return account;
-		};
-		database.addDatabase(
-				new MySQLStatisticDatabase(this,
-						new Statistic[]{
-								Statistics.KILLS_GLOBAL,
-								Statistics.KILLS_CRYSTAL,
-								Statistics.KILLS_ANCHOR,
-								Statistics.KILLS_BED,
-								Statistics.KILLS_TNT
-						},
-						dataSource,
-						"fluffy_kills",
-						function
-				)
-		);
-		database.addDatabase(
-				new MySQLStatisticDatabase(this,
-						new Statistic[]{
-								Statistics.DEATHS_GLOBAL,
-								Statistics.DEATHS_CRYSTAL,
-								Statistics.DEATHS_ANCHOR,
-								Statistics.DEATHS_BED,
-								Statistics.DEATHS_TNT
-						},
-						dataSource,
-						"fluffy_deaths",
-						function
-				)
-		);
-		database.addDatabase(
-				new MySQLStatisticDatabase(this,
-						new Statistic[]{
-								Statistics.STREAK_KILLS,
-								Statistics.STREAK_DEATHS,
-						},
-						dataSource,
-						"fluffy_streak",
-						function
-				)
-		);
-
-
-
 		statisticManager = new StatisticManager(this);
 		statisticManager.onEnable();
 
-		glowingEntities = new GlowingEntities(this); // required in combat manager
-		glowingBlocks = new GlowingBlocks(this); // required in combat manager
+		shine = ShinePlugin.getPlugin(ShinePlugin.class).getShine();
 		combatManager = new CombatManager(this);
 		userManager = new UserManager(this);
 		blockUserManager = new BlockUserManager(this);
@@ -382,11 +277,6 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		combatLogManager = new CombatLogManager();
 		combatManager.onEnable();
 		userManager.onEnable();
-		new CMDDebug(this).registerCommand();
-		new CMDReload(this).registerCommand();
-		new CMDPotions(this).registerCommand();
-		new CMDGlow(this).registerCommand();
-		new CMDBlockOwner(this).registerCommand();
 		registerListeners(this);
 		registerListeners(cooldownManager);
 		registerListeners(statisticManager);
@@ -402,7 +292,6 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		registerListeners(new LiquidOwnerListener(this));
 		registerListeners(new ConnectionListener(this));
 		registerListeners(new ArmorChangeListener(this));
-		registerListeners(new AccountLoadListener(this));
 
 		ArmorEquipEvent.registerListener(this);
 
@@ -467,11 +356,6 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		userManager.onDisable();
 		combatManager.onDisable();
 		statisticManager.onDisable();
-		glowingEntities.disable();
-		glowingBlocks.disable();
-		if (dataSource != null){
-			dataSource.close();
-		}
 	}
 
 
@@ -547,14 +431,5 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 
 	private FileConfiguration getConfig(File file){
 		return YamlConfiguration.loadConfiguration(file);
-	}
-
-	@Deprecated(forRemoval = true)
-	public Messenger<FluffyCombat> getMessageManager() {
-		return messageManager;
-	}
-
-	public Messenger<FluffyCombat> messenger(){
-		return messageManager;
 	}
 }

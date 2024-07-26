@@ -1,6 +1,6 @@
 package bet.astral.fluffy.listeners.combat;
 
-import fr.skytasul.glowingentities.GlowingBlocks;
+import bet.astral.shine.receiver.ShineReceiver;
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.BlockCombatUser;
 import bet.astral.fluffy.manager.BlockUserManager;
@@ -29,9 +29,8 @@ public class BreakCombatTaggedBlockListener implements Listener {
 		}
 		blockCombatUser.setAlive(event.isCancelled());
 		if (fluffy.getCombatConfig().isCombatGlow()) {
-			GlowingBlocks glowingBlocks = fluffy.getGlowingBlocks();
 			try {
-				glowingBlocks.unsetGlowing(event.getBlock(), event.getPlayer());
+				fluffy.getShine().removeGlowing(ShineReceiver.of(event.getBlock()), event.getPlayer());
 			} catch (ReflectiveOperationException e) {
 				throw new RuntimeException(e);
 			}

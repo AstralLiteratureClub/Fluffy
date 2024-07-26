@@ -2,8 +2,8 @@ package bet.astral.fluffy.listeners.combat;
 
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.manager.CombatManager;
-import bet.astral.fluffy.messenger.MessageKey;
-import bet.astral.messenger.placeholder.LegacyPlaceholder;
+import bet.astral.fluffy.messenger.Translations;
+import bet.astral.messenger.v2.placeholder.Placeholder;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -34,7 +34,7 @@ public class ExecuteCommandWhileInCombatListener implements Listener {
 					)
 			) {
 				event.setCancelled(true);
-				fluffy.getMessageManager().message(player, MessageKey.COMBAT_ILLEGAL_COMMAND, new LegacyPlaceholder("command", event.getMessage()));
+				fluffy.getMessenger().message(player, Translations.COMBAT_CANNOT_USE_COMMANDS, Placeholder.of("command", event.getMessage()));
 			}
 		}
 	}

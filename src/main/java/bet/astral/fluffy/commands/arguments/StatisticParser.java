@@ -1,6 +1,5 @@
 package bet.astral.fluffy.commands.arguments;
 
-import bet.astral.fluffy.commands.suggestions.TooltipSuggestion;
 import bet.astral.fluffy.statistic.Statistic;
 import bet.astral.fluffy.statistic.StatisticDescription;
 import bet.astral.fluffy.statistic.Statistics;
@@ -61,7 +60,7 @@ public class StatisticParser<C> implements ArgumentParser<C, Statistic>, Suggest
 						if (description instanceof RichDescription richDescription) {
 							return ComponentTooltipSuggestion.suggestion(val.getName(), richDescription.contents());
 						}
-						return new TooltipSuggestion(val.getName(), description.textDescription());
+						return Suggestion.suggestion(val.getName());
 					} else {
 						return Suggestion.suggestion(val.getName());
 					}

@@ -1,12 +1,13 @@
 package bet.astral.fluffy.statistic;
 
-import bet.astral.messenger.placeholder.Placeholder;
-import bet.astral.messenger.placeholder.PlaceholderList;
-import bet.astral.messenger.placeholder.Placeholderable;
-import bet.astral.messenger.utils.PlaceholderUtils;
+import bet.astral.messenger.v2.placeholder.Placeholder;
+import bet.astral.messenger.v2.placeholder.PlaceholderList;
+import bet.astral.messenger.v2.placeholder.Placeholderable;
+import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -28,13 +29,12 @@ public interface Account extends Placeholderable {
 
 
 	@Override
-	default Collection<Placeholder> asPlaceholder(String s) {
+	default @NotNull List<Placeholder> toPlaceholders(String s) {
 		PlaceholderList placeholders = new PlaceholderList();
 		for (Map.Entry<Statistic, Integer> entry : getAllStatistics().entrySet()){
 			Statistic statistic = entry.getKey();
 			int amount = entry.getValue() != null ? entry.getValue() : 0;
-			placeholders.add(PlaceholderUtils.createPlaceholder(s, statistic.getName(), amount));
-			System.out.println(s+"_"+statistic.getName()+ " "+ amount);
+			placeholders.add(Placeholder.of(s, statistic.getName(), Component.text(amount)));
 		}
 		return placeholders;
 	}

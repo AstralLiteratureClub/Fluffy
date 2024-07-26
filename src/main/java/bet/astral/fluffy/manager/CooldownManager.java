@@ -4,9 +4,9 @@ import bet.astral.fluffy.cooldowns.Cooldown;
 import bet.astral.fluffy.cooldowns.EnderPearlCooldown;
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.events.player.PlayerCombatFullEndEvent;
-import bet.astral.fluffy.messenger.MessageKey;
-import bet.astral.messenger.message.message.IMessage;
-import bet.astral.messenger.placeholder.LegacyPlaceholder;
+import bet.astral.fluffy.messenger.Translations;
+import bet.astral.messenger.v2.placeholder.Placeholder;
+import bet.astral.messenger.v2.translation.TranslationKey;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -123,16 +123,12 @@ public class CooldownManager implements Listener {
 				} else {
 					event.setCancelled(true);
 					if (cooldown.message()){
-						IMessage<?, Component> message = fluffy.getMessageManager().getMessage(MessageKey.itemSpecificItemCooldown(material));
-						if (message == null){
-							fluffy.getMessageManager()
-									.message(player, MessageKey.COMBAT_COOLDOWN_DEFAULT,
-											new LegacyPlaceholder("cooldown", String.valueOf(cooldown.seconds())));
-						} else {
-							fluffy.getMessageManager()
-									.message(player, MessageKey.itemSpecificItemCooldown(material),
-											new LegacyPlaceholder("cooldown", String.valueOf(cooldown.seconds())));
+						TranslationKey key = TranslationKey.of("listener.cooldown."+ cooldown.material().getKey());
+						if (fluffy.getMessenger().getBaseComponent(key, Locale.US)==null){
+							key = Translations.LISTENER_COOLDOWN_DEFAULT;
 						}
+						fluffy.getMessenger()
+								.message(player, key, Placeholder.of("cooldown", cooldown.seconds()), Placeholder.of("type", Component.translatable(cooldown.material().translationKey())));
 					}
 				}
 			}
@@ -165,17 +161,13 @@ public class CooldownManager implements Listener {
 							);
 							player.playSound(sound);
 						}
-						if (cooldown.message()){
-							IMessage<?, Component> message = fluffy.getMessageManager().getMessage(MessageKey.itemSpecificItemCooldown(material));
-							if (message == null){
-								fluffy.getMessageManager()
-										.message(player, MessageKey.COMBAT_COOLDOWN_DEFAULT,
-												new LegacyPlaceholder("cooldown", String.valueOf(cooldown.seconds())));
-							} else {
-								fluffy.getMessageManager()
-										.message(player, MessageKey.itemSpecificItemCooldown(material),
-												new LegacyPlaceholder("cooldown", String.valueOf(cooldown.seconds())));
+						if (cooldown.message()) {
+							TranslationKey key = TranslationKey.of("listener.cooldown." + cooldown.material().getKey());
+							if (fluffy.getMessenger().getBaseComponent(key, Locale.US) == null) {
+								key = Translations.LISTENER_COOLDOWN_DEFAULT;
 							}
+							fluffy.getMessenger()
+									.message(player, key, Placeholder.of("cooldown", cooldown.seconds()), Placeholder.of("type", Component.translatable(cooldown.material().translationKey())));
 						}
 					} else {
 						event.setCancelled(true);

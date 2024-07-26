@@ -4,9 +4,9 @@ import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.CombatTag;
 import bet.astral.fluffy.api.CombatUser;
 import bet.astral.fluffy.statistic.Account;
-import bet.astral.messenger.Messenger;
-import bet.astral.messenger.placeholder.PlaceholderList;
-import bet.astral.messenger.utils.PlaceholderUtils;
+import bet.astral.messenger.v2.Messenger;
+import bet.astral.messenger.v2.placeholder.Placeholder;
+import bet.astral.messenger.v2.placeholder.PlaceholderList;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -34,11 +34,11 @@ public class DeathListener implements Listener {
 	}
 
 	private final FluffyCombat fluffy;
-	private final Messenger<FluffyCombat> msg;
+	private final Messenger msg;
 
 	public DeathListener(FluffyCombat fluffy) {
 		this.fluffy = fluffy;
-		msg = fluffy.getMessageManager();
+		msg = fluffy.getMessenger();
 	}
 
 	@EventHandler
@@ -55,7 +55,7 @@ public class DeathListener implements Listener {
 		getLogger().info("Died due to " + damageEvent.getCause().name());
 
 		String messageKey;
-		PlaceholderList placeholders = new PlaceholderList(PlaceholderUtils.createPlaceholders("victim", (LivingEntity) player));
+//		PlaceholderList placeholders = new PlaceholderList(Placeholder.of("victim", (LivingEntity) player));
 		ItemStack weapon = null;
 
 
