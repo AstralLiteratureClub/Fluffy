@@ -1,6 +1,6 @@
 package bet.astral.fluffy.messenger;
 
-import bet.astral.messenger.v2.paper.PaperMessenger;
+import bet.astral.messenger.v3.minecraft.paper.PaperMessenger;
 import org.slf4j.Logger;
 
 import java.util.Locale;

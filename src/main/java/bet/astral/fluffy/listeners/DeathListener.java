@@ -2,10 +2,15 @@ package bet.astral.fluffy.listeners;
 
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.BlockCombatUser;
+import bet.astral.fluffy.api.CombatCause;
 import bet.astral.fluffy.api.CombatTag;
+import bet.astral.fluffy.api.CombatUser;
 import bet.astral.fluffy.manager.CombatManager;
+import bet.astral.fluffy.messenger.DeathTranslations;
 import bet.astral.fluffy.statistic.Account;
 import bet.astral.fluffy.statistic.Statistics;
+import bet.astral.messenger.v2.placeholder.collection.PlaceholderMap;
+import bet.astral.messenger.v2.translation.TranslationKey;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -45,23 +50,30 @@ public class DeathListener implements Listener {
 		} else {
 			weapon = null;
 		}
-
 		Account victimAcc = fluffy.getStatisticManager().get(player);
 		Account attackerAcc = tag != null ? !isBlock ? fluffy.getStatisticManager().get(isVictim ? tag.getAttacker().getUniqueId() : tag.getVictim().getUniqueId()) : null : null;
 		victimAcc.increment(Statistics.DEATHS_GLOBAL);
-		if (attackerAcc != null){
-			attackerAcc.increment(Statistics.KILLS_GLOBAL);
-		}
 
-		String messageKey;
-		switch (cause) {
-			case KILL -> {
-				// NONE
+		PlaceholderMap placeholders = new PlaceholderMap();
+
+		TranslationKey deathMessage = null;
+		if (tag != null) {
+			if (attackerAcc != null) {
+				attackerAcc.increment(Statistics.KILLS_GLOBAL);
 			}
-			case WORLD_BORDER -> {
-				// NONE
-			}
-			case CONTACT -> {
+
+			final CombatUser victimUser = isVictim ? tag.getVictim() : tag.getAttacker();
+			final CombatUser attackerUser = !isVictim ? tag.getAttacker() : tag.getVictim();
+			final CombatCause lastCombatCause = isVictim ? tag.getVictimCombatCause() : tag.getAttackerCombatCause();
+
+			boolean pushedDown = false;
+
+			switch (cause) {
+				case KILL -> {
+				}
+				case WORLD_BORDER -> {
+				}
+				case CONTACT -> {
 				/*
 				//
 				if (tag != null) {
@@ -74,93 +86,282 @@ public class DeathListener implements Listener {
 					}
 				}
 				 */
-			}
-			case ENTITY_ATTACK -> {
-				// Handled before (giving 1 to global kills)
-			}
-			case ENTITY_SWEEP_ATTACK -> {
-				// Handled before
-			}
-			case PROJECTILE -> {
-				// Isn't counted
-			}
-			case SUFFOCATION -> {
-				// Isn't counted
-			}
-			case FALL -> {
-				// Isn't counted
-			}
-			case FIRE -> {
-				// Isn't counted
-			}
-			case FIRE_TICK -> {
-				// Isn't counted
-			}
-			case MELTING -> {
-				// Isn't counted
-			}
-			case LAVA -> {
-				// Isn't counted
-			}
-			case DROWNING -> {
-				// Isn't counted
-			}
-			case BLOCK_EXPLOSION -> {
+				}
+				case ENTITY_ATTACK -> {
+					// Handled before (giving 1 to global kills)
+				}
+				case ENTITY_SWEEP_ATTACK -> {
+					// Handled before
+				}
+				case PROJECTILE -> {
+					// Isn't counted
+				}
+				case SUFFOCATION -> {
+					// Isn't counted
+				}
+				case FALL -> {
+					deathMessage = DeathTranslations.DEATH_VOID;
+				}
+				case FIRE -> {
+					// Isn't counted
+				}
+				case FIRE_TICK -> {
+					// Isn't counted
+				}
+				case LAVA -> {
+					// Isn't counted
+				}
+				case MELTING -> {
+					// Isn't counted
+				}
+				case CAMPFIRE -> {
 
-			}
-			case ENTITY_EXPLOSION -> {
+				}
+				case DROWNING -> {
+					// Isn't counted
+				}
+				case BLOCK_EXPLOSION -> {
+					switch (lastCombatCause) {
+						case BED -> {
+							victimAcc.increment(Statistics.DEATHS_BED);
+							deathMessage = DeathTranslations.DEATH_BED;
+							if (attackerAcc != null) {
+								attackerAcc.increment(Statistics.KILLS_BED);
+								deathMessage = DeathTranslations.DEATH_BED_ATTACKER;
+							}
+						}
+						case RESPAWN_ANCHOR -> {
+							victimAcc.increment(Statistics.DEATHS_ANCHOR);
+							deathMessage = DeathTranslations.DEATH_ANCHOR;
+							if (attackerAcc != null) {
+								attackerAcc.increment(Statistics.KILLS_ANCHOR);
+								deathMessage = DeathTranslations.DEATH_ANCHOR_ATTACKER;
+							}
+						}
+						case TNT -> {
+							// Not sure
+						}
+					}
+				}
+				case ENTITY_EXPLOSION -> {
+					switch (lastCombatCause) {
+						case TNT -> {
+							victimAcc.increment(Statistics.DEATHS_TNT);
+							deathMessage = DeathTranslations.DEATH_TNT;
+							if (attackerAcc != null) {
+								attackerAcc.increment(Statistics.KILLS_TNT);
+								deathMessage = DeathTranslations.DEATH_TNT_ATTACKER;
+							}
+						}
+						case ENDER_CRYSTAL -> {
+							victimAcc.increment(Statistics.DEATHS_CRYSTAL);
+							deathMessage = DeathTranslations.DEATH_CRYSTAL;
+							if (attackerAcc != null) {
+								attackerAcc.increment(Statistics.KILLS_CRYSTAL);
+								deathMessage = DeathTranslations.DEATH_CRYSTAL_ATTACKER;
+							}
+						}
+					}
+				}
+				case VOID -> {
+					deathMessage = DeathTranslations.DEATH_VOID;
+					if (attackerAcc != null) {
+						if (pushedDown) {
+							deathMessage = DeathTranslations.DEATH_VOID_ATTACKER;
+						} else {
+							deathMessage = DeathTranslations.DEATH_VOID_ATTACKER_FELL_DOWN;
+						}
+					}
+				}
+				case LIGHTNING -> {
 
-			}
-			case VOID -> {
+				}
+				case SUICIDE -> {
 
-			}
-			case LIGHTNING -> {
+				}
+				case STARVATION -> {
 
-			}
-			case SUICIDE -> {
+				}
+				case POISON -> {
+					if (attackerAcc != null) {
+						deathMessage = DeathTranslations.DEATH_POISON_ATTACKER;
+						switch (lastCombatCause) {
+							case LINGERING_POTION -> {
+								deathMessage = DeathTranslations.DEATH_POISON_ATTACKER_LINGERING;
+							}
+							case SPLASH_POTION -> {
+								deathMessage = DeathTranslations.DEATH_POISON_ATTACKER_SPLASH;
+							}
+						}
+					}
+				}
+				case MAGIC -> {
+					if (attackerAcc != null) {
+						deathMessage = DeathTranslations.DEATH_INSTANT_DAMAGE_ATTACKER;
+						switch (lastCombatCause) {
+							case LINGERING_POTION -> {
+								deathMessage = DeathTranslations.DEATH_INSTANT_DAMAGE_ATTACKER_LINGERING;
+							}
+							case SPLASH_POTION -> {
+								deathMessage = DeathTranslations.DEATH_INSTANT_DAMAGE_ATTACKER_SPLASH;
+							}
+						}
+					}
+				}
+				case WITHER -> {
+					if (attackerAcc != null) {
+						deathMessage = DeathTranslations.DEATH_WITHER_ATTACKER;
+						switch (lastCombatCause) {
+							case LINGERING_POTION -> {
+								deathMessage = DeathTranslations.DEATH_WITHER_ATTACKER_LINGERING;
+							}
+							case SPLASH_POTION -> {
+								deathMessage = DeathTranslations.DEATH_WITHER_ATTACKER_SPLASH;
+							}
+						}
+					}
+				}
+				case FALLING_BLOCK -> {
 
-			}
-			case STARVATION -> {
+				}
+				case THORNS -> {
 
-			}
-			case POISON -> {
+				}
+				case DRAGON_BREATH -> {
 
-			}
-			case MAGIC -> {
+				}
+				case CUSTOM -> {
 
-			}
-			case WITHER -> {
+				}
+				case FLY_INTO_WALL -> {
 
-			}
-			case FALLING_BLOCK -> {
+				}
+				case HOT_FLOOR -> {
 
-			}
-			case THORNS -> {
+				}
+				case CRAMMING -> {
 
-			}
-			case DRAGON_BREATH -> {
+				}
+				case DRYOUT -> {
 
-			}
-			case CUSTOM -> {
+				}
+				case FREEZE -> {
 
-			}
-			case FLY_INTO_WALL -> {
+				}
+				case SONIC_BOOM -> {
 
+				}
 			}
-			case HOT_FLOOR -> {
+		} else {
+			switch (cause) {
+				case KILL -> {
+				}
+				case WORLD_BORDER -> {
+				}
+				case CONTACT -> {
+				/*
+				//
+				if (tag != null) {
+					if (isVictim && tag.getVictimCombatCause() == CombatCause.FALLING_BLOCK) {
+					} else if (!isVictim && tag.getAttackerCombatCause() == CombatCause.FALLING_BLOCK) {
+					} else if (isVictim && tag.getVictimCombatCause() == CombatCause.CACTUS) {
+					} else if (!isVictim && tag.getAttackerCombatCause() == CombatCause.CACTUS) {
+					} else if (isVictim && tag.getVictimCombatCause() == CombatCause.DRIPSTONE) {
+					} else if (!isVictim && tag.getAttackerCombatCause() == CombatCause.DRIPSTONE) {
+					}
+				}
+				 */
+				}
+				case ENTITY_ATTACK -> {
+					// Handled before (giving 1 to global kills)
+				}
+				case ENTITY_SWEEP_ATTACK -> {
+					// Handled before
+				}
+				case PROJECTILE -> {
+					// Isn't counted
+				}
+				case SUFFOCATION -> {
+					// Isn't counted
+				}
+				case FALL -> {
+					deathMessage = DeathTranslations.DEATH_VOID;
+				}
+				case FIRE -> {
+					// Isn't counted
+				}
+				case FIRE_TICK -> {
+					// Isn't counted
+				}
+				case LAVA -> {
+					// Isn't counted
+				}
+				case MELTING -> {
+					// Isn't counted
+				}
+				case CAMPFIRE -> {
 
-			}
-			case CRAMMING -> {
+				}
+				case DROWNING -> {
+					// Isn't counted
+				}
+				case BLOCK_EXPLOSION -> {
 
-			}
-			case DRYOUT -> {
+				}
+				case ENTITY_EXPLOSION -> {
+				}
+				case VOID -> {
+					deathMessage = DeathTranslations.DEATH_VOID;
 
-			}
-			case FREEZE -> {
+				}
+				case LIGHTNING -> {
 
-			}
-			case SONIC_BOOM -> {
+				}
+				case SUICIDE -> {
 
+				}
+				case STARVATION -> {
+
+				}
+				case POISON -> {
+
+				}
+				case MAGIC -> {
+
+				}
+				case WITHER -> {
+
+				}
+				case FALLING_BLOCK -> {
+
+				}
+				case THORNS -> {
+
+				}
+				case DRAGON_BREATH -> {
+
+				}
+				case CUSTOM -> {
+
+				}
+				case FLY_INTO_WALL -> {
+
+				}
+				case HOT_FLOOR -> {
+
+				}
+				case CRAMMING -> {
+
+				}
+				case DRYOUT -> {
+
+				}
+				case FREEZE -> {
+
+				}
+				case SONIC_BOOM -> {
+
+				}
 			}
 		}
 	}

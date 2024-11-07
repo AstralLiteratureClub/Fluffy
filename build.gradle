@@ -9,7 +9,7 @@ plugins {
 }
 
 group 'bet.astral'
-version '1.2'
+version '1.2.0'
 
 repositories {
     mavenLocal()
@@ -32,14 +32,11 @@ repositories {
 }
 
 dependencies {
-    implementation 'bet.astral:messenger:2.0.1' // Messenger
-    implementation 'bet.astral:messenger-cloud:2.0.0' // Messenger
-    implementation 'bet.astral:messenger-paper:2.0.0' // Messenger
-    implementation 'bet.astral:shine:1.0.0'
-    implementation 'bet.astral:tuples:1.0.0'
-    implementation 'bet.astral:cloudplusplus:1.2.6'
-    implementation 'bet.astral:cloudplusplus-paper:1.2.6'
-    implementation 'bet.astral:guiman:1.0.1'
+    implementation 'bet.astral:shine:1.0.0' // Shine
+    implementation 'bet.astral:messenger:2.3.0' // Messenger
+    implementation 'bet.astral:cloudplusplus:1.3.0' // Cloud Plus Plus
+    implementation("bet.astral:more4j:1.0.2") // More 4 J
+    implementation 'bet.astral:guiman:1.2.0' // GUIMAN
 
     // LOMBOK
     compileOnly 'org.projectlombok:lombok:1.18.34'
@@ -75,7 +72,7 @@ jar {
 }
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+    toolchain.languageVersion.set(JavaLanguageVersion.of(22))
 }
 
 processResources {

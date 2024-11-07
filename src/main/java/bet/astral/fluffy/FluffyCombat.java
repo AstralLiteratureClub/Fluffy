@@ -1,6 +1,6 @@
 package bet.astral.fluffy;
 
-import bet.astral.cloudplusplus.paper.bootstrap.BootstrapHandler;
+import bet.astral.cloudplusplus.minecraft.paper.bootstrap.BootstrapHandler;
 import bet.astral.fluffy.api.CombatUser;
 import bet.astral.fluffy.configs.CombatConfig;
 import bet.astral.fluffy.database.CoreDatabase;
@@ -18,10 +18,9 @@ import bet.astral.fluffy.listeners.combat.mobility.TridentWhileInCombatListener;
 import bet.astral.fluffy.listeners.hitdetection.*;
 import bet.astral.fluffy.manager.*;
 import bet.astral.fluffy.messenger.FluffyMessenger;
-import bet.astral.messenger.v2.paper.PaperMessenger;
+import bet.astral.messenger.v3.minecraft.paper.PaperMessenger;
 import bet.astral.shine.Shine;
-import bet.astral.shine.ShinePlugin;
-import bet.astral.tuples.Pair;
+import bet.astral.more4j.tuples.Pair;
 import com.jeff_media.armorequipevent.ArmorEquipEvent;
 import lombok.AccessLevel;
 import lombok.Getter;
