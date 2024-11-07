@@ -1,7 +1,7 @@
 package bet.astral.fluffy.statistic;
 
 import bet.astral.messenger.v2.placeholder.Placeholder;
-import bet.astral.messenger.v2.placeholder.PlaceholderList;
+import bet.astral.messenger.v2.placeholder.collection.PlaceholderList;
 import bet.astral.messenger.v2.placeholder.Placeholderable;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;

@@ -1,8 +1,8 @@
 package bet.astral.fluffy;
 
-import bet.astral.cloudplusplus.paper.bootstrap.BootstrapCommandRegisterer;
-import bet.astral.cloudplusplus.paper.bootstrap.BootstrapHandler;
-import bet.astral.cloudplusplus.paper.mapper.CommandSourceStackToCommandSenderMapper;
+import bet.astral.cloudplusplus.minecraft.paper.bootstrap.BootstrapCommandRegisterer;
+import bet.astral.cloudplusplus.minecraft.paper.bootstrap.BootstrapHandler;
+import bet.astral.cloudplusplus.minecraft.paper.mapper.CommandSourceStackToCommandSenderMapper;
 import bet.astral.fluffy.messenger.FluffyMessenger;
 import bet.astral.messenger.v2.Messenger;
 import bet.astral.messenger.v2.receiver.Receiver;

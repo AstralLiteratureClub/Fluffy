@@ -3,7 +3,7 @@ package bet.astral.fluffy.database;
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.statistic.Account;
 import bet.astral.fluffy.statistic.Statistic;
-import bet.astral.tuples.Pair;
+import bet.astral.more4j.tuples.Pair;
 import lombok.Getter;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 

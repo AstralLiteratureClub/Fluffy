@@ -1,6 +1,6 @@
 package bet.astral.fluffy.commands;
 
-import bet.astral.cloudplusplus.paper.bootstrap.commands.CPPBootstrapCommand;
+import bet.astral.cloudplusplus.minecraft.paper.bootstrap.commands.CPPBootstrapCommand;
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.FluffyCommandRegisterer;
 import org.bukkit.command.CommandSender;

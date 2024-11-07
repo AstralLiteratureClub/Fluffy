@@ -12,7 +12,7 @@ import bet.astral.fluffy.events.player.PlayerCombatFullEndEvent;
 import bet.astral.fluffy.messenger.Translations;
 import bet.astral.shine.Shine;
 import bet.astral.shine.ShineColor;
-import bet.astral.tuples.Quartet;
+import bet.astral.more4j.tuples.Quartet;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
