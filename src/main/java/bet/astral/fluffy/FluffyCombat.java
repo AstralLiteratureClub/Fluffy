@@ -227,8 +227,18 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 
 		return clone;
 	}
-	public static boolean isPaper = false;
-	public static boolean isStopping = false;
+	public static boolean isPaper;
+
+    static {
+        try {
+            Class.forName("io.papermc.paper.plugin.bootstrap.PluginBootstrap");
+            isPaper = true;
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static boolean isStopping = false;
 	public static boolean debug = false;
 	private Shine shine;
 	private FluffyMessenger messenger;
@@ -239,7 +249,6 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 	private CooldownManager cooldownManager;
 	private CombatLogManager combatLogManager;
 	private StatisticManager statisticManager;
-	private PaperCommandManager<CommandSender> commandManager;
 	private CombatConfig combatConfig;
 	private AnchorDetection anchorDetection;
 	private BedDetection bedDetection;
