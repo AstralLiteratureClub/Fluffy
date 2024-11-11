@@ -11,6 +11,7 @@ import bet.astral.fluffy.manager.UserManager;
 import bet.astral.fluffy.messenger.Placeholders;
 import bet.astral.fluffy.messenger.Translations;
 import bet.astral.messenger.v2.Messenger;
+import bet.astral.messenger.v2.delay.Delay;
 import bet.astral.messenger.v2.placeholder.Placeholder;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -50,7 +51,7 @@ public class QuitWhileInCombatListener implements Listener {
 			} else {
 			 */
 				messenger.broadcast(Translations.COMBAT_REJOINED_BROADCAST, placeholders);
-				messenger.message(player, Translations.COMBAT_REJOINED_BROADCAST, placeholders);
+				messenger.message(player, Delay.ofTicks(10), Translations.COMBAT_REJOINED_PLAYER, placeholders);
 //			}
 		}
 	}
