@@ -137,7 +137,7 @@ public class PlaceholderAPIHook extends PlaceholderExpansion implements Hook {
 								}
 								case "max_health" ->{
 									OfflinePlayer oPlayer = opponent instanceof  BlockCombatUser ? null : opponent.getPlayer();
-									return decimalFormat.format(oPlayer != null ? (oPlayer instanceof Player oP ? oP.getAttribute(Attribute.GENERIC_MAX_HEALTH) : 00.00) : 1);
+									return decimalFormat.format(oPlayer != null ? (oPlayer instanceof Player oP ? oP.getAttribute(Attribute.MAX_HEALTH) : 00.00) : 1);
 								}
 							}
 						}

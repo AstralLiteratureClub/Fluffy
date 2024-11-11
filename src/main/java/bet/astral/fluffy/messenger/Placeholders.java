@@ -62,7 +62,7 @@ public final class Placeholders {
 		placeholders.add(Placeholder.of(key+"_displayname", entity.customName() != null ? Objects.requireNonNull(entity.customName()) : entity.name()));
 		placeholders.add(Placeholder.plain(key+"_health", decimalFormat.format(entity.getHealth())));
 		// It's so ludicrous you need to use attributes now
-		placeholders.add(Placeholder.plain(key+"_max_health", decimalFormat.format(entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue())));
+		placeholders.add(Placeholder.plain(key+"_max_health", decimalFormat.format(entity.getAttribute(Attribute.MAX_HEALTH).getValue())));
 		placeholders.add(Placeholder.plain(key+"_x", decimalFormat.format(entity.getX())));
 		placeholders.add(Placeholder.plain(key+"_y", decimalFormat.format(entity.getY())));
 		placeholders.add(Placeholder.plain(key+"_z", decimalFormat.format(entity.getZ())));

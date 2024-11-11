@@ -211,8 +211,8 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		meta.lore(lore);
 
 		if (elytraMode== CombatConfig.ElytraMode.DENY_CHESTPLATE) {
-			meta.removeAttributeModifier(Attribute.GENERIC_ARMOR);
-			meta.addAttributeModifier(Attribute.GENERIC_ARMOR, new AttributeModifier(new NamespacedKey("fluffy", "elytra_replacer"), -3, AttributeModifier.Operation.ADD_NUMBER));
+			meta.removeAttributeModifier(Attribute.ARMOR);
+			meta.addAttributeModifier(Attribute.ARMOR, new AttributeModifier(new NamespacedKey("fluffy", "elytra_replacer"), -3, AttributeModifier.Operation.ADD_NUMBER));
 			meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 			if (!meta.hasEnchants()) {
 				meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
