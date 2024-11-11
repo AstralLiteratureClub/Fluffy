@@ -24,6 +24,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.projectiles.BlockProjectileSource;
 import org.bukkit.projectiles.ProjectileSource;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -66,6 +67,10 @@ public class TNTDetection implements Listener {
 		this.crystalDetection = crystalDetection;
 	}
 
+	public static void setTNTPrimer(Player player, @NotNull TNTPrimed primed) {
+		primed.setMetadata("fluffy_tnt_primer", new FixedMetadataValue(FluffyCombat.getPlugin(FluffyCombat.class), player));
+	}
+
 	/**
 	 * Returns null when an entity is a block or a non entity OR entity was not saved
 	 *
@@ -78,7 +83,7 @@ public class TNTDetection implements Listener {
 		if (listValues.isEmpty()) {
 			return null;
 		}
-		Object obj = listValues.get(0).value();
+		Object obj = listValues.getFirst().value();
 		if (obj == null) {
 			return null;
 		}
@@ -100,7 +105,7 @@ public class TNTDetection implements Listener {
 		if (listValues.isEmpty()) {
 			return null;
 		}
-		return listValues.get(0).value();
+		return listValues.getFirst().value();
 	}
 
 	public static Block getBlockPrimer(TNTPrimed tntPrimed) {
@@ -126,7 +131,8 @@ public class TNTDetection implements Listener {
 	 * @param tntPrimed primer
 	 * @return offline player, player or entity;
 	 */
-	@Nullable
+	@SuppressWarnings("t")
+    @Nullable
 	public static Object getStartingEntityPrimer(TNTPrimed tntPrimed) {
 		FluffyCombat fluffy = FluffyCombat.getPlugin(FluffyCombat.class);
 		TNTDetection tntDetection = fluffy.getTntDetection();
@@ -296,6 +302,8 @@ public class TNTDetection implements Listener {
 						scheduledTask -> {
 							crystalOwners.remove(id);
 						}, 5, TimeUnit.SECONDS);
+			} else if (entity instanceof Player player){
+
 			}
 			primers.remove(location);
 			tnt.setMetadata("fluffy_tnt_primer", new FixedMetadataValue(fluffy, entity));
