@@ -1,5 +1,6 @@
 package bet.astral.fluffy.listeners.combat.begin;
 
+import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.BlockCombatUser;
 import bet.astral.fluffy.api.CombatCause;
 import bet.astral.fluffy.api.CombatTag;
@@ -8,10 +9,10 @@ import bet.astral.fluffy.events.*;
 import bet.astral.fluffy.manager.BlockUserManager;
 import bet.astral.fluffy.manager.CombatManager;
 import bet.astral.fluffy.messenger.Placeholders;
-import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.messenger.Translations;
 import bet.astral.messenger.v2.Messenger;
 import bet.astral.messenger.v2.placeholder.Placeholder;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -65,13 +66,28 @@ public class BeginCombatListener implements Listener {
 		handle(victim, attacker, combatCause, itemStack, false);
 	}
 
+	public static boolean cannotEnterCombat(Player player){
+		FluffyCombat fluffyCombat = FluffyCombat.getPlugin(FluffyCombat.class);
+		boolean can = !fluffyCombat.getRegionManager().canEnterCombat(player, player.getLocation());
+		Bukkit.broadcast(Component.text(can));
+		return can;
+	}
+
 	public static void handle(Player victim, OfflinePlayer attacker, CombatCause combatCause, ItemStack itemStack, boolean fireTicks) {
+		Bukkit.broadcast(Component.text("Hello 3"));
 		if (victim.getUniqueId() == attacker.getUniqueId() && !FluffyCombat.debug) {
 			return;
 		}
+		Bukkit.broadcast(Component.text("Hello 2"));
 		if (victim.isDead()){
 			return;
 		}
+
+		Bukkit.broadcast(Component.text("Hello"));
+		if (cannotEnterCombat(victim)){
+			return;
+		}
+
 		FluffyCombat fluffy = FluffyCombat.getPlugin(FluffyCombat.class);
 		CombatManager cM = fluffy.getCombatManager();
 		Messenger mm = fluffy.getMessenger();
@@ -123,6 +139,10 @@ public class BeginCombatListener implements Listener {
 		if (victim.isDead()){
 			return;
 		}
+		if (!cannotEnterCombat(victim)){
+			return;
+		}
+
 		FluffyCombat combat = FluffyCombat.getPlugin(FluffyCombat.class);
 		BlockUserManager blockUserManager = combat.getBlockUserManager();
 
@@ -142,6 +162,10 @@ public class BeginCombatListener implements Listener {
 		if (victim.isDead()){
 			return;
 		}
+		if (!cannotEnterCombat(victim)){
+			return;
+		}
+
 		FluffyCombat fluffy = FluffyCombat.getPlugin(FluffyCombat.class);
 
 		CombatManager cM = fluffy.getCombatManager();

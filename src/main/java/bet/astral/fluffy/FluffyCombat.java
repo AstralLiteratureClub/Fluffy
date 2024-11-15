@@ -24,6 +24,7 @@ import bet.astral.more4j.tuples.Pair;
 import com.jeff_media.armorequipevent.ArmorEquipEvent;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -243,10 +244,12 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 	private CombatManager combatManager;
 	private UserManager userManager;
 	private BlockUserManager blockUserManager;
-	private HookManager hookManager;
+	private final HookManager hookManager = new HookManager(this);
 	private CooldownManager cooldownManager;
 	private CombatLogManager combatLogManager;
 	private StatisticManager statisticManager;
+	@Setter
+	private RegionManager regionManager = RegionManager.NONE;
 	private CombatConfig combatConfig;
 	private AnchorDetection anchorDetection;
 	private BedDetection bedDetection;
@@ -262,6 +265,11 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 	public FluffyCombat(@NotNull BootstrapHandler handler, FluffyMessenger messenger) {
 		this.handler = handler;
 		this.messenger = messenger;
+	}
+
+	@Override
+	public void onLoad() {
+		hookManager.onLoad();
 	}
 
 	@Override
@@ -320,8 +328,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 				lavaDetection
 		);
 
-
-		hookManager = new HookManager(this);
+		hookManager.onEnable();
 
 		//statisticDatabase = new CombinedStatisticDatabase(this);
 

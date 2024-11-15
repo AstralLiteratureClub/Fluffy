@@ -82,7 +82,7 @@ public class CrystalDetection implements Listener {
 			return;
 		}
 
-		if (attacker.getUniqueId().equals(victim.getUniqueId())){
+		if (attacker.getUniqueId().equals(victim.getUniqueId()) && !FluffyCombat.debug){
 			return;
 		}
 

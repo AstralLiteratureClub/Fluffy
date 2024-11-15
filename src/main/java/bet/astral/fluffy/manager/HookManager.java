@@ -2,8 +2,12 @@ package bet.astral.fluffy.manager;
 
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.hooks.*;
+import bet.astral.fluffy.hooks.placeholderapi.PlaceholderAPIHook;
+import bet.astral.fluffy.hooks.worldguard.WorldGuardHook;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import lombok.Getter;
 import me.clip.placeholderapi.PlaceholderAPIPlugin;
+import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,9 +23,18 @@ public class HookManager {
 	private final FluffyCombat fluffyCombat;
 	public HookManager(FluffyCombat fluffyCombat){
 		this.fluffyCombat = fluffyCombat;
-		hookPlaceholderAPI();
 	}
 
+	public void onLoad(){
+		hookWorldGuard();
+	}
+	public void onEnable(){
+		hookPlaceholderAPI();
+		if (getHook("worldguard") != null){
+			WorldGuardHook worldGuardHook = (WorldGuardHook) getHook("worldguard");
+			worldGuardHook.onEnable();
+		}
+	}
 
 	private void hookPlaceholderAPI() {
 		try {
@@ -29,6 +42,13 @@ public class HookManager {
 			hook("placeholderapi", PlaceholderAPIPlugin.class, PlaceholderAPIHook.class);
 		} catch (ClassNotFoundException ignore) {}
 	}
+	private void hookWorldGuard() {
+		try {
+			Class.forName("com.sk89q.worldguard.WorldGuard");
+			hook("worldguard", WorldGuardPlugin.class, WorldGuardHook.class);
+		} catch (ClassNotFoundException ignore) {}
+	}
+
 
 
 

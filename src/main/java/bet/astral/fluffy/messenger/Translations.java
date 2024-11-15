@@ -51,6 +51,9 @@ public class Translations {
 	public static final Translation COMBAT_ENTER_VICTIM = new Translation("combat.enter.victim").add(ComponentType.CHAT, text("<red>You're now in combat with <white>%attacker%<red>!"));
 	public static final Translation COMBAT_ENTER_ATTACKER = new Translation("combat.enter.attacker").add(ComponentType.CHAT, text("<red>You're now in combat with <white>%victim%<red>!"));
 
+	public static final Translation REGION_ENTER_IN_COMBAT = new Translation("combat.region.cannot-enter").add(ComponentType.CHAT, text("<red>You are not permitted to enter this region while in combat!"));
+	public static final Translation REGION_ENTER_IN_COMBAT_COMBAT_EXTENDED = new Translation("combat.region.cannot-enter-extended-tag").add(ComponentType.CHAT, text("<red>Your combat tag was extended by <white>%seconds%s</white> for attempting to escape!"));
+
 	public static Collection<bet.astral.messenger.v2.translation.Translation> getTranslations(){
 		return translations.values();
 	}

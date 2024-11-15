@@ -95,7 +95,7 @@ public class AnchorDetection implements Listener {
 			return;
 		}
 
-		if (tag.owner==victim){
+		if (tag.owner==victim && !FluffyCombat.debug){
 			return;
 		}
 

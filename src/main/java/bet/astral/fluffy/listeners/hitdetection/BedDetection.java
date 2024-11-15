@@ -110,7 +110,7 @@ public class BedDetection implements Listener {
 		if (bedTag == null){
 			return;
 		}
-		if (bedTag.owner.getUniqueId().equals(victim.getUniqueId())){
+		if (bedTag.owner.getUniqueId().equals(victim.getUniqueId()) && !FluffyCombat.debug){
 			return;
 		}
 

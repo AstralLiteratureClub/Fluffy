@@ -173,4 +173,12 @@ public class CombatTag {
 	public CombatUser getOpposite(@NotNull UUID uniqueId){
 		return uniqueId.equals(this.victim.getUniqueId()) ? this.attacker : victim;
 	}
+
+	public void setTicksLeft(UUID uniqueId, int ticks){
+		if (victim.getUniqueId()==uniqueId){
+			setVictimTicksLeft(ticks);
+		} else {
+			setAttackerTicksLeft(ticks);
+		}
+	}
 }

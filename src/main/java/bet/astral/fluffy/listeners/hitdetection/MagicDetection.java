@@ -213,6 +213,7 @@ public class MagicDetection implements Listener {
 		}
 	}
 
+	@EventHandler
 	private void onMagicDamage(EntityDamageByEntityEvent event){
 		if (!(event.getEntity() instanceof Player player)){
 			return;

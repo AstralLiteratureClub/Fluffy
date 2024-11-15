@@ -13,6 +13,7 @@ import bet.astral.fluffy.messenger.Translations;
 import bet.astral.shine.Shine;
 import bet.astral.shine.ShineColor;
 import bet.astral.more4j.tuples.Quartet;
+import net.kyori.adventure.util.Ticks;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
@@ -25,7 +26,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Antritus
@@ -465,6 +468,35 @@ public final class CombatManager {
 		});
 		return returnList;
 	}
+	/**
+	 * Returns all tags where player is part of.
+	 * @param player player
+	 * @return empty list if none found, else all tags where player is in the key
+	 */
+	public synchronized List<CombatTag> getTags(UUID player){
+		List<CombatTag> returnList = new ArrayList<>();
+		tags.forEach((key, tag)->{
+			if (key.contains(player.toString())){
+				returnList.add(tag);
+			}
+		});
+		return returnList;
+	}
+	/**
+	 * Checks keys and tries to find any key that contains the id of the player
+	 * @param player player
+	 * @return found tags
+	 */
+	public synchronized boolean hasTags(UUID player){
+		List<String> keys = tags.keySet().stream().filter(key->key.contains(player.toString())).toList();
+		for (String key : keys){
+			CombatTag tag = this.tags.get(key);
+			if (isActive(tag, player)){
+				return true;
+			}
+		}
+		return false;
+	}
 
 	/**
 	 * Checks keys and tries to find any key that contains the id of the player
@@ -550,4 +582,38 @@ public final class CombatManager {
 		return main;
 	}
 
+
+	/**
+	 * Extends the combat of a given player.
+	 * @param uniqueId player
+	 * @param extendCombat time to extend tag with
+	 * @param timeUnit time unit
+	 */
+	public void extendAllTags(@NotNull UUID uniqueId, int extendCombat, @NotNull TimeUnit timeUnit) {
+		List<CombatTag> tags = getTags(uniqueId);
+
+		for (CombatTag tag : tags) {
+			if (tag.isActive(uniqueId)){
+				tag.setTicksLeft(uniqueId, (int) (timeUnit.toMillis(extendCombat)/Ticks.SINGLE_TICK_DURATION_MS));
+			}
+		}
+	}
+	/**
+	 * Extends the combat of a given player.
+	 * @param user player
+	 * @param extendCombat time to extend tag with
+	 * @param timeUnit time unit
+	 */
+	public void extendAllTags(@NotNull Player user, int extendCombat, @NotNull TimeUnit timeUnit) {
+		extendAllTags(user.getUniqueId(), extendCombat, timeUnit);
+	}
+	/**
+	 * Extends the combat of a given player.
+	 * @param user player
+	 * @param extendCombat time to extend tag with
+	 * @param timeUnit time unit
+	 */
+	public void extendAllTags(@NotNull CombatUser user, int extendCombat, @NotNull TimeUnit timeUnit) {
+		extendAllTags(user.getUniqueId(), extendCombat, timeUnit);
+	}
 }
