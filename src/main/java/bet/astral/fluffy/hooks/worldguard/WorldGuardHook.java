@@ -45,6 +45,7 @@ public class WorldGuardHook implements Hook {
         fluffy.getMessenger().registerReceiverConverter(new WGReceiverConverter());
     }
 
+
     @Override
     public FluffyCombat main() {
         return fluffy;

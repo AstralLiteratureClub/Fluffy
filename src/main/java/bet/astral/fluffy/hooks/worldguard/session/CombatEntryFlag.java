@@ -1,6 +1,7 @@
 package bet.astral.fluffy.hooks.worldguard.session;
 
 import bet.astral.fluffy.FluffyCombat;
+import bet.astral.fluffy.api.CombatTag;
 import bet.astral.fluffy.hooks.worldguard.FluffyWGFlags;
 import bet.astral.fluffy.messenger.Translations;
 import bet.astral.messenger.v2.info.MessageInfo;
@@ -27,10 +28,8 @@ public class CombatEntryFlag extends FluffyHandler {
 
     public boolean onCrossBoundary(LocalPlayer player, Location from, Location to, ApplicableRegionSet toSet, Set<ProtectedRegion> entered, Set<ProtectedRegion> exited, MoveType moveType) {
         boolean allowed = toSet.testState(player, FluffyWGFlags.ENTER_ZONE_IN_COMBAT);
-        Integer extendCombat = toSet.queryValue(player, FluffyWGFlags.EXTEND_COMBAT_IF_ENTER);
-        if (extendCombat == null){
-            extendCombat = 0;
-        }
+        boolean extend = toSet.testState(player, FluffyWGFlags.EXTEND_COMBAT_IF_ENTER);
+
         boolean inCombat = getCombatManager().hasTags(player.getUniqueId());
 
         if (    !allowed  // Cannot enter the region (by flag)
@@ -38,7 +37,7 @@ public class CombatEntryFlag extends FluffyHandler {
                 && moveType.isCancellable()) {
 
             long now = System.currentTimeMillis();
-            if (now- this.lastMessage > 2000L){
+            if (now- this.lastMessage > 1000L){
                 MessageInfo messageInfo = new MessageInfoBuilder(Translations.REGION_ENTER_IN_COMBAT)
                         .withReceiver(player)
                         .create();
@@ -47,16 +46,15 @@ public class CombatEntryFlag extends FluffyHandler {
                 this.lastMessage = now;
             }
 
-            if (now-this.lastExtended > extendCombat*1000){
+            if (extend && now-this.lastExtended > 1000){
                 MessageInfo lastExtended = new MessageInfoBuilder(Translations.REGION_ENTER_IN_COMBAT_COMBAT_EXTENDED)
                         .withReceiver(player)
-                        .withPlaceholder(Placeholder.of("seconds", extendCombat))
                         .create();
 
                 getMessenger().send(lastExtended);
 
 
-                getCombatManager().extendAllTags(player.getUniqueId(), extendCombat, TimeUnit.SECONDS);
+                getCombatManager().resetTagTicks(player.getUniqueId());
                 this.lastExtended = now;
             }
             return false;

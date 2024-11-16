@@ -69,21 +69,17 @@ public class BeginCombatListener implements Listener {
 	public static boolean cannotEnterCombat(Player player){
 		FluffyCombat fluffyCombat = FluffyCombat.getPlugin(FluffyCombat.class);
 		boolean can = !fluffyCombat.getRegionManager().canEnterCombat(player, player.getLocation());
-		Bukkit.broadcast(Component.text(can));
 		return can;
 	}
 
 	public static void handle(Player victim, OfflinePlayer attacker, CombatCause combatCause, ItemStack itemStack, boolean fireTicks) {
-		Bukkit.broadcast(Component.text("Hello 3"));
 		if (victim.getUniqueId() == attacker.getUniqueId() && !FluffyCombat.debug) {
 			return;
 		}
-		Bukkit.broadcast(Component.text("Hello 2"));
 		if (victim.isDead()){
 			return;
 		}
 
-		Bukkit.broadcast(Component.text("Hello"));
 		if (cannotEnterCombat(victim)){
 			return;
 		}

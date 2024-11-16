@@ -586,34 +586,28 @@ public final class CombatManager {
 	/**
 	 * Extends the combat of a given player.
 	 * @param uniqueId player
-	 * @param extendCombat time to extend tag with
-	 * @param timeUnit time unit
 	 */
-	public void extendAllTags(@NotNull UUID uniqueId, int extendCombat, @NotNull TimeUnit timeUnit) {
+	public void resetTagTicks(@NotNull UUID uniqueId) {
 		List<CombatTag> tags = getTags(uniqueId);
 
 		for (CombatTag tag : tags) {
 			if (tag.isActive(uniqueId)){
-				tag.setTicksLeft(uniqueId, (int) (timeUnit.toMillis(extendCombat)/Ticks.SINGLE_TICK_DURATION_MS));
+				tag.resetTicks(uniqueId);
 			}
 		}
 	}
 	/**
 	 * Extends the combat of a given player.
 	 * @param user player
-	 * @param extendCombat time to extend tag with
-	 * @param timeUnit time unit
 	 */
-	public void extendAllTags(@NotNull Player user, int extendCombat, @NotNull TimeUnit timeUnit) {
-		extendAllTags(user.getUniqueId(), extendCombat, timeUnit);
+	public void resetTagTicks(@NotNull Player user) {
+		resetTagTicks(user.getUniqueId());
 	}
 	/**
 	 * Extends the combat of a given player.
 	 * @param user player
-	 * @param extendCombat time to extend tag with
-	 * @param timeUnit time unit
 	 */
-	public void extendAllTags(@NotNull CombatUser user, int extendCombat, @NotNull TimeUnit timeUnit) {
-		extendAllTags(user.getUniqueId(), extendCombat, timeUnit);
+	public void resetTagTicks(@NotNull CombatUser user) {
+		resetTagTicks(user.getUniqueId());
 	}
 }

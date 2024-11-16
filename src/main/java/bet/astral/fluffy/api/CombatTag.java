@@ -19,7 +19,7 @@ import java.util.UUID;
 @Getter
 @Setter
 public class CombatTag {
-	private static final int ticks;
+	public static final int ticks;
 	static {
 		FluffyCombat fluffy = FluffyCombat.getPlugin(FluffyCombat.class);
 		FileConfiguration configuration = fluffy.getConfig();
@@ -174,11 +174,14 @@ public class CombatTag {
 		return uniqueId.equals(this.victim.getUniqueId()) ? this.attacker : victim;
 	}
 
-	public void setTicksLeft(UUID uniqueId, int ticks){
-		if (victim.getUniqueId()==uniqueId){
-			setVictimTicksLeft(ticks);
+	public void resetTicks(UUID uniqueId){
+		if (victim == attacker){
+			this.attackerTicksLeft = CombatTag.ticks;
+			this.victimTicksLeft = CombatTag.ticks;
+		} else if (victim.getUniqueId()==uniqueId){
+			this.victimTicksLeft = CombatTag.ticks;
 		} else {
-			setAttackerTicksLeft(ticks);
+			this.attackerTicksLeft = CombatTag.ticks;
 		}
 	}
 }

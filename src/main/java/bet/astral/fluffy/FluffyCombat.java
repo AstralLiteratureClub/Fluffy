@@ -16,6 +16,7 @@ import bet.astral.fluffy.listeners.combat.mobility.ElytraWhileInCombatListener;
 import bet.astral.fluffy.listeners.combat.mobility.FlightWhileInCombatListener;
 import bet.astral.fluffy.listeners.combat.mobility.TridentWhileInCombatListener;
 import bet.astral.fluffy.listeners.hitdetection.*;
+import bet.astral.fluffy.listeners.region.RegionWallListener;
 import bet.astral.fluffy.manager.*;
 import bet.astral.fluffy.messenger.FluffyMessenger;
 import bet.astral.messenger.v3.minecraft.paper.PaperMessenger;
@@ -308,6 +309,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		registerListeners(new LiquidOwnerListener(this));
 		registerListeners(new ConnectionListener(this));
 		registerListeners(new ArmorChangeListener(this));
+		registerListeners(new RegionWallListener(this));
 
 		ArmorEquipEvent.registerListener(this);
 
