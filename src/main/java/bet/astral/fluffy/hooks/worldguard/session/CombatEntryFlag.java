@@ -1,12 +1,10 @@
 package bet.astral.fluffy.hooks.worldguard.session;
 
 import bet.astral.fluffy.FluffyCombat;
-import bet.astral.fluffy.api.CombatTag;
 import bet.astral.fluffy.hooks.worldguard.FluffyWGFlags;
 import bet.astral.fluffy.messenger.Translations;
 import bet.astral.messenger.v2.info.MessageInfo;
 import bet.astral.messenger.v2.info.MessageInfoBuilder;
-import bet.astral.messenger.v2.placeholder.Placeholder;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
@@ -16,7 +14,6 @@ import com.sk89q.worldguard.session.Session;
 import com.sk89q.worldguard.session.handler.Handler;
 
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 public class CombatEntryFlag extends FluffyHandler {
     private long lastMessage;
