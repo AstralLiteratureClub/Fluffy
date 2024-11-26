@@ -1,5 +1,6 @@
 package bet.astral.fluffy.manager;
 
+import bet.astral.fluffy.FluffyCombat;
 import bet.astral.more4j.tuples.Pair;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -13,7 +14,7 @@ import java.util.*;
 
 
 public abstract class RegionManager {
-    public static final RegionManager NONE = new RegionManager() {
+    public static final RegionManager NONE = new RegionManager(null) {
         @Override
         public boolean canEnterCombat(Player victim, Location location) {
             return true;
@@ -28,10 +29,20 @@ public abstract class RegionManager {
         public Material getBarrierMaterial(Location location) {
             return Material.BARRIER;
         }
+
+        @Override
+        public void clearOldLocations(Player player, Set<Location> locations) {
+
+        }
     };
+    protected final FluffyCombat fluffy;
     private final Map<UUID, Set<Location>> barrierLocations = new HashMap<>();
     private final Map<UUID, Map<Location, BlockData>> barrierMaterials = new HashMap<>();
     private final Map<org.bukkit.Material, BlockData> defaultBlockData = new HashMap<>();
+
+    protected RegionManager(FluffyCombat fluffy) {
+        this.fluffy = fluffy;
+    }
 
     public abstract boolean canEnterCombat(Player victim, Location location);
     public abstract Color getBarrierColor(Location location);
@@ -47,6 +58,9 @@ public abstract class RegionManager {
     }
 
     public void clearOldLocations(Player player, Set<Location> locations){
+        if (fluffy.getNpcManager().isNPC(player)){
+            return;
+        }
         Set<Location> cloned = new HashSet<>(this.barrierLocations.get(player.getUniqueId()));
         cloned.removeIf(locations::contains);
 

@@ -5,6 +5,7 @@ import bet.astral.fluffy.api.BlockCombatUser;
 import bet.astral.fluffy.api.CombatCause;
 import bet.astral.fluffy.api.CombatTag;
 import bet.astral.fluffy.api.CombatUser;
+import bet.astral.fluffy.database.CombatLogDB;
 import bet.astral.fluffy.manager.CombatManager;
 import bet.astral.fluffy.messenger.DeathTranslations;
 import bet.astral.fluffy.statistic.Account;
@@ -21,6 +22,9 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
+import java.util.UUID;
 
 public class DeathListener implements Listener {
 	private final FluffyCombat fluffy;
@@ -252,6 +256,26 @@ public class DeathListener implements Listener {
 
 				}
 			}
+
+			if (fluffy.getNpcManager().isFluffyNPC(player)) {
+				UUID owner = fluffy.getNpcManager().getUniqueId(player);
+				if (owner == null) {
+					return;
+				}
+
+				CombatLogDB combatLogDB = fluffy.getCombatLogDB();
+				Objects.requireNonNull(combatLogDB.getLog(player.getUniqueId())).thenAccept((log) -> {
+					if (log != null) {
+						combatLogDB.save(owner);
+						if (attackerAcc != null) {
+							combatLogDB.update(owner, attackerAcc.getId());
+						}
+					}
+				});
+
+
+			}
+
 		} else {
 			switch (cause) {
 				case KILL -> {
@@ -363,6 +387,23 @@ public class DeathListener implements Listener {
 
 				}
 			}
+		}
+		if (fluffy.getNpcManager().isFluffyNPC(player)) {
+			UUID owner = fluffy.getNpcManager().getUniqueId(player);
+			if (owner == null) {
+				return;
+			}
+
+			CombatLogDB combatLogDB = fluffy.getCombatLogDB();
+			Objects.requireNonNull(combatLogDB.getLog(player.getUniqueId())).thenAccept((log) -> {
+				if (log != null) {
+					combatLogDB.save(owner);
+					if (attackerAcc != null) {
+						combatLogDB.update(owner, null);
+					}
+				}
+			});
+
 		}
 	}
 }

@@ -26,14 +26,13 @@ public class WorldGuardHook implements Hook {
         this.worldGuardPlugin = hook;
         this.worldGuard = WorldGuard.getInstance();
         this.hookClass = clazz;
-        onLoad();
     }
 
     public void onLoad(){
         if (worldGuard != null) {
             FluffyWGFlags.register(this);
 
-            RegionManager regionManager = new WGRegionManager(this);
+            RegionManager regionManager = new WGRegionManager(fluffy, this);
             fluffy.setRegionManager(regionManager);
         }
     }

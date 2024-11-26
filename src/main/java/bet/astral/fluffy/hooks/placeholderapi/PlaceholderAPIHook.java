@@ -36,10 +36,6 @@ public class PlaceholderAPIHook extends PlaceholderExpansion implements Hook {
 		this.hookState = state;
 		this.hookPlugin = papi;
 		this.hookClass = clazz;
-		if (papi != null){
-			//noinspection UnstableApiUsage
-			papi.getLocalExpansionManager().register(this);
-		}
 	}
 
 	@Override
@@ -60,6 +56,18 @@ public class PlaceholderAPIHook extends PlaceholderExpansion implements Hook {
 	@Override
 	public HookState state() {
 		return hookState;
+	}
+
+	@Override
+	public void onLoad() {
+	}
+
+	@Override
+	public void onEnable() {
+		if (hookPlugin != null){
+			//noinspection UnstableApiUsage
+			hookPlugin.getLocalExpansionManager().register(this);
+		}
 	}
 
 	@Override

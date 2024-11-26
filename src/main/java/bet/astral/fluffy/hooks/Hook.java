@@ -8,4 +8,7 @@ public interface Hook {
 	JavaPlugin hookPlugin();
 	Class<?> hookPluginClass();
 	HookState state();
+
+	void onLoad();
+	void onEnable();
 }

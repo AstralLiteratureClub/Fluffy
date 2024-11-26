@@ -83,13 +83,15 @@ hooks:
         # /tpaccept // /tpaccept to [name]
         # True/False
         to: true
-  citizens:
-    # True/False
-    enabled: false
   placeholderapi:
     # True/False
     enabled: true
-
+  worldguard:
+    enabled: true
+  citizens:
+    enabled: true
+  sentinel:
+    enabled: true
 
 elytra:
   # Denies use of elytra in combat
@@ -186,7 +188,7 @@ combat-log:
     # What should happen when player combat logs?
     # SPAWN_NPC <- Requires citizens
     # NOTHING, KILL, SPAWN_NPC
-    action: KILL
+    action: SPAWN_NPC
     # Broadcast to the server about the combat log
     # True/False
     # Configuration for killing the player when they log out.

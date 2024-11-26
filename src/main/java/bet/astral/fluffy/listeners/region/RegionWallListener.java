@@ -30,6 +30,10 @@ public class RegionWallListener implements Listener {
     @EventHandler
     public void onEnd(PlayerCombatFullEndEvent event) {
         OfflinePlayer oPlayer = event.player();
+        if (fluffy.getNpcManager().isNPC(oPlayer)){
+            return;
+        }
+
         if (oPlayer instanceof Player player){
             fluffy.getRegionManager().clearOldLocations(player, Set.of());
         }

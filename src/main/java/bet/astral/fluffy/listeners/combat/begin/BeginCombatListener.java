@@ -68,8 +68,12 @@ public class BeginCombatListener implements Listener {
 
 	public static boolean cannotEnterCombat(Player player){
 		FluffyCombat fluffyCombat = FluffyCombat.getPlugin(FluffyCombat.class);
-		boolean can = !fluffyCombat.getRegionManager().canEnterCombat(player, player.getLocation());
-		return can;
+
+		if (!fluffyCombat.getNpcManager().isFluffyNPC(player)){
+			return false;
+		}
+
+        return !fluffyCombat.getRegionManager().canEnterCombat(player, player.getLocation());
 	}
 
 	public static void handle(Player victim, OfflinePlayer attacker, CombatCause combatCause, ItemStack itemStack, boolean fireTicks) {
@@ -88,10 +92,10 @@ public class BeginCombatListener implements Listener {
 		CombatManager cM = fluffy.getCombatManager();
 		Messenger mm = fluffy.getMessenger();
 		List<Placeholder> placeholders = new LinkedList<>(Placeholders.combatPlaceholders(victim, attacker, combatCause, itemStack));
-		if (!cM.hasTags(victim)) {
+		if (!cM.hasTags(victim) && !fluffy.getNpcManager().isNPC(victim)) {
 			mm.message(victim, Translations.COMBAT_ENTER_VICTIM, placeholders);
 		}
-		if (!cM.hasTags(attacker)) {
+		if (!cM.hasTags(attacker)  && !fluffy.getNpcManager().isNPC(attacker)) {
 			if (attacker.isOnline()){
 			mm.message(attacker, Translations.COMBAT_ENTER_ATTACKER, placeholders);
 			}

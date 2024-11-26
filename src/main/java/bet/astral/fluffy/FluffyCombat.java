@@ -3,7 +3,8 @@ package bet.astral.fluffy;
 import bet.astral.cloudplusplus.minecraft.paper.bootstrap.BootstrapHandler;
 import bet.astral.fluffy.api.CombatUser;
 import bet.astral.fluffy.configs.CombatConfig;
-import bet.astral.fluffy.database.CoreDatabase;
+import bet.astral.fluffy.database.CombatLogDB;
+import bet.astral.fluffy.database.Database;
 import bet.astral.fluffy.listeners.ConnectionListener;
 import bet.astral.fluffy.listeners.ArmorChangeListener;
 import bet.astral.fluffy.listeners.block.LiquidOwnerListener;
@@ -251,6 +252,8 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 	private StatisticManager statisticManager;
 	@Setter
 	private RegionManager regionManager = RegionManager.NONE;
+	@Setter
+	private NPCManager npcManager = NPCManager.NONE;
 	private CombatConfig combatConfig;
 	private AnchorDetection anchorDetection;
 	private BedDetection bedDetection;
@@ -260,8 +263,9 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 	private LiquidOwnerListener lavaDetection;
 	private FireDetection fireDetection;
 	private FileConfiguration configuration;
-	private CoreDatabase database;
 	private BootstrapHandler handler;
+	private Database databaseRoot;
+	private CombatLogDB combatLogDB;
 
 	public FluffyCombat(@NotNull BootstrapHandler handler, FluffyMessenger messenger) {
 		this.handler = handler;
@@ -282,7 +286,10 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		combatConfig = new CombatConfig(this);
 		reloadConfig();
 		debug = getConfig().getBoolean("debug");
-		database = new CoreDatabase(this);
+		databaseRoot = new Database(this);
+		combatLogDB = new CombatLogDB(databaseRoot);
+		combatLogDB.onEnable();
+
 		statisticManager = new StatisticManager(this);
 		statisticManager.onEnable();
 
@@ -294,6 +301,8 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		combatLogManager = new CombatLogManager();
 		combatManager.onEnable();
 		userManager.onEnable();
+		hookManager.onEnable();
+
 		registerListeners(this);
 		registerListeners(cooldownManager);
 		registerListeners(statisticManager);
@@ -310,6 +319,22 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		registerListeners(new ConnectionListener(this));
 		registerListeners(new ArmorChangeListener(this));
 		registerListeners(new RegionWallListener(this));
+		if (npcManager instanceof Listener listener) {
+			System.out.println("REGISTERED");
+			System.out.println("REGISTERED");
+			System.out.println("REGISTERED");
+			System.out.println("REGISTERED");
+			System.out.println("REGISTERED");
+			System.out.println("REGISTERED");
+			System.out.println("REGISTERED");
+			System.out.println("REGISTERED");
+			System.out.println("REGISTERED");
+			System.out.println("REGISTERED");
+			System.out.println("REGISTERED");
+			System.out.println("REGISTERED");
+			System.out.println("REGISTERED");
+			registerListeners(listener);
+		}
 
 		ArmorEquipEvent.registerListener(this);
 
@@ -329,8 +354,6 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 				magicDetection,
 				lavaDetection
 		);
-
-		hookManager.onEnable();
 
 		//statisticDatabase = new CombinedStatisticDatabase(this);
 

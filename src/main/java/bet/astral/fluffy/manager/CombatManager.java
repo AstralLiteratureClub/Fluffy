@@ -410,10 +410,15 @@ public final class CombatManager {
 	 */
 	@NotNull
 	public synchronized CombatTag create(Player playerVictim, OfflinePlayer playerAttacker){
-		@NotNull
-		CombatUser combatUserVictim = Objects.requireNonNull(main.getUserManager().getUser(playerVictim));
+		NPCManager npcManager = getMain().getNpcManager();
+		CombatUser combatUserVictim = main.getUserManager().getUser(playerVictim);
 		@Nullable
 		CombatUser combatUserAttacker = main.getUserManager().getUser(playerAttacker.getUniqueId());
+
+		if (npcManager.isFluffyNPC(playerVictim) && combatUserVictim == null) {
+			combatUserVictim = main.getUserManager().createAndLoadASync(playerVictim);
+		}
+
 		if (combatUserAttacker == null) {
 			combatUserAttacker = main.getUserManager().createAndLoadASync(playerAttacker);
 		}
@@ -442,6 +447,11 @@ public final class CombatManager {
 	public synchronized CombatTag create(Player playerVictim, BlockCombatUser block){
 		alreadyEnded.remove(playerVictim.getUniqueId());
 		CombatUser combatUserVictim = main.getUserManager().getUser(playerVictim);
+
+		NPCManager npcManager = getMain().getNpcManager();
+		if (npcManager.isFluffyNPC(playerVictim) && combatUserVictim == null){
+			combatUserVictim = getMain().getUserManager().createAndLoadASync(playerVictim);
+		}
 		try {
 			BlockCombatTag tag = blockCombatTagConstructor.newInstance(main, combatUserVictim, block);
 			tags.remove(toId(playerVictim, block));
@@ -451,6 +461,7 @@ public final class CombatManager {
 			throw new RuntimeException(e);
 		}
 	}
+
 
 
 

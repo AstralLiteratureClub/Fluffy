@@ -43,7 +43,9 @@ public class Translations {
 	public static final Translation COMBAT_END = new Translation("combat.end").add(ComponentType.CHAT, text("<red>You're no longer in combat!")).add(ComponentType.SUBTITLE, text("<gray>You're no longer in combat!"));
 	public static final Translation COMBAT_LOGGED_BROADCAST = new Translation("combat.rejoin.player").add(ComponentType.CHAT, text("\n<white>%player% <dark_red>has logged out while in combat!\n"));
 	public static final Translation COMBAT_REJOINED_BROADCAST = new Translation("combat.rejoin.broadcast").add(ComponentType.CHAT, text("\n<white>%player% <yellow>quit while in combat. They are back now! <gray>x<white>%x%<gray>, y<white>%y%<gray>, y<white>%y%<gray>, <white>%world%\n"));
-	public static final Translation COMBAT_REJOINED_PLAYER = new Translation("combat.rejoin.player").add(ComponentType.CHAT, text("<dark_red>You last time quit while in combat!")).add(ComponentType.SUBTITLE, text("<gray>You're no longer in combat!"));
+	public static final Translation COMBAT_REJOINED_PLAYER = new Translation("combat.rejoin.player").add(ComponentType.CHAT, text("<dark_red>You last time quit while in combat!"));
+	public static final Translation COMBAT_REJOINED_PLAYER_KILLED = new Translation("combat.rejoin.player.killed").add(ComponentType.CHAT, text("<dark_red>You last time quit while in combat!"));
+	public static final Translation COMBAT_REJOINED_PLAYER_NPC_ALIVE = new Translation("combat.rejoin.player.npc-alive").add(ComponentType.CHAT, text("<dark_red>You last time quit while in combat!"));
 	public static final Translation COMBAT_CANNOT_USE_COMMANDS = new Translation("combat.command.canceled").add(ComponentType.CHAT, text("<red>You cannot use this command in combat!"));
 	public static final Translation COMBAT_CANNOT_USE_TRIDENT_RIPTIDE = new Translation("combat.item.trident-riptide-canceled").add(ComponentType.CHAT, text("<red>You cannot use riptide tridents while in combat!"));
 	public static final Translation COMBAT_CANNOT_USE_ELYTRA = new Translation("combat.item.elytra-canceled").add(ComponentType.CHAT, text("<red>You cannot use elytra while in combat!"));

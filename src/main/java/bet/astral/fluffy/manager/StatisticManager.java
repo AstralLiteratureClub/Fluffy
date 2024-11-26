@@ -62,11 +62,16 @@ public class StatisticManager implements Listener {
 	}
 
 	public CompletableFuture<Void> load(OfflinePlayer player) {
+		return CompletableFuture.runAsync(()->{
+			users.put(player.getUniqueId(), new AccountImpl(fluffy, player.getUniqueId()));
+		});
+		/*
 		return fluffy.getDatabase()
 				.get(new AccountImpl(fluffy, player.getUniqueId()), (account) -> {
 					AccountLoadEvent event = new AccountLoadEvent(true, account);
 					event.callEvent();
 					users.put(account.getId(), account);
 				});
+		 */
 	}
 }

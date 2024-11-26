@@ -4,7 +4,6 @@ import bet.astral.fluffy.manager.RegionManager;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.flags.EnumFlag;
 import com.sk89q.worldguard.protection.flags.Flag;
-import com.sk89q.worldguard.protection.flags.IntegerFlag;
 import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;

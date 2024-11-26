@@ -96,7 +96,8 @@ public class AccountImpl implements Account {
 
 	@Override
 	public CompletableFuture<Void> save() {
-		return fluffyCombat.getDatabase().save(this);
+		// fluffyCombat.getDatabaseRoot().save(this);
+		return CompletableFuture.runAsync(()->{});
 	}
 
 	@Override

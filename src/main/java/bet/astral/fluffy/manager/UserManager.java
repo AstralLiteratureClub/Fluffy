@@ -2,7 +2,6 @@ package bet.astral.fluffy.manager;
 
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.CombatUser;
-import bet.astral.fluffy.database.CoreDatabase;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -86,7 +85,7 @@ public class UserManager {
 	public void load(OfflinePlayer player) {
 		if (users.get(player.getUniqueId()) == null){
 			fluffyCombat.getServer().getAsyncScheduler().runNow(fluffyCombat, (x)->{
-				CoreDatabase database = fluffyCombat.getDatabase();
+				Object database = null;
 				// Might be null in testing. Database isn't working atm so this fixes it
 				if (database == null){
 					users.put(player.getUniqueId(), new CombatUser(fluffyCombat, player.getUniqueId()));
@@ -115,7 +114,7 @@ public class UserManager {
 	public CombatUser createAndLoadASync(OfflinePlayer player) {
 		CombatUser user = new CombatUser(fluffyCombat, player.getUniqueId());
 		fluffyCombat.getServer().getAsyncScheduler().runNow(fluffyCombat, (x)->{
-			CoreDatabase database = fluffyCombat.getDatabase();
+			Object database = null;
 			// Might be null in testing. Database isn't working atm so this fixes it
 			if (database == null){
 				users.put(player.getUniqueId(), user);
@@ -126,5 +125,9 @@ public class UserManager {
 		});
 
 		return user;
+	}
+
+	public void reassignCombatUser(Player whoToClone, UUID uniqueId) {
+		users.put(uniqueId, users.remove(whoToClone.getUniqueId()));
 	}
 }

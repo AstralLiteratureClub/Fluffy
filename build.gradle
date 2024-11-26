@@ -32,6 +32,12 @@ repositories {
 
     // World Guard
     maven { url "https://maven.enginehub.org/repo/" }
+
+    // Citizens
+    maven {
+        name = 'citizens-repo'
+        url = 'https://maven.citizensnpcs.co/repo'
+    }
 }
 
 dependencies {
@@ -53,6 +59,15 @@ dependencies {
     // World Guard
     compileOnly 'com.sk89q.worldguard:worldguard-bukkit:7.0.13-SNAPSHOT'
     compileOnly 'com.sk89q.worldedit:worldedit-bukkit:7.0.13-SNAPSHOT'
+
+    // Citizens
+    compileOnly('net.citizensnpcs:citizens-main:2.0.35-SNAPSHOT') {
+        exclude group: '*', module: '*'
+    }
+    // Sentinel (Citizens)
+    compileOnly('org.mcmonkey:sentinel:2.9.2-SNAPSHOT') {
+        exclude group: '*', module: '*'
+    }
 
     var cloudVer = "2.0.0-beta.8"
     implementation 'org.incendo:cloud-paper:'+cloudVer

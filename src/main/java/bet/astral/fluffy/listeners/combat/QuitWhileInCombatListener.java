@@ -5,14 +5,18 @@ import bet.astral.fluffy.api.BlockCombatUser;
 import bet.astral.fluffy.api.CombatTag;
 import bet.astral.fluffy.api.CombatUser;
 import bet.astral.fluffy.configs.CombatConfig;
+import bet.astral.fluffy.database.CombatLogDB;
 import bet.astral.fluffy.events.CombatLogEvent;
 import bet.astral.fluffy.manager.CombatManager;
+import bet.astral.fluffy.manager.NPCManager;
 import bet.astral.fluffy.manager.UserManager;
 import bet.astral.fluffy.messenger.Placeholders;
 import bet.astral.fluffy.messenger.Translations;
 import bet.astral.messenger.v2.Messenger;
 import bet.astral.messenger.v2.delay.Delay;
-import bet.astral.messenger.v2.placeholder.Placeholder;
+import bet.astral.messenger.v2.placeholder.collection.PlaceholderList;
+import bet.astral.messenger.v2.placeholder.collection.PlaceholderMap;
+import bet.astral.messenger.v2.translation.TranslationKey;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -26,6 +30,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.UUID;
 
 public class QuitWhileInCombatListener implements Listener {
 	private final FluffyCombat fluffy;
@@ -38,26 +43,58 @@ public class QuitWhileInCombatListener implements Listener {
 	private void onJoin(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
 		boolean logged = fluffy.getCombatLogManager().hasCombatLogged(player); // Automatically deleted
-		if (logged){
-			Messenger messenger = fluffy.getMessenger();
-			Placeholder[] placeholders = Placeholders.playerPlaceholders("player", player).toArray(Placeholder[]::new);
-			/**
-			if (Objects.requireNonNull(fluffy.getCombatConfig().getCombatLogAction()) == CombatConfig.CombatLogAction.SPAWN_NPC) {
-				// TODO - Make the message chosen if the NPC is alive or dead.
-//					fluffy.getMessageManager().broadcast(MessageKey.COMBAT_REJOIN_NPC_REPLACEMENT_DEAD_BROADCAST, placeholders);
-				messenger.message(messenger.broadcast(), Translations.COMBAT_REJOIN_NPC_REPLACEMENT_ALIVE_BROADCAST, placeholders);
-//					fluffy.getMessageManager().message(player, MessageKey.COMBAT_REJOIN_NPC_REPLACEMENT_DEAD, placeholders);
-				messenger.message(player, MessageKey.COMBAT_REJOIN_NPC_REPLACEMENT_ALIVE, placeholders);
-			} else {
-			 */
-				messenger.broadcast(Translations.COMBAT_REJOINED_BROADCAST, placeholders);
-				messenger.message(player, Delay.ofTicks(10), Translations.COMBAT_REJOINED_PLAYER, placeholders);
-//			}
-		}
+		fluffy.getCombatLogDB().getLog(player.getUniqueId())
+				.thenAccept(log -> {
+					if (log != null) {
+						Messenger messenger = fluffy.getMessenger();
+						TranslationKey playerMessage = Translations.COMBAT_REJOINED_PLAYER;
+						TranslationKey broadCastMessage = Translations.COMBAT_REJOINED_PLAYER;
+
+						PlaceholderMap placeholders = new PlaceholderMap();
+						placeholders.addAll(Placeholders.playerPlaceholders("player", player));
+
+						NPCManager npcManager = fluffy.getNpcManager();
+						if (log.isKilled()) {
+							playerMessage = Translations.COMBAT_REJOINED_PLAYER_KILLED;
+							UUID killer = log.getKilledBy();
+							if (killer != null) {
+								placeholders.add("killer", Bukkit.getOfflinePlayer(killer).getName());
+							}
+
+							if (fluffy.getCombatConfig().getCombatLogAction() == CombatConfig.CombatLogAction.SPAWN_NPC) {
+								player.getInventory().clear();
+								player.setHealth(0);
+							}
+						} else {
+							Object npc = fluffy.getNpcManager().getCombatLogNPC(player.getUniqueId());
+							if (npc != null) {
+								playerMessage = Translations.COMBAT_REJOINED_PLAYER_NPC_ALIVE;
+
+								Location location = npcManager.getLocation(npc);
+								if (location == null){
+									return;
+								}
+
+								player.teleportAsync(location);
+								npcManager.clearNPC(npc);
+							}
+
+						}
+
+						messenger.broadcast(broadCastMessage, placeholders);
+						messenger.message(player, Delay.ofTicks(10), playerMessage, placeholders);
+					}
+				});
 	}
 
 	@EventHandler
 	private void onQuit(@NotNull PlayerQuitEvent event) {
+		if (fluffy.getCombatConfig().getCombatLogAction()== CombatConfig.CombatLogAction.SPAWN_NPC){
+
+		} else if (fluffy.getCombatConfig().getCombatLogAction()== CombatConfig.CombatLogAction.KILL){
+		} else {
+		}
+
 		if (FluffyCombat.isStopping) {
 			return;
 		}
@@ -74,13 +111,18 @@ public class QuitWhileInCombatListener implements Listener {
 			if (logEvent.isCancelled()) {
 				return;
 			}
-			List<Placeholder> placeholders = Placeholders.playerPlaceholders("player", player);
-			Placeholder[] placeholderArray = placeholders.toArray(Placeholder[]::new);
-			messenger.message(messenger.broadcast(), Translations.COMBAT_LOGGED_BROADCAST, placeholderArray);
+			PlaceholderList placeholders = new PlaceholderList(Placeholders.playerPlaceholders("player", player));
+
+			messenger.broadcast(Translations.COMBAT_LOGGED_BROADCAST, placeholders);
+
+			CombatLogDB combatLogDB = fluffy.getCombatLogDB();
+			combatLogDB.save(player.getUniqueId());
 
 			if (fluffy.getCombatConfig().getCombatLogAction() == CombatConfig.CombatLogAction.NOTHING){
 				return;
 			} else if (fluffy.getCombatConfig().getCombatLogAction() == CombatConfig.CombatLogAction.SPAWN_NPC){
+				NPCManager npcManager = fluffy.getNpcManager();
+				npcManager.spawnNPC(player.getLocation(), player);
 				return;
 			} else if (fluffy.getCombatConfig().getCombatLogAction() == CombatConfig.CombatLogAction.KILL) {
 				boolean destroyed = false;
@@ -131,18 +173,21 @@ public class QuitWhileInCombatListener implements Listener {
 		}
 	}
 
-
 	@SuppressWarnings("removal")
 	@EventHandler(priority = EventPriority.NORMAL)
 	private void onDeath(PlayerDeathEvent event) {
 		if (FluffyCombat.isStopping) {
 			return;
 		}
-		if (fluffy.getCombatConfig().getCombatLogAction() != CombatConfig.CombatLogAction.KILL) {
+
+		Player player = event.getEntity();
+		if (fluffy.getNpcManager().isNPC(player)){
 			return;
 		}
 
-		Player player = event.getEntity();
+		if (fluffy.getCombatConfig().getCombatLogAction() != CombatConfig.CombatLogAction.KILL) {
+			return;
+		}
 		UserManager uM = fluffy.getUserManager();
 		CombatUser user = uM.getUser(player);
 		assert user != null;

@@ -1,12 +1,12 @@
 package bet.astral.fluffy.hooks.worldguard;
 
+import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.manager.RegionManager;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
-import com.sk89q.worldguard.bukkit.BukkitWorldGuardPlatform;
 import com.sk89q.worldguard.internal.platform.WorldGuardPlatform;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
@@ -22,7 +22,8 @@ import java.util.Set;
 public class WGRegionManager extends RegionManager {
     private final WorldGuardHook worldGuardHook;
 
-    public WGRegionManager(WorldGuardHook worldGuardHook) {
+    public WGRegionManager(FluffyCombat fluffyCombat, WorldGuardHook worldGuardHook) {
+        super(fluffyCombat);
         this.worldGuardHook = worldGuardHook;
     }
 
