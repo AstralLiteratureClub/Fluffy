@@ -11,4 +11,6 @@ public interface Hook {
 
 	void onLoad();
 	void onEnable();
+
+    default void tryFixState(){}
 }

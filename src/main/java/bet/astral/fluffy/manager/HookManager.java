@@ -17,6 +17,7 @@ import org.mcmonkey.sentinel.SentinelPlugin;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -31,44 +32,19 @@ public class HookManager {
 
 	public void onLoad(){
 		hookWorldGuard();
-		System.out.println("BYE");
-		System.out.println("BYE");
-		System.out.println("BYE");
-		System.out.println("BYE");
-		System.out.println("BYE");
-		System.out.println("BYE");
-		System.out.println("BYE");
-		System.out.println("BYE");
-		System.out.println("BYE");
-		System.out.println("BYE");
-		System.out.println("BYE");
-		System.out.println("BYE");
-		System.out.println("BYE");
-		System.out.println("BYE");
-		System.out.println("BYE");
-		System.out.println("BYE");
-		System.out.println("BYE");
-		System.out.println("BYE");
-
-
-		hookMap.values().stream().filter(hook->hook.state()==HookState.HOOKED).forEach(Hook::onLoad);
+		hookMap.values().stream().filter(hook->hook.state()==HookState.HOOKED||hook.state()==HookState.UNKNOWN_PLUGIN_NOT_ENABLED).forEach(hook->{
+			if (hook.state() == HookState.UNKNOWN_PLUGIN_NOT_ENABLED){
+				hook.tryFixState();
+			}
+			if (hook.state() == HookState.HOOKED){
+				hook.onLoad();
+			}
+		});
 	}
 	public void onEnable(){
 		hookPlaceholderAPI();
 		hookCitizens();
 		hookSentinel();
-		System.out.println("HELLO");
-		System.out.println("HELLO");
-		System.out.println("HELLO");
-		System.out.println("HELLO");
-		System.out.println("HELLO");
-		System.out.println("HELLO");
-		System.out.println("HELLO");
-		System.out.println("HELLO");
-		System.out.println("HELLO");
-		System.out.println("HELLO");
-		System.out.println("HELLO");
-
 		hookMap.values().stream().filter(hook->hook.state()==HookState.HOOKED).forEach(Hook::onEnable);
 	}
 
@@ -108,7 +84,11 @@ public class HookManager {
 		if (javaPlugin==null){
 			state=HookState.HOOK_NOT_FOUND;
 		} else if (!javaPlugin.isEnabled()){
-			state=HookState.UNKNOWN;
+			if (!getFluffyCombat().getConfig().getBoolean("hooks."+name+".enabled", false)){
+				state=HookState.NOT_HOOKED;
+			} else {
+				state = HookState.UNKNOWN_PLUGIN_NOT_ENABLED;
+			}
 		} else {
 			if (getFluffyCombat().getConfig().getBoolean("hooks."+name+".enabled", false)){
 				state=HookState.HOOKED;
@@ -120,21 +100,6 @@ public class HookManager {
 		try {
 			Constructor<? extends Hook> hookConstructor = hookClass.getConstructor(FluffyCombat.class, clazz, Class.class, HookState.class);
 			Hook hook = hookConstructor.newInstance(fluffyCombat, plugin, clazz, state);
-			System.out.println(name + " |  " + state.name());
-			System.out.println(name + " |  " + state.name());
-			System.out.println(name + " |  " + state.name());
-			System.out.println(name + " |  " + state.name());
-			System.out.println(name + " |  " + state.name());
-			System.out.println(name + " |  " + state.name());
-			System.out.println(name + " |  " + state.name());
-			System.out.println(name + " |  " + state.name());
-			System.out.println(name + " |  " + state.name());
-			System.out.println(name + " |  " + state.name());
-			System.out.println(name + " |  " + state.name());
-			System.out.println(name + " |  " + state.name());
-			System.out.println(name + " |  " + state.name());
-			System.out.println(name + " |  " + state.name());
-			System.out.println(name + " |  " + state.name());
 			hookMap.put(name.toLowerCase(), hook);
 		} catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
 			throw new RuntimeException(e);
@@ -146,4 +111,7 @@ public class HookManager {
 		return hookMap.get(name);
 	}
 
+	public Collection<Hook> getHooks() {
+		return hookMap.values();
+	}
 }

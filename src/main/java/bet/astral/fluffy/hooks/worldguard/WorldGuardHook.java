@@ -18,7 +18,7 @@ public class WorldGuardHook implements Hook {
     private final WorldGuard worldGuard;
     private final Class<?> hookClass;
     private final FluffyCombat fluffy;
-    private final HookState hookState;
+    private HookState hookState;
 
     public WorldGuardHook(@NotNull FluffyCombat fluffyCombat, @Nullable WorldGuardPlugin hook, @Nullable Class<?> clazz, @NotNull HookState state) {
         this.fluffy = fluffyCombat;
@@ -34,6 +34,13 @@ public class WorldGuardHook implements Hook {
 
             RegionManager regionManager = new WGRegionManager(fluffy, this);
             fluffy.setRegionManager(regionManager);
+        }
+    }
+
+    @Override
+    public void tryFixState() {
+        if (worldGuard != null){
+            hookState = HookState.HOOKED;
         }
     }
 
