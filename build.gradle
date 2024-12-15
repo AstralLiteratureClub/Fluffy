@@ -3,7 +3,7 @@ plugins {
     id 'java'
     id("io.github.goooler.shadow") version "8.1.8"
     id 'io.freefair.lombok' version '8.6'
-    id("io.papermc.paperweight.userdev") version "1.7.1"
+    id("io.papermc.paperweight.userdev") version "1.7.7"
     id("xyz.jpenilla.run-paper") version "2.3.0"
     id 'maven-publish'
 }
@@ -56,9 +56,19 @@ dependencies {
     compileOnly 'io.github.classgraph:classgraph:4.8.165'
     // PAPI
     compileOnly 'me.clip:placeholderapi:2.11.5'
+
     // World Guard
-    compileOnly 'com.sk89q.worldguard:worldguard-bukkit:7.0.13-SNAPSHOT'
-    compileOnly 'com.sk89q.worldedit:worldedit-bukkit:7.0.13-SNAPSHOT'
+    compileOnly('com.sk89q.worldedit:worldedit-bukkit:7.3.0') {
+        exclude group: 'com.google.guava', module: '*'
+        exclude group: 'com.google.code.gson', module: '*'
+        exclude group: 'org.apache.logging.log4j', module: '*'
+    }
+    compileOnly('com.sk89q.worldguard:worldguard-bukkit:7.0.13-SNAPSHOT') {
+        exclude group: 'com.google.guava', module: '*'
+        exclude group: 'com.google.code.gson', module: '*'
+        exclude group: 'org.apache.logging.log4j', module: '*'
+        exclude group: 'it.unimi.dsi', module: '*'
+    }
 
     // Citizens
     compileOnly('net.citizensnpcs:citizens-main:2.0.35-SNAPSHOT') {
@@ -75,7 +85,7 @@ dependencies {
     implementation 'org.incendo:cloud-minecraft-extras:'+cloudVer
 
     // PAPER MC
-    paperweight.paperDevBundle("1.21.3-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT")
 }
 
 shadowJar {
@@ -115,6 +125,6 @@ publishing {
 
 tasks {
     runServer {
-        minecraftVersion("1.21.3")
+        minecraftVersion("1.21.4")
     }
 }
