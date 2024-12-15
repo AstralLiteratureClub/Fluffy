@@ -4,7 +4,7 @@ import bet.astral.cloudplusplus.minecraft.paper.bootstrap.BootstrapHandler;
 import bet.astral.fluffy.api.CombatUser;
 import bet.astral.fluffy.configs.CombatConfig;
 import bet.astral.fluffy.database.CombatLogDB;
-import bet.astral.fluffy.database.Database;
+import bet.astral.fluffy.database.StatisticsDatabase;
 import bet.astral.fluffy.listeners.ConnectionListener;
 import bet.astral.fluffy.listeners.ArmorChangeListener;
 import bet.astral.fluffy.listeners.block.LiquidOwnerListener;
@@ -20,20 +20,18 @@ import bet.astral.fluffy.listeners.hitdetection.*;
 import bet.astral.fluffy.listeners.region.RegionWallListener;
 import bet.astral.fluffy.manager.*;
 import bet.astral.fluffy.messenger.FluffyMessenger;
+import bet.astral.fluffy.utils.ItemStackUtils;
 import bet.astral.messenger.v3.minecraft.paper.PaperMessenger;
 import bet.astral.shine.Shine;
 import bet.astral.more4j.tuples.Pair;
 import com.jeff_media.armorequipevent.ArmorEquipEvent;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.*;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
@@ -47,9 +45,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -189,6 +185,14 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		if (original.getType()!=Material.ELYTRA){
 			return null;
 		}
+
+		ItemStack clone = original.clone();
+		clone.unsetData(DataComponentTypes.GLIDER);
+		ItemStackUtils.setValue(clone, ELYTRA_KEY, PersistentDataType.BOOLEAN, true);
+
+		return clone;
+
+		/*
 		ItemStack clone = elytraMode== CombatConfig.ElytraMode.DENY_CHESTPLATE ? elytraReplacer.clone() : original.clone();
 		clone.setItemMeta(original.getItemMeta());
 
@@ -227,6 +231,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		clone.setItemMeta(meta);
 
 		return clone;
+		 */
 	}
 	public static boolean isPaper;
 
@@ -264,7 +269,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 	private FireDetection fireDetection;
 	private FileConfiguration configuration;
 	private BootstrapHandler handler;
-	private Database databaseRoot;
+	private StatisticsDatabase statisticsDatabase;
 	private CombatLogDB combatLogDB;
 
 	public FluffyCombat(@NotNull BootstrapHandler handler, FluffyMessenger messenger) {
@@ -274,6 +279,9 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 
 	@Override
 	public void onLoad() {
+		configuration = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "config.yml"));
+		combatConfig = new CombatConfig(this);
+
 		hookManager.onLoad();
 	}
 
@@ -282,13 +290,12 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		PaperMessenger.init(this);
 		handler.init();
 		uploadUploads();
-		configuration = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "config.yml"));
-		combatConfig = new CombatConfig(this);
 		reloadConfig();
 		debug = getConfig().getBoolean("debug");
-		databaseRoot = new Database(this);
-		combatLogDB = new CombatLogDB(databaseRoot);
+		combatLogDB = new CombatLogDB(this);
+		statisticsDatabase = new StatisticsDatabase(this);
 		combatLogDB.onEnable();
+		statisticsDatabase.onEnable();
 
 		statisticManager = new StatisticManager(this);
 		statisticManager.onEnable();
@@ -320,19 +327,6 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		registerListeners(new ArmorChangeListener(this));
 		registerListeners(new RegionWallListener(this));
 		if (npcManager instanceof Listener listener) {
-			System.out.println("REGISTERED");
-			System.out.println("REGISTERED");
-			System.out.println("REGISTERED");
-			System.out.println("REGISTERED");
-			System.out.println("REGISTERED");
-			System.out.println("REGISTERED");
-			System.out.println("REGISTERED");
-			System.out.println("REGISTERED");
-			System.out.println("REGISTERED");
-			System.out.println("REGISTERED");
-			System.out.println("REGISTERED");
-			System.out.println("REGISTERED");
-			System.out.println("REGISTERED");
 			registerListeners(listener);
 		}
 
@@ -398,6 +392,8 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		isStopping = true;
 		userManager.onDisable();
 		combatManager.onDisable();
+		statisticsDatabase.onDisable();
+		combatLogDB.onDisable();
 		statisticManager.onDisable();
 	}
 

@@ -1,12 +1,14 @@
 package bet.astral.fluffy.listeners.combat.mobility;
 
 import bet.astral.fluffy.configs.CombatConfig;
+import bet.astral.fluffy.hooks.npc.citizens.CitizensNPCManager;
 import bet.astral.fluffy.messenger.Translations;
 import bet.astral.fluffy.utils.ItemStackUtils;
-import com.destroystokyo.paper.event.player.PlayerElytraBoostEvent;
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.manager.CombatManager;
+import com.destroystokyo.paper.event.player.PlayerElytraBoostEvent;
 import io.papermc.paper.datacomponent.DataComponentTypes;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -18,6 +20,9 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ElytraWhileInCombatListener implements Listener {
 	private final FluffyCombat fluffy;
 
@@ -25,13 +30,29 @@ public class ElytraWhileInCombatListener implements Listener {
 		this.fluffy = fluffy;
 	}
 
+	public static final NamespacedKey ELYTRA_KEY = new NamespacedKey("test", "test");
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	private void onDeath(PlayerDeathEvent event){
-		event.getDrops().forEach(item->{
-			if (item.getPersistentDataContainer().has(FluffyCombat.ELYTRA_KEY)) {
-				ItemStackUtils.resetValue(item, FluffyCombat.ELYTRA_KEY);
+	private void onDeath(PlayerDeathEvent event) {
+		// Citizens 2 break this completely with their own NPCs
+		if (fluffy.getNpcManager() instanceof CitizensNPCManager
+				&& fluffy.getNpcManager().isNPC(event.getPlayer())){
+			return;
+		}
+		fixItemsList(event.getDrops());
+		fixItemsList(event.getItemsToKeep());
+	}
+
+	public void fixItemsList(List<ItemStack> items) {
+		List<ItemStack> newDrops = new ArrayList<>();
+		for (ItemStack itemStack : items) {
+			if (itemStack.getPersistentDataContainer().has(ELYTRA_KEY)) {
+				ItemStackUtils.resetValue(itemStack, ELYTRA_KEY);
+				itemStack.setData(DataComponentTypes.GLIDER);
+				newDrops.add(itemStack);
 			}
-		});
+		}
+		items.clear();
+		items.addAll(newDrops);
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)

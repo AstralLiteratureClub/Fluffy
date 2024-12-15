@@ -1,6 +1,7 @@
 package bet.astral.fluffy.api;
 
 import bet.astral.fluffy.FluffyCombat;
+import bet.astral.fluffy.statistic.Account;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Location;
@@ -32,6 +33,10 @@ public class BlockCombatUser extends CombatUser {
 		this.location = block.getLocation();
 	}
 
+	@Override
+	public Account getStatisticsAccount() {
+		return null;
+	}
 
 	/**
 	 * Returns null as blocks don't have player forms

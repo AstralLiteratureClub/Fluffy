@@ -1,6 +1,7 @@
 package bet.astral.fluffy.api;
 
 import bet.astral.fluffy.FluffyCombat;
+import bet.astral.fluffy.statistic.Account;
 import bet.astral.shine.ShineColor;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,13 +25,16 @@ import static lombok.AccessLevel.NONE;
 @Setter
 public class CombatUser {
 
+
 	/*
-	 * Glowing
+	 * Cached accounts
 	 */
 
-	private boolean showGlowingLatest;
-	private boolean showGlowingTagged;
-	private boolean showGlowingTagReLogged;
+	private Account statisticsAccount = null;
+
+	/*
+	 * Combat helpers
+	 */
 
 	private UUID lastFireDamage = null;
 
@@ -55,6 +59,14 @@ public class CombatUser {
 	private UUID uniqueId;
 	private FluffyCombat fluffyCombat;
 
+	/*
+	 * Glowing
+	 */
+
+	private boolean showGlowingLatest;
+	private boolean showGlowingTagged;
+	private boolean showGlowingTagReLogged;
+
 	// Custom Glowing color support
 	@Getter(NONE)
 	private ShineColor latestGlowColor = null;
@@ -71,6 +83,12 @@ public class CombatUser {
 	public CombatUser(FluffyCombat combat, UUID uniqueId) {
 		this.uniqueId = uniqueId;
 		this.fluffyCombat = combat;
+		if (uniqueId != null) {
+			this.statisticsAccount = fluffyCombat.getStatisticManager().get(uniqueId);
+			if (statisticsAccount == null){
+				fluffyCombat.getStatisticsDatabase().load(uniqueId).thenAccept(a->statisticsAccount = a);
+			}
+		}
 	}
 
 	public CombatUser() {

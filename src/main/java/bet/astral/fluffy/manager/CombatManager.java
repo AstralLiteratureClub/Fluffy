@@ -411,7 +411,18 @@ public final class CombatManager {
 	@NotNull
 	public synchronized CombatTag create(Player playerVictim, OfflinePlayer playerAttacker){
 		NPCManager npcManager = getMain().getNpcManager();
-		CombatUser combatUserVictim = main.getUserManager().getUser(playerVictim);
+		if (playerVictim == null){
+			playerVictim = (Player) playerAttacker;
+		} else if (playerAttacker == null){
+			playerAttacker = playerVictim;
+		}
+
+        CombatUser combatUserVictim = main.getUserManager().getUser(playerVictim);
+		if (npcManager.isFluffyNPC(playerVictim)) {
+			combatUserVictim = main.getUserManager().createAndLoadASync(
+					playerVictim
+			);
+		}
 		@Nullable
 		CombatUser combatUserAttacker = main.getUserManager().getUser(playerAttacker.getUniqueId());
 
@@ -427,7 +438,8 @@ public final class CombatManager {
 		alreadyEnded.remove(playerAttacker.getUniqueId());
 
 		try {
-			CombatTag tag = (CombatTag) combatTagConstructor.newInstance(main, combatUserVictim, combatUserAttacker);
+			CombatTag tag = (CombatTag) combatTagConstructor.newInstance(main, combatUserVictim != null ? combatUserVictim : combatUserAttacker,
+					combatUserAttacker != null ? combatUserAttacker : combatUserVictim);
 			tags.remove(toId(playerAttacker, playerVictim));
 			tags.remove(toId(playerVictim, playerAttacker));
 			tags.put(toId(playerVictim, playerAttacker), tag);

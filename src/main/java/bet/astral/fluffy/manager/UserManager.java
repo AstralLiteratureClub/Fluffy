@@ -112,6 +112,11 @@ public class UserManager {
 	}
 
 	public CombatUser createAndLoadASync(OfflinePlayer player) {
+		if (fluffyCombat.getNpcManager()
+				.isNPC(player)){
+			UUID uniqueId = fluffyCombat.getNpcManager().getUniqueId(player);
+			return fluffyCombat.getUserManager().getUser(uniqueId);
+		}
 		CombatUser user = new CombatUser(fluffyCombat, player.getUniqueId());
 		fluffyCombat.getServer().getAsyncScheduler().runNow(fluffyCombat, (x)->{
 			Object database = null;
