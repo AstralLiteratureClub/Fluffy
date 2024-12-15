@@ -21,7 +21,9 @@ public final class Statistics {
 	public static final Statistic DEATHS_BED = Statistic.of("deaths_bed");
 
 	public static final Statistic STREAK_KILLS = Statistic.of("streak_kills");
+	public static final Statistic STREAK_KILLS_HIGHEST = Statistic.of("streak_kills_highest");
 	public static final Statistic STREAK_DEATHS = Statistic.of("streak_deaths");
+	public static final Statistic STREAK_DEATHS_HIGHEST = Statistic.of("streak_deaths_highest");
 
 	private static final Statistic[] statistics;
 	static {

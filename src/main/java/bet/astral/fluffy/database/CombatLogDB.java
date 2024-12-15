@@ -1,20 +1,34 @@
 package bet.astral.fluffy.database;
 
+import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.database.cache.CombatLog;
 import org.jetbrains.annotations.Nullable;
 
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.io.File;
+import java.sql.*;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class CombatLogDB extends Connect{
-
-    public CombatLogDB(Database database) {
-        super(database);
+    private Connection connection;
+    public CombatLogDB(FluffyCombat fluffyCombat) {
+        super(fluffyCombat);
     }
+
+    @Override
+    public Connection connect() {
+        File file = new File(getFluffy().getDataFolder(), "combatlog.db");
+        if (file.getParentFile().exists()) {
+            file.getParentFile().mkdir();
+        }
+
+        try {
+            return DriverManager.getConnection("jdbc:sqlite:" + file.getName());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     @Override
     public void onDisable() {
@@ -62,7 +76,7 @@ public class CombatLogDB extends Connect{
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
-        });;
+        });
         return result.exceptionally(exception("Encountered error while trying to get combat log of "+ uniqueId.toString()));
     }
 

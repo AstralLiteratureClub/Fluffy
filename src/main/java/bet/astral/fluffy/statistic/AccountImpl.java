@@ -96,13 +96,11 @@ public class AccountImpl implements Account {
 
 	@Override
 	public CompletableFuture<Void> save() {
-		// fluffyCombat.getDatabaseRoot().save(this);
-		return CompletableFuture.runAsync(()->{});
+		return fluffyCombat.getStatisticsDatabase().save(this);
 	}
 
 	@Override
 	public UUID getId() {
 		return uniqueId;
 	}
-
 }

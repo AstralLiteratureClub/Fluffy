@@ -11,6 +11,9 @@ public final class DeathTranslations {
     public static final Translation DEATH_TNT = null;
     public static final Translation DEATH_CRYSTAL_ATTACKER = null;
     public static final Translation DEATH_CRYSTAL = null;
+    public static final Translation DEATH_FELL_ATTACKER = null;
+    public static final Translation DEATH_FELL_ATTACKER_FELL_DOWN = null;
+    public static final Translation DEATH_FELL = null;
     public static final Translation DEATH_VOID_ATTACKER = null;
     public static final Translation DEATH_VOID_ATTACKER_FELL_DOWN = null;
     public static final Translation DEATH_VOID = null;

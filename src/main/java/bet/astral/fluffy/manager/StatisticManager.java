@@ -2,10 +2,8 @@ package bet.astral.fluffy.manager;
 
 import bet.astral.fluffy.FluffyCombat;
 
-
 import bet.astral.fluffy.events.AccountLoadEvent;
 import bet.astral.fluffy.statistic.Account;
-import bet.astral.fluffy.statistic.AccountImpl;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -36,6 +34,9 @@ public class StatisticManager implements Listener {
 	}
 
 	public void onDisable() {
+		for (Account account : users.values()){
+			account.save();
+		}
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
@@ -62,16 +63,11 @@ public class StatisticManager implements Listener {
 	}
 
 	public CompletableFuture<Void> load(OfflinePlayer player) {
-		return CompletableFuture.runAsync(()->{
-			users.put(player.getUniqueId(), new AccountImpl(fluffy, player.getUniqueId()));
-		});
-		/*
-		return fluffy.getDatabase()
-				.get(new AccountImpl(fluffy, player.getUniqueId()), (account) -> {
+		return fluffy.getStatisticsDatabase()
+				.load(player.getUniqueId()).thenAccept(account->{
+					users.put(account.getId(), account);
 					AccountLoadEvent event = new AccountLoadEvent(true, account);
 					event.callEvent();
-					users.put(account.getId(), account);
 				});
-		 */
 	}
 }
