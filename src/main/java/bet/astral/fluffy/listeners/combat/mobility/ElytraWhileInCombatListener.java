@@ -2,11 +2,11 @@ package bet.astral.fluffy.listeners.combat.mobility;
 
 import bet.astral.fluffy.configs.CombatConfig;
 import bet.astral.fluffy.messenger.Translations;
+import bet.astral.fluffy.utils.ItemStackUtils;
 import com.destroystokyo.paper.event.player.PlayerElytraBoostEvent;
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.manager.CombatManager;
-import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -18,11 +18,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class ElytraWhileInCombatListener implements Listener {
-	private final Map<Player, ItemStack> elytras = new HashMap<>();
 	private final FluffyCombat fluffy;
 
 	public ElytraWhileInCombatListener(FluffyCombat fluffy) {
@@ -31,45 +27,33 @@ public class ElytraWhileInCombatListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	private void onDeath(PlayerDeathEvent event){
-		if (elytras.get(event.getEntity()) != null){
-			ItemStack itemStack = elytras.get(event.getEntity());
-
-			ItemStack replacementElytra = FluffyCombat.convertElytraWithReplacer(itemStack, fluffy.getCombatConfig().getElytraMode());
-			if (replacementElytra == null){
-				return;
+		event.getDrops().forEach(item->{
+			if (item.getPersistentDataContainer().has(FluffyCombat.ELYTRA_KEY)) {
+				ItemStackUtils.resetValue(item, FluffyCombat.ELYTRA_KEY);
 			}
-			event.getDrops().removeIf(item->item.getItemMeta().getPersistentDataContainer().has(FluffyCombat.ELYTRA_KEY));
-
-			if (itemStack.getEnchantmentLevel(Enchantment.VANISHING_CURSE)>0){
-				elytras.remove(event.getEntity());
-				return;
-			}
-			if (event.getKeepInventory()){
-				return;
-			}
-			event.getDrops().add(itemStack);
-			elytras.remove(event.getEntity());
-		}
+		});
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
 	private void onQuit(PlayerQuitEvent event){
-		if (elytras.get(event.getPlayer()) != null){
-			ItemStack itemStack = elytras.get(event.getPlayer());
-			event.getPlayer().getInventory().setChestplate(itemStack);
+		for (ItemStack itemStack : event.getPlayer().getInventory().getContents()){
+			if (itemStack == null || itemStack.isEmpty()){
+				continue;
+			}
+			ItemStackUtils.resetValue(itemStack, FluffyCombat.ELYTRA_KEY);
 		}
 	}
 
 	@EventHandler
 	private void onItemDrop(PlayerDropItemEvent event){
 		if (event.getItemDrop().getPersistentDataContainer().has(FluffyCombat.ELYTRA_KEY)){
-			event.setCancelled(true);
+			ItemStackUtils.resetValue(event.getItemDrop().getItemStack(), FluffyCombat.ELYTRA_KEY);
 		}
 	}
 	@EventHandler
 	private void onItemPickup(PlayerAttemptPickupItemEvent event){
 		if (event.getItem().getPersistentDataContainer().has(FluffyCombat.ELYTRA_KEY)){
-			event.setCancelled(true);
+			ItemStackUtils.resetValue(event.getItem().getItemStack(), FluffyCombat.ELYTRA_KEY);
 		}
 	}
 
@@ -78,7 +62,7 @@ public class ElytraWhileInCombatListener implements Listener {
 	private void onEntityToggleGlide(EntityToggleGlideEvent e) {
 		if (!(e.getEntity() instanceof Player player)) return;
 		ItemStack itemStack = player.getInventory().getChestplate();
-		if (itemStack == null || itemStack.getType() != Material.ELYTRA) {
+		if (itemStack == null || !itemStack.hasData(DataComponentTypes.GLIDER)) {
 			return;
 		}
 		if (fluffy.getCombatConfig().getElytraMode() != CombatConfig.ElytraMode.ALLOW) {
@@ -96,15 +80,15 @@ public class ElytraWhileInCombatListener implements Listener {
 		player.setGliding(false);
 		fluffy.getServer().getScheduler().runTaskLater(fluffy,
 				() -> player.setGliding(false), 2);
-		elytras.put(player, itemStack);
 		player.getInventory().setChestplate(FluffyCombat.convertElytraWithReplacer(itemStack, fluffy.getCombatConfig().getElytraMode()));
 
 		fluffy.getServer().getScheduler().runTaskLater(fluffy, () -> {
-			if (!elytras.containsKey(player)) {
-				return;
+			for (ItemStack item : player.getInventory().getContents()){
+				if (item == null || item.isEmpty() || !item.getPersistentDataContainer().has(FluffyCombat.ELYTRA_KEY)){
+					continue;
+				}
+				ItemStackUtils.resetValue(item, FluffyCombat.ELYTRA_KEY);
 			}
-			player.getInventory().setChestplate(itemStack);
-			elytras.remove(player);
 		}, 25);
 	}
 
