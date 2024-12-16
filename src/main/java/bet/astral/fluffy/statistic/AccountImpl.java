@@ -20,6 +20,11 @@ public class AccountImpl implements Account {
 		this.uniqueId = uniqueId;
 	}
 
+	protected void addStatisticPlaceholder(Statistic statistic, int amount) {
+		setDefault(statistic, 0);
+		statistics.put(statistic, statistics.get(statistic)+amount);
+	}
+
 	@Override
 	public Map<Statistic, Integer> getAllStatistics() {
 		return statistics;
@@ -37,6 +42,7 @@ public class AccountImpl implements Account {
 	@Override
 	public void increment(Statistic statistic) {
 		if (!has(statistic)){
+			setDefault(statistic, 1);
 			return;
 		}
 		statistics.put(statistic, statistics.get(statistic)+1);
@@ -44,6 +50,12 @@ public class AccountImpl implements Account {
 
 	@Override
 	public void add(Statistic statistic, @Range(from = 0, to = Integer.MAX_VALUE) int amount) {
+		if (amount > 1){
+			if (statistic.canOnlyIncrement()){
+				increment(statistic);
+				return;
+			}
+		}
 		statistics.putIfAbsent(statistic, 0);
 		int a = statistics.get(statistic);
 		a+=amount;
@@ -55,7 +67,11 @@ public class AccountImpl implements Account {
 
 	@Override
 	public void decrement(Statistic statistic) {
+		if (statistic.canOnlyIncrement()){
+			return;
+		}
 		if (!has(statistic)){
+			setDefault(statistic, -1);
 			return;
 		}
 		statistics.put(statistic, statistics.get(statistic)-1);
@@ -63,6 +79,10 @@ public class AccountImpl implements Account {
 
 	@Override
 	public void remove(Statistic statistic, @Range(from = 0, to = Integer.MAX_VALUE) int amount) {
+		if (statistic.canOnlyIncrement()){
+			return;
+		}
+
 		statistics.putIfAbsent(statistic, 0);
 		int a = statistics.get(statistic);
 		a-=amount;
@@ -74,11 +94,19 @@ public class AccountImpl implements Account {
 
 	@Override
 	public void reset(Statistic statistic) {
+		if (statistic.canOnlyIncrement()){
+			return;
+		}
 		statistics.remove(statistic);
 	}
 
 	@Override
 	public void set(Statistic statistic, @Range(from = 0, to = Integer.MAX_VALUE) int amount) {
+		if (statistic.canOnlyIncrement()) {
+			if (amount - getStatistic(statistic) != 1) {
+				return;
+			}
+		}
 		statistics.put(statistic, amount);
 	}
 
@@ -90,6 +118,9 @@ public class AccountImpl implements Account {
 
 	@Override
 	public CompletableFuture<Void> delete(Statistic statistic) {
+		if (statistic.canOnlyIncrement()) {
+			return new CompletableFuture<>();
+		}
 		statistics.remove(statistic);
 		return save();
 	}

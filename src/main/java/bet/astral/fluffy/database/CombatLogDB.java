@@ -6,6 +6,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.sql.*;
+import java.time.Instant;
+import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -23,7 +25,7 @@ public class CombatLogDB extends Connect{
         }
 
         try {
-            return DriverManager.getConnection("jdbc:sqlite:" + file.getName());
+            return DriverManager.getConnection("jdbc:sqlite:" + file);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -37,7 +39,7 @@ public class CombatLogDB extends Connect{
     @Override
     public void onEnable() {
         try {
-            PreparedStatement statement = getConnection().prepareStatement("CREATE TABLE IF NOT EXISTS combatlog (uniqueId VARCHAR(36), date DATE, wasKilled BOOL DEFAULT false, killer VARCHAR(36))");
+            PreparedStatement statement = getConnection().prepareStatement("CREATE TABLE IF NOT EXISTS combatlog (uniqueId VARCHAR(36), date BIGINT, wasKilled BOOL DEFAULT false, killer VARCHAR(36))");
             statement.execute();
             statement.close();
         } catch (SQLException e) {
@@ -61,12 +63,12 @@ public class CombatLogDB extends Connect{
                     return null;
                 }
 
-                Date date = resultSet.getDate("date");
+                long date = resultSet.getLong("date");
                 String killer = resultSet.getString("killer");
                 UUID killerUUID = killer != null ? UUID.fromString(killer) : null;
                 boolean killed = resultSet.getBoolean("wasKilled");
 
-                CombatLog combatLog = new CombatLog(uniqueId, java.util.Date.from(date.toInstant()), killerUUID, killed);
+                CombatLog combatLog = new CombatLog(uniqueId, Date.from(Instant.ofEpochMilli(date)), killerUUID, killed);
 
                 resultSet.close();
                 statement.close();
@@ -95,7 +97,7 @@ public class CombatLogDB extends Connect{
 
                 PreparedStatement statement = getConnection().prepareStatement("INSERT INTO combatlog (uniqueId, date) VALUES (?, ?)");
                 statement.setString(1, uniqueId.toString());
-                statement.setDate(2, new Date(System.currentTimeMillis()));
+                statement.setLong(2, System.currentTimeMillis());
                 statement.executeUpdate();
                 statement.close();
             } catch (SQLException e) {
@@ -106,20 +108,18 @@ public class CombatLogDB extends Connect{
     public void update(UUID uniqueId, UUID killer){
         CompletableFuture.runAsync(()->{
             try {
-                delete(uniqueId);
-
                 if (killer != null) {
-                    PreparedStatement statement = getConnection().prepareStatement("INSERT INTO combatlog SET killer = ?, wasKilled = ? WHERE uniqueId = ?");
+                    PreparedStatement statement = getConnection().prepareStatement("UPDATE combatlog SET killer = ?, wasKilled = ? WHERE uniqueId = ?");
                     statement.setString(1, killer.toString());
                     statement.setBoolean(2, true);
-                    statement.setString(2, uniqueId.toString());
+                    statement.setString(3, uniqueId.toString());
 
                     statement.executeUpdate();
                     statement.close();
                 } else {
-                    PreparedStatement statement = getConnection().prepareStatement("INSERT INTO combatlog SET wasKilled = ? WHERE uniqueId = ?");
+                    PreparedStatement statement = getConnection().prepareStatement("UPDATE combatlog SET wasKilled = ? WHERE uniqueId = ?");
                     statement.setBoolean(1, true);
-                    statement.setString(1, uniqueId.toString());
+                    statement.setString(2, uniqueId.toString());
 
                     statement.executeUpdate();
                     statement.close();

@@ -30,7 +30,7 @@ public class StatisticsDatabase extends Connect{
         }
 
         try {
-            return DriverManager.getConnection("jdbc:sqlite:" + file.getName());
+            return DriverManager.getConnection("jdbc:sqlite:" + file);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -39,7 +39,9 @@ public class StatisticsDatabase extends Connect{
     public void onEnable() {
         try {
             PreparedStatement statement = getConnection().prepareStatement("CREATE TABLE IF NOT EXISTS stats (uniqueId VARCHAR(36), " +
-                    "kills INT, killsAnchor INT, killsCrystal INT, killsTNT INT, killsBed INT, deaths INT, deathsAnchor INT, deathsCrystal INT, deathsTNT INT, deathsBed INT, killstreak INT, highestKillstreak INT, deathstreak INT, highestDeathstreak INT)");
+                    "kills INT, killsAnchor INT, killsCrystal INT, killsTNT INT, killsBed INT, deaths INT, deathsAnchor INT, deathsCrystal INT, deathsTNT INT, deathsBed INT, killstreak INT" +
+                    ", highestKillstreak INT, deathstreak INT, highestDeathstreak INT, combatLogStreak INT, combatLogs INT," +
+                    "killsTotem INT, killstreakTotem INT, highestKillstreakTotem INT, deathsTotem INT, deathstreakTotem INT, highestDeathstreakTotem INT)");
             statement.execute();
             statement.close();
         } catch (SQLException e) {
@@ -57,7 +59,8 @@ public class StatisticsDatabase extends Connect{
                     PackedPreparedStatement updateStatement = new PackedPreparedStatement(
                             getConnection().prepareStatement("UPDATE stats SET kills = ?, killsAnchor = ?, killsCrystal = ?, killsTNT = ?," +
                                     "killsBed = ?, deaths = ?, deathsAnchor = ?, deathsCrystal = ?, deathsTNT = ?, deathsBed = ?, " +
-                                    "killstreak = ?, highestKillstreak = ?, deathstreak = ?, highestDeathstreak = ? WHERE uniqueId = ?")
+                                    "killstreak = ?, highestKillstreak = ?, deathstreak = ?, highestDeathstreak = ?, combatLogStreak = ?, combatLogs = ?, killsTotem = ?," +
+                                    "killstreakTotem = ?, highestKillstreakTotem = ?, deathsTotem = ?, deathstreakTotem = ?, highestDeathstreakTotem = ? WHERE uniqueId = ?")
                     );
                     updateStatement.setInt(1, account.getStatistic(Statistics.KILLS_GLOBAL));
                     updateStatement.setInt(2, account.getStatistic(Statistics.KILLS_ANCHOR));
@@ -73,14 +76,43 @@ public class StatisticsDatabase extends Connect{
                     updateStatement.setInt(12, account.getStatistic(Statistics.STREAK_KILLS_HIGHEST));
                     updateStatement.setInt(13, account.getStatistic(Statistics.STREAK_DEATHS));
                     updateStatement.setInt(14, account.getStatistic(Statistics.STREAK_DEATHS_HIGHEST));
-                    updateStatement.setUUID(15, account.getId());
+                    updateStatement.setInt(15, account.getStatistic(Statistics.STREAK_COMBAT_LOGS));
+                    updateStatement.setInt(16, account.getStatistic(Statistics.COMBAT_LOGS));
+                    updateStatement.setInt(17, account.getStatistic(Statistics.KILLS_TOTEM));
+                    updateStatement.setInt(18, account.getStatistic(Statistics.STREAK_KILLS_TOTEM));
+                    updateStatement.setInt(19, account.getStatistic(Statistics.STREAK_KILLS_TOTEM_HIGHEST));
+                    updateStatement.setInt(20, account.getStatistic(Statistics.DEATHS_TOTEM));
+                    updateStatement.setInt(21, account.getStatistic(Statistics.STREAK_DEATHS_TOTEM));
+                    updateStatement.setInt(22, account.getStatistic(Statistics.STREAK_DEATHS_TOTEM_HIGHEST));
+                    updateStatement.setUUID(23, account.getId());
                     updateStatement.executeUpdate();
                     updateStatement.close();
                 } else {
                     PackedPreparedStatement insertStatement = new PackedPreparedStatement(
-                            getConnection().prepareStatement("INSERT INTO stats (kills, killsAnchor, killsCrystal, killsTNT, killsBed," +
-                                    "deaths, deathsAnchor, deathsCrystal, deathsTNT, deathsBed, killstreak, highestKillstreak," +
-                                    "deathstreak, highestDeathstreak) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+                            getConnection().prepareStatement("INSERT INTO stats (" +
+                                    "uniqueId," +
+                                    "kills, " +
+                                    "killsAnchor, " +
+                                    "killsCrystal, " +
+                                    "killsTNT, " +
+                                    "killsBed," +
+                                    "deaths, " +
+                                    "deathsAnchor, " +
+                                    "deathsCrystal, " +
+                                    "deathsTNT, " +
+                                    "deathsBed, " +
+                                    "killstreak, " +
+                                    "highestKillstreak," +
+                                    "deathstreak, " +
+                                    "highestDeathstreak," +
+                                    "combatLogStreak," +
+                                    "combatLogs," +
+                                    "killsTotem," +
+                                    "killstreakTotem," +
+                                    "highestDeathstreakTotem," +
+                                    "deathsTotem," +
+                                    "deathstreakTotem," +
+                                    "highestDeathstreakTotem) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
                     );
                     insertStatement.setUUID(1, account.getId());
                     insertStatement.setInt(2, account.getStatistic(Statistics.KILLS_GLOBAL));
@@ -97,6 +129,14 @@ public class StatisticsDatabase extends Connect{
                     insertStatement.setInt(13, account.getStatistic(Statistics.STREAK_KILLS_HIGHEST));
                     insertStatement.setInt(14, account.getStatistic(Statistics.STREAK_DEATHS));
                     insertStatement.setInt(15, account.getStatistic(Statistics.STREAK_DEATHS_HIGHEST));
+                    insertStatement.setInt(16, account.getStatistic(Statistics.STREAK_COMBAT_LOGS));
+                    insertStatement.setInt(17, account.getStatistic(Statistics.COMBAT_LOGS));
+                    insertStatement.setInt(18, account.getStatistic(Statistics.KILLS_TOTEM));
+                    insertStatement.setInt(19, account.getStatistic(Statistics.STREAK_KILLS_TOTEM));
+                    insertStatement.setInt(20, account.getStatistic(Statistics.STREAK_KILLS_TOTEM_HIGHEST));
+                    insertStatement.setInt(21, account.getStatistic(Statistics.DEATHS_TOTEM));
+                    insertStatement.setInt(22, account.getStatistic(Statistics.STREAK_DEATHS_TOTEM));
+                    insertStatement.setInt(23, account.getStatistic(Statistics.STREAK_DEATHS_TOTEM_HIGHEST));
                     insertStatement.executeUpdate();
                     insertStatement.close();
                 }
@@ -135,6 +175,14 @@ public class StatisticsDatabase extends Connect{
                     account.set(Statistics.STREAK_KILLS_HIGHEST, packedSet.getInt("highestKillstreak"));
                     account.set(Statistics.STREAK_DEATHS, packedSet.getInt("deathstreak"));
                     account.set(Statistics.STREAK_DEATHS_HIGHEST, packedSet.getInt("highestDeathstreak"));
+                    account.set(Statistics.STREAK_COMBAT_LOGS, packedSet.getInt("combatLogStreak"));
+                    account.set(Statistics.COMBAT_LOGS, packedSet.getInt("combatLogs"));
+                    account.set(Statistics.KILLS_TOTEM, packedSet.getInt("killsTotem"));
+                    account.set(Statistics.STREAK_KILLS_TOTEM, packedSet.getInt("killstreakTotem"));
+                    account.set(Statistics.STREAK_KILLS_TOTEM_HIGHEST, packedSet.getInt("highestKillstreakTotem"));
+                    account.set(Statistics.DEATHS_TOTEM, packedSet.getInt("deathsTotem"));
+                    account.set(Statistics.STREAK_DEATHS_TOTEM, packedSet.getInt("deathstreakTotem"));
+                    account.set(Statistics.STREAK_DEATHS_TOTEM_HIGHEST, packedSet.getInt("highestDeathstreakTotem"));
                 }
 
                 if (resultSet != null && !resultSet.isClosed()){

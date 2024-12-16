@@ -15,6 +15,7 @@ public class FluffyTrait extends Trait {
     UUID combatLogUser = null;
     CombatUser combatUser = null;
 
+
     protected FluffyTrait() {
         super("flf");
     }

@@ -15,6 +15,7 @@ import net.citizensnpcs.api.trait.trait.Inventory;
 import net.citizensnpcs.npc.ai.NPCHolder;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -202,5 +203,19 @@ public class CitizensNPCManager extends NPCManager implements Listener {
             npc.despawn(DespawnReason.REMOVAL);
             npc.destroy();
         }
+    }
+
+    @Override
+    @Nullable
+    public OfflinePlayer getOwnerFromNPC(Object object) {
+        if (isFluffyNPC(object)){
+            FluffyTrait trait = ((NPC)object).getTraitNullable(FluffyTrait.class);
+            if (trait == null){
+                return null;
+            }
+
+            return Bukkit.getOfflinePlayer(trait.getCombatLogUser());
+        }
+        return null;
     }
 }

@@ -29,8 +29,24 @@ public class Translations {
 			text("<yellow>Type: <white>%type%").appendSpace(),
 			text("<yellow>X: <white>%x%<gray>, <yellow>Y: <white>%y%<gray>, <yellow>Z: <white>%z%")
 	);
+	public static final Translation COMMAND_STATISTICS_DESCRIPTION = new Translation("commands.statistics.description").add(ComponentType.CHAT, text("Allows players to see their own and others statistics."));
+	public static final Translation COMMAND_STATISTICS_WHO_DESCRIPTION = new Translation("commands.statistics.who-arg.description").add(ComponentType.CHAT, text("Who to see statistics of"));
+	public static final TranslationKey COMMAND_STATISTICS_SELF = new Translation("commands.statistics.self").add(ComponentType.CHAT,
+			text("<yellow>Your statistics").appendNewline(),
+			text(" <gray>- <yellow>Kills: <white>%kills% <gray>(<aqua><hover:show_text:'<yellow>Amount of player kills'>%kills_global%<reset><gray>/<green><hover:show_text:'<yellow>Amount of other players totems activated'>%kills_totem%<reset><gray>)").appendNewline(),
+			text(" <gray>- <yellow>Killstreak: <aqua><hover:show_text:'<yellow>Current streak of killing other players until dying'>%streak_kills%<reset><gray>/<dark_aqua><hover:show_text:'<yellow>Highest streak of player kills until dying'>%streak_kills_highest%<reset> <gray>(<green><hover:show_text:'<yellow>Current streak of activating player totems until dying'>%streak_kills_totem%<reset><gray>/<dark_green><hover:show_text:'<yellow>Highest streak of activating player totems until dying'>%streak_kills_totem_highest%<reset><gray>)").appendNewline(),
+			text(" <gray>- <yellow>Deaths: <white>%deaths% <gray>(<aqua><hover:show_text:'<yellow>Amount of player deaths'>%deaths_global%<reset><gray>/<green><hover:show_text:'<yellow>Amount of totem resurrections'>%deaths_totem%<reset><gray>)").appendNewline(),
+			text(" <gray>- <yellow>Combat Logs: <white>%combat_logs%").appendNewline()
+	);
+	public static final TranslationKey COMMAND_STATISTICS_OTHER = new Translation("commands.statistics.other").add(ComponentType.CHAT,
+			text("<yellow>%player%'s statistics").appendNewline(),
+			text(" <gray>- <yellow>Kills: <white>%kills% <gray>(<aqua><hover:show_text:'<yellow>Amount of player kills'>%kills_global%<reset><gray>/<green><hover:show_text:'<yellow>Amount of other players totems activated'>%kills_totem%<reset><gray>)").appendNewline(),
+			text(" <gray>- <yellow>Killstreak: <aqua><hover:show_text:'<yellow>Current streak of killing other players until dying'>%streak_kills%<reset><gray>/<dark_aqua><hover:show_text:'<yellow>Highest streak of player kills until dying'>%streak_kills_highest%<reset> <gray>(<green><hover:show_text:'<yellow>Current streak of activating player totems until dying'>%streak_kills_totem%<reset><gray>/<dark_green><hover:show_text:'<yellow>Highest streak of activating player totems until dying'>%streak_kills_totem_highest%<reset><gray>)").appendNewline(),
+			text(" <gray>- <yellow>Deaths: <white>%deaths% <gray>(<aqua><hover:show_text:'<yellow>Amount of player deaths'>%deaths_global%<reset><gray>/<green><hover:show_text:'<yellow>Amount of totem resurrections'>%deaths_totem%<reset><gray>)").appendNewline(),
+			text(" <gray>- <yellow>Combat Logs: <white>%combat_logs%").appendNewline()
+	);
 	public static final Translation COMMAND_TAG_DESCRIPTION = new Translation("commands.tag.description").add(ComponentType.CHAT, text("Allows administrators to see combat tags of players."));
-	public static final Translation COMMAND_TAG_WHO_DESCRIPTION = new Translation("commands.tag.description").add(ComponentType.CHAT, text("Who to see combat tags of."));
+	public static final Translation COMMAND_TAG_WHO_DESCRIPTION = new Translation("commands.tag.who-arg.description").add(ComponentType.CHAT, text("Who to see combat tags of."));
 	public static final Translation COMMAND_TAG_NO_TAGS_SELF = new Translation("commands.tag.no-tags-self").add(ComponentType.CHAT, text("<red>You do not have any combat tags!"));
 	public static final Translation COMMAND_TAG_NO_TAGS_OTHER = new Translation("commands.tag.no-tags-other").add(ComponentType.CHAT, text("<red>%who% does not have any combat tags!"));
 	public static final Translation COMMAND_TAG_INFO_SELF = new Translation("commands.tag.info-self").add(ComponentType.CHAT, text("<yellow>Your combat tags (Highest = Newest)"));
@@ -41,8 +57,8 @@ public class Translations {
 	public static final Translation LISTENER_COOLDOWN_ENDER_PEARL = new Translation("listener.cooldown.minecraft:enderpearl").add(ComponentType.CHAT, text("<yellow>You're on cooldown with <light_purple>Ender Pearl<yellow> for <white>%time% seconds<yellow>."));
 	public static final Translation LISTENER_COOLDOWN_ENCHANTED_GOLDEN_APPLE = new Translation("listener.cooldown.minecraft:enchanted_golden_apple").add(ComponentType.CHAT, text("<yellow>You're on cooldown with <light_purple>Enchanted Golden Apple<yellow> for <white>%time% seconds<yellow>."));
 	public static final Translation COMBAT_END = new Translation("combat.end").add(ComponentType.CHAT, text("<red>You're no longer in combat!")).add(ComponentType.SUBTITLE, text("<gray>You're no longer in combat!"));
-	public static final Translation COMBAT_LOGGED_BROADCAST = new Translation("combat.rejoin.player").add(ComponentType.CHAT, text("\n<white>%player% <dark_red>has logged out while in combat!\n"));
-	public static final Translation COMBAT_REJOINED_BROADCAST = new Translation("combat.rejoin.broadcast").add(ComponentType.CHAT, text("\n<white>%player% <yellow>quit while in combat. They are back now! <gray>x<white>%x%<gray>, y<white>%y%<gray>, y<white>%y%<gray>, <white>%world%\n"));
+	public static final Translation COMBAT_LOGGED_BROADCAST = new Translation("combat.logged.broadcast").add(ComponentType.CHAT, text("<white>%player% <dark_red>has logged out while in combat!"));
+	public static final Translation COMBAT_REJOINED_BROADCAST = new Translation("combat.rejoin.broadcast").add(ComponentType.CHAT, text("<white>%player% <yellow>quit while in combat. They were killed when they combat logged!"));
 	public static final Translation COMBAT_REJOINED_PLAYER = new Translation("combat.rejoin.player").add(ComponentType.CHAT, text("<dark_red>You last time quit while in combat!"));
 	public static final Translation COMBAT_REJOINED_PLAYER_KILLED = new Translation("combat.rejoin.player.killed").add(ComponentType.CHAT, text("<dark_red>You last time quit while in combat!"));
 	public static final Translation COMBAT_REJOINED_PLAYER_NPC_ALIVE = new Translation("combat.rejoin.player.npc-alive").add(ComponentType.CHAT, text("<dark_red>You last time quit while in combat!"));

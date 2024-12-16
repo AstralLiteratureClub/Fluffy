@@ -1,15 +1,12 @@
 package bet.astral.fluffy.listeners;
 
 import bet.astral.fluffy.FluffyCombat;
-import bet.astral.fluffy.api.BlockCombatUser;
-import bet.astral.fluffy.api.CombatCause;
-import bet.astral.fluffy.api.CombatTag;
-import bet.astral.fluffy.api.CombatUser;
+import bet.astral.fluffy.api.*;
 import bet.astral.fluffy.database.CombatLogDB;
-import bet.astral.fluffy.events.player.PlayerNewHighStreakEvent;
 import bet.astral.fluffy.manager.CombatManager;
 import bet.astral.fluffy.messenger.DeathTranslations;
 import bet.astral.fluffy.statistic.Account;
+import bet.astral.fluffy.statistic.PlaceholderAccount;
 import bet.astral.fluffy.statistic.Statistic;
 import bet.astral.fluffy.statistic.Statistics;
 import bet.astral.messenger.v2.placeholder.collection.PlaceholderMap;
@@ -25,14 +22,16 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityResurrectEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
-import static org.bukkit.damage.DamageType.*;
+import static bet.astral.fluffy.statistic.Statistic.incrementStreak;
 
 public class DeathListener implements Listener {
 	private final FluffyCombat fluffy;
@@ -41,14 +40,47 @@ public class DeathListener implements Listener {
 		this.fluffy = fluffy;
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(ignoreCancelled = true)
+	public void onEntityResurrect(EntityResurrectEvent event) {
+		if (event.getEntity() instanceof Player player){
+			Account account = fluffy.getStatisticManager().get(player);
+
+			account.increment(Statistics.DEATHS_TOTEM);
+			account.reset(Statistics.STREAK_KILLS_TOTEM);
+			Statistic.incrementStreak(player, account, Statistics.STREAK_DEATHS_TOTEM, Statistics.STREAK_DEATHS_TOTEM_HIGHEST);
+			if (!fluffy.getCombatManager().hasTags(player.getUniqueId())){
+				return;
+			}
+			CombatTag tag = fluffy.getCombatManager().getLatest(player);
+			if (tag instanceof BlockCombatTag){
+				return;
+			}
+			if (tag == null){
+				return;
+			}
+			Account attackerAccount = tag.getOpposite(player).getStatisticsAccount();
+			if (player.getUniqueId().equals(attackerAccount.getId())) {
+				return;
+			}
+			Statistic.incrementStreak(tag.getOpposite(player).getPlayer(), attackerAccount, Statistics.STREAK_KILLS_TOTEM, Statistics.STREAK_KILLS_TOTEM_HIGHEST);
+			attackerAccount.increment(Statistics.KILLS_TOTEM);
+			attackerAccount.reset(Statistics.STREAK_DEATHS); // Not sure if this fits here
+			attackerAccount.reset(Statistics.STREAK_DEATHS_TOTEM);
+		}
+	}
+
+
+	@EventHandler(priority = EventPriority.NORMAL)
 	private void onDeath(PlayerDeathEvent event) {
 		EntityDamageEvent entityDamageEvent = event.getEntity().getLastDamageCause();
 		if (entityDamageEvent == null) {
 			return;
 		}
-		DamageSource damageSource = event.getDamageSource();
+		if (fluffy.getNpcManager().isNPC(event.getPlayer()) && !fluffy.getNpcManager().isFluffyNPC(event.getPlayer())){
+			return;
+		}
 
+		DamageSource damageSource = event.getDamageSource();
 
 		final Player player = event.getPlayer();
 		Entity attacker = (entityDamageEvent instanceof EntityDamageByEntityEvent entityDamageByEntityEven ? entityDamageByEntityEven.getDamager() : null);
@@ -66,21 +98,33 @@ public class DeathListener implements Listener {
 			weapon = null;
 		}
 		Account victimAcc = fluffy.getStatisticManager().get(player);
+		if (fluffy.getNpcManager().isNPC(player)){
+			OfflinePlayer owner = fluffy.getNpcManager().getOwnerFromNPC(player);
+			victimAcc = fluffy.getStatisticManager().get(owner.getUniqueId());
+			if (victimAcc == null){
+				victimAcc = new PlaceholderAccount(fluffy, owner.getUniqueId());
+				fluffy.getStatisticManager().load(owner);
+			}
+		}
 		Account attackerAcc = tag != null ? !isBlock ? isVictim ? tag.getAttacker().getStatisticsAccount() : tag.getVictim().getStatisticsAccount() : null : null;
 
-		victimAcc.increment(Statistics.DEATHS_GLOBAL);
-		victimAcc.reset(Statistics.STREAK_DEATHS);
 		incrementStreak(player, victimAcc, Statistics.STREAK_DEATHS, Statistics.STREAK_DEATHS_HIGHEST);
+		victimAcc.increment(Statistics.DEATHS_GLOBAL);
+		victimAcc.reset(Statistics.STREAK_KILLS);
+		victimAcc.reset(Statistics.STREAK_KILLS_TOTEM);
+//		victimAcc.reset(Statistics.STREAK_COMBAT_LOGS);
 
 		PlaceholderMap placeholders = new PlaceholderMap();
 
 		TranslationKey deathMessage = null;
 		if (tag != null) {
-			if (attackerAcc != null) {
+			if (attackerAcc != null && !attackerAcc.getId().equals(player.getUniqueId())) {
 				attackerAcc.increment(Statistics.KILLS_GLOBAL);
 				OfflinePlayer attackerPlayer = Bukkit.getOfflinePlayer(tag.getAttacker().getUniqueId());
 				incrementStreak(attackerPlayer, attackerAcc, Statistics.STREAK_KILLS, Statistics.STREAK_KILLS_HIGHEST);
 				attackerAcc.reset(Statistics.STREAK_DEATHS);
+				attackerAcc.reset(Statistics.STREAK_DEATHS_TOTEM);
+				attackerAcc.reset(Statistics.STREAK_COMBAT_LOGS);
 			}
 
 			final CombatUser victimUser = isVictim ? tag.getVictim() : tag.getAttacker();
@@ -359,29 +403,36 @@ public class DeathListener implements Listener {
 		}
 		if (fluffy.getNpcManager().isFluffyNPC(player)) {
 			UUID owner = fluffy.getNpcManager().getUniqueId(player);
-			if (owner == null) {
-				return;
-			}
+			if (owner != null) {
 
-			CombatLogDB combatLogDB = fluffy.getCombatLogDB();
-			Objects.requireNonNull(combatLogDB.getLog(player.getUniqueId())).thenAccept((log) -> {
-				if (log != null) {
-					combatLogDB.save(owner);
-					if (attackerAcc != null) {
-						combatLogDB.update(owner, null);
+				CombatLogDB combatLogDB = fluffy.getCombatLogDB();
+				Objects.requireNonNull(combatLogDB.getLog(player.getUniqueId())).thenAccept((log) -> {
+					if (log != null) {
+						combatLogDB.save(owner);
+						if (attackerAcc != null) {
+							combatLogDB.update(owner, null);
+						}
 					}
-				}
-			});
-
+				});
+			}
 		}
-	}
 
-	public void incrementStreak(OfflinePlayer player, Account account, Statistic streak, Statistic highestStreak){
-		account.increment(streak);
-		if (account.getStatistic(streak) > account.getStatistic(highestStreak)) {
-			account.set(streak, account.getStatistic(highestStreak));
-			PlayerNewHighStreakEvent event = new PlayerNewHighStreakEvent(player, account, streak, highestStreak);
-			event.callEvent();
+		if (victimAcc instanceof PlaceholderAccount placeholderAccount) {
+			Account realAccount = fluffy.getStatisticManager().get(placeholderAccount.getId());
+			if (realAccount == null) {
+				Bukkit.getAsyncScheduler().runDelayed(fluffy, t -> {
+					placeholderAccount.apply(realAccount);
+				}, 20, TimeUnit.MILLISECONDS);
+			}
+			placeholderAccount.apply(realAccount);
+			victimAcc.save();
+		} else {
+			victimAcc.save();
 		}
+
+		if (attackerAcc != null){
+			attackerAcc.save();
+		}
+
 	}
 }

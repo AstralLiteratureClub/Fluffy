@@ -27,6 +27,9 @@ public class UserManager {
 					List<UUID> removeList = new LinkedList<>();
 					for (CombatUser user : users.values()) {
 						// Might be null in testing. Database isn't working atm so this fixes it
+						if (user == null){
+							continue;
+						}
 						if (!user.getPlayer().isOnline()) {
 							removeList.add(user.getUniqueId());
 							requireSave.add(user);
@@ -133,6 +136,6 @@ public class UserManager {
 	}
 
 	public void reassignCombatUser(Player whoToClone, UUID uniqueId) {
-		users.put(uniqueId, users.remove(whoToClone.getUniqueId()));
+		users.put(uniqueId, users.get(whoToClone.getUniqueId()));
 	}
 }

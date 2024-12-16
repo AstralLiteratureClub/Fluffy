@@ -61,6 +61,13 @@ public abstract class RegionManager {
         if (fluffy.getNpcManager().isNPC(player)){
             return;
         }
+        if (this.barrierLocations.isEmpty()){
+            return;
+        }
+        if (this.barrierLocations.get(player.getUniqueId()) == null ||
+                this.barrierLocations.get(player.getUniqueId()).isEmpty()){
+            return;
+        }
         Set<Location> cloned = new HashSet<>(this.barrierLocations.get(player.getUniqueId()));
         cloned.removeIf(locations::contains);
 

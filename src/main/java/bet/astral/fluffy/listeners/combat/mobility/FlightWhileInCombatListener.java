@@ -38,6 +38,9 @@ public class FlightWhileInCombatListener implements Listener {
 		if (fluffy.getCombatConfig().getFlightMode()== CombatConfig.FlightMode.ALLOW){
 			return;
 		}
+		if (!event.isFlying()){
+			return;
+		}
 		Player player = event.getPlayer();
 		if (fluffy.getCombatManager().hasTags(player)){
 			boolean toggleOn = player.isFlying();

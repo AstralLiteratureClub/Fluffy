@@ -7,6 +7,7 @@ import bet.astral.fluffy.database.CombatLogDB;
 import bet.astral.fluffy.database.StatisticsDatabase;
 import bet.astral.fluffy.listeners.ConnectionListener;
 import bet.astral.fluffy.listeners.ArmorChangeListener;
+import bet.astral.fluffy.listeners.DeathListener;
 import bet.astral.fluffy.listeners.block.LiquidOwnerListener;
 import bet.astral.fluffy.listeners.combat.BreakCombatTaggedBlockListener;
 import bet.astral.fluffy.listeners.combat.end.CombatEndListener;
@@ -326,6 +327,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		registerListeners(new ConnectionListener(this));
 		registerListeners(new ArmorChangeListener(this));
 		registerListeners(new RegionWallListener(this));
+		registerListeners(new DeathListener(this));
 		if (npcManager instanceof Listener listener) {
 			registerListeners(listener);
 		}

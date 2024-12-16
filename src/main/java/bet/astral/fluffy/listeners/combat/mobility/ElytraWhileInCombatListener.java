@@ -49,6 +49,8 @@ public class ElytraWhileInCombatListener implements Listener {
 				ItemStackUtils.resetValue(itemStack, ELYTRA_KEY);
 				itemStack.setData(DataComponentTypes.GLIDER);
 				newDrops.add(itemStack);
+			} else {
+				newDrops.add(itemStack);
 			}
 		}
 		items.clear();

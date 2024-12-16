@@ -3,6 +3,7 @@ package bet.astral.fluffy.configs;
 import bet.astral.shine.ShineColor;
 import lombok.Getter;
 import bet.astral.fluffy.FluffyCombat;
+import net.kyori.adventure.util.TriState;
 import org.apache.commons.lang3.EnumUtils;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
@@ -43,8 +44,8 @@ public class CombatConfig {
 
 	private boolean isCombatLogKillTotemBypass;
 	private int combatLogKillTotemBypassAmount;
-	private boolean isCombatLogKillKeepItem;
-	private boolean isCombatLogKillKeepExp;
+	private TriState isCombatLogKillKeepItem;
+	private TriState isCombatLogKillKeepExp;
 
 	private boolean isCombatLogNPCArmor;
 	private boolean isCombatLogNPCAttackAI;
@@ -103,8 +104,8 @@ public class CombatConfig {
 
 		isCombatLogKillTotemBypass = configuration.getBoolean("combat-log.quit.kill.totem-bypass");
 		combatLogKillTotemBypassAmount = configuration.getInt("combat-log.quit.kill.totems-to-bypass");
-		isCombatLogKillKeepItem = configuration.getBoolean("combat-log.quit.kill.keep-items");
-		isCombatLogKillKeepExp = configuration.getBoolean("combat-log.quit.kill.keep-experience");
+		isCombatLogKillKeepItem = EnumUtils.getEnumIgnoreCase(TriState.class, configuration.getString("combat-log.quit.kill.keep-items"), TriState.NOT_SET);
+		isCombatLogKillKeepExp = EnumUtils.getEnumIgnoreCase(TriState.class, configuration.getString("combat-log.quit.kill.keep-experience"), TriState.NOT_SET);
 
 		isCombatLogNPCArmor = configuration.getBoolean("combat-log.quit.npc.equip-armor");
 		isCombatLogNPCAttackAI = configuration.getBoolean("combat-log.quit.npc.attack-others");

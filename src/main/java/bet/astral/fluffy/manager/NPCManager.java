@@ -1,6 +1,7 @@
 package bet.astral.fluffy.manager;
 
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -43,6 +44,9 @@ public class NPCManager {
             return player.getUniqueId();
         }
         return null;
+    }
+    public OfflinePlayer getOwnerFromNPC(Object object){
+        return (OfflinePlayer) object;
     }
 
     public boolean isCombatLogNPC(Object object){
