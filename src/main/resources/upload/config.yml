@@ -1,10 +1,5 @@
 # Enables debugging features, as self combat tagging
-debug: true
-
-database:
-  url: jcdb:mysql:https://
-  password: BassPassword
-  username: root
+debug: false
 
 # Changing this requires the restart of the server (or if you are unsafe, reload of the plugin)
 # How long should combat last for?
@@ -43,7 +38,7 @@ glowing:
 
   # Should any of the glowing be enabled?
   # True/False
-  enabled: true
+  enabled: false
   regular:
     # Should all players in your tags glow in x color?
     enabled: true
@@ -89,15 +84,15 @@ hooks:
   worldguard:
     enabled: true
   citizens:
-    enabled: true
+    enabled: false
   sentinel:
-    enabled: true
+    enabled: false
 
 elytra:
   # Denies use of elytra in combat
   # TRUE/FALSE
   # Bypass permission: fluffy.bypass.combat-elytra
-  allow-in-combat: TRUE
+  allow-in-combat: FALSE
   # True/False
   rocket-boost:
     # Denies use of rocket boosting with elytra in combat
@@ -186,7 +181,7 @@ combat-log:
     # What should happen when player combat logs?
     # SPAWN_NPC <- Requires citizens
     # NOTHING, KILL, SPAWN_NPC
-    action: SPAWN_NPC
+    action: KILL
     # Broadcast to the server about the combat log
     # True/False
     # Configuration for killing the player when they log out.
