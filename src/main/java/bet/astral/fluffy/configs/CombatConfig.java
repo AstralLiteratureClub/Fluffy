@@ -128,7 +128,7 @@ public class CombatConfig {
 		isCommandsDisabled = configuration.getBoolean("commands.combat.enabled", true);
 		commandsToDisable = configuration.getStringList("commands.combat.disabled-list");
 
-		elytraMode = EnumUtils.getEnumIgnoreCase(ElytraMode.class, configuration.getString("elytra.allow-in-combat"), ElytraMode.DENY_CHESTPLATE);
+		elytraMode = EnumUtils.getEnumIgnoreCase(ElytraMode.class, configuration.getString("elytra.allow-in-combat"), ElytraMode.FALSE);
 		isElytraBoostAllowed = configuration.getBoolean("elytra.rocket-boost.allow-in-combat", true);
 
 		isTridentBoostAllowed = configuration.getBoolean("trident.riptide.allow-in-combat", true);
@@ -201,8 +201,7 @@ public class CombatConfig {
 	}
 
 	public enum ElytraMode {
-		ALLOW,
-		DENY_ELYTRA,
-		DENY_CHESTPLATE
+		TRUE,
+		FALSE
 	}
 }

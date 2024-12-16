@@ -21,12 +21,10 @@ import bet.astral.fluffy.listeners.hitdetection.*;
 import bet.astral.fluffy.listeners.region.RegionWallListener;
 import bet.astral.fluffy.manager.*;
 import bet.astral.fluffy.messenger.FluffyMessenger;
-import bet.astral.fluffy.utils.ItemStackUtils;
 import bet.astral.messenger.v3.minecraft.paper.PaperMessenger;
 import bet.astral.shine.Shine;
 import bet.astral.more4j.tuples.Pair;
 import com.jeff_media.armorequipevent.ArmorEquipEvent;
-import io.papermc.paper.datacomponent.DataComponentTypes;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -46,8 +44,6 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -65,10 +61,8 @@ import static bet.astral.fluffy.utils.Resource.loadResourceToFile;
 public class FluffyCombat extends JavaPlugin implements Listener {
 	public static boolean emergencyStop = false;
 	public static final NamespacedKey PROJECTILE_ITEM_KEY = new NamespacedKey("fluffy", "shooter_tool");
-	public static final NamespacedKey ELYTRA_KEY = new NamespacedKey("fluffy", "elytra");
 	@Getter(AccessLevel.NONE)
 	private static final MiniMessage miniMessage = MiniMessage.miniMessage();
-	public static ItemStack elytraReplacer = new ItemStack(Material.LEATHER_CHESTPLATE);
 	@Getter(AccessLevel.NONE)
 	private static Map<Chunk, Map<Location, Pair<UUID, Material>>> blockOwners = new HashMap<>();
 
@@ -172,69 +166,6 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		blockOwners.get(block.getChunk()).put(block.getLocation(), Pair.immutable(player.getUniqueId(), material));
 	}
 
-
-
-	/**
-	 * Returns the elytra replacer with item meta of given elytra
-	 * Returns null if not elytra
-	 *
-	 * @param original   elytra
-	 * @param elytraMode
-	 * @return replacer, else if not elytra null
-	 */
-	@Nullable
-	public static ItemStack convertElytraWithReplacer(ItemStack original, CombatConfig.ElytraMode elytraMode) {
-		if (original.getType()!=Material.ELYTRA){
-			return null;
-		}
-
-		ItemStack clone = original.clone();
-		clone.unsetData(DataComponentTypes.GLIDER);
-		ItemStackUtils.setValue(clone, ELYTRA_KEY, PersistentDataType.BOOLEAN, true);
-
-		return clone;
-
-		/*
-		ItemStack clone = elytraMode== CombatConfig.ElytraMode.DENY_CHESTPLATE ? elytraReplacer.clone() : original.clone();
-		clone.setItemMeta(original.getItemMeta());
-
-		ItemMeta meta = original.getItemMeta();
-		if (elytraMode == CombatConfig.ElytraMode.DENY_CHESTPLATE) {
-			Component displayname = meta.displayName();
-			if (displayname == null)
-				displayname = miniMessage.deserialize("<Yellow>Elytra Placeholder").decoration(TextDecoration.ITALIC, false);
-			meta.displayName(displayname);
-		}
-		@Nullable List<Component> lore = meta.lore();
-		if (lore == null) {
-			lore = new LinkedList<>();
-		} else {
-			lore = new ArrayList<>(lore);
-		}
-
-		lore.add(Component.text().build());
-		lore.add(miniMessage.deserialize("<dark_gray> | <gray>This item will disappear soon").decoration(TextDecoration.ITALIC, false));
-		lore.add(miniMessage.deserialize("<dark_gray> |  <gray>and give your elytra back!").decoration(TextDecoration.ITALIC, false));
-		lore.add(miniMessage.deserialize("<dark_gray> | <gray>Bugged? <yellow>@antritus <dark_aqua>(DISCORD) <gray>report this").decoration(TextDecoration.ITALIC, false));
-		lore.add(miniMessage.deserialize("<dark_gray> |  <gray>bug so it may be fixed.").decoration(TextDecoration.ITALIC, false));
-		meta.lore(lore);
-
-		if (elytraMode== CombatConfig.ElytraMode.DENY_CHESTPLATE) {
-			meta.removeAttributeModifier(Attribute.ARMOR);
-			meta.addAttributeModifier(Attribute.ARMOR, new AttributeModifier(new NamespacedKey("fluffy", "elytra_replacer"), -3, AttributeModifier.Operation.ADD_NUMBER));
-			meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-			if (!meta.hasEnchants()) {
-				meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-			}
-			clone.setItemMeta(meta);
-		}
-
-		meta.getPersistentDataContainer().set(ELYTRA_KEY, PersistentDataType.BOOLEAN, true);
-		clone.setItemMeta(meta);
-
-		return clone;
-		 */
-	}
 	public static boolean isPaper;
 
     static {

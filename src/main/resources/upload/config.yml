@@ -95,11 +95,9 @@ hooks:
 
 elytra:
   # Denies use of elytra in combat
-  # ALLOW/DENY_ELYTRA/DENY_CHESTPLATE
-  # DENY_ELYTRA = Replace player's elytra with durability 0 elytra
-  # DENY_CHESTPLATE = Replace player's elytra with copy of the elytra on leather chestplate
+  # TRUE/FALSE
   # Bypass permission: fluffy.bypass.combat-elytra
-  allow-in-combat: DENY_ELYTRA
+  allow-in-combat: TRUE
   # True/False
   rocket-boost:
     # Denies use of rocket boosting with elytra in combat
