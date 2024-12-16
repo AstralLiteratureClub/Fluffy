@@ -6,17 +6,12 @@ import bet.astral.fluffy.api.CombatTag;
 import bet.astral.fluffy.api.CombatUser;
 import bet.astral.fluffy.configs.CombatConfig;
 import bet.astral.fluffy.events.CombatTagEndEvent;
-import bet.astral.fluffy.manager.CombatManager;
 import bet.astral.shine.Shine;
 import bet.astral.shine.receiver.ShineReceiver;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.PlayerDeathEvent;
-
-import java.util.List;
 
 public class CombatEndListener implements Listener {
 	private final FluffyCombat fluffy;
@@ -27,27 +22,6 @@ public class CombatEndListener implements Listener {
 	public FluffyCombat fluffy() {
 		return fluffy;
 	}
-
-
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
-	private void onDeath(PlayerDeathEvent event){
-		CombatManager combatManager = fluffy.getCombatManager();
-		Player player = event.getEntity();
-		if (combatManager.hasTags(player)){
-			List<CombatTag> tags = combatManager.getTags(player);
-				tags.forEach(tag->{
-					// Set the tag ticks to -1 as it's instantly removed from the player
-					tag.setAttackerTicksLeft(-1);
-					tag.setVictimTicksLeft(-1);
-					if (tag.getAttacker().getUniqueId().equals(player.getUniqueId())){
-						tag.setDeadAttacker(true);
-					} else {
-						tag.setDeadVictim(true);
-					}
-			});
-		}
-	}
-
 	@EventHandler
 	private void onCombatEnd(CombatTagEndEvent event){
 		CombatTag tag = event.getCombatTag();

@@ -35,6 +35,7 @@ public abstract class RegionManager {
 
         }
     };
+
     protected final FluffyCombat fluffy;
     private final Map<UUID, Set<Location>> barrierLocations = new HashMap<>();
     private final Map<UUID, Map<Location, BlockData>> barrierMaterials = new HashMap<>();
@@ -42,6 +43,9 @@ public abstract class RegionManager {
 
     protected RegionManager(FluffyCombat fluffy) {
         this.fluffy = fluffy;
+    }
+    public boolean isWithinNoCombatRegion(Location location){
+        return false;
     }
 
     public abstract boolean canEnterCombat(Player victim, Location location);

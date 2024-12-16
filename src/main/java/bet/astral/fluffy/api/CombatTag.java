@@ -20,7 +20,8 @@ import java.util.UUID;
 @Setter
 public class CombatTag {
 	public static final int ticks;
-	static {
+
+    static {
 		FluffyCombat fluffy = FluffyCombat.getPlugin(FluffyCombat.class);
 		FileConfiguration configuration = fluffy.getConfig();
 		ticks = configuration.getInt("time", 300);

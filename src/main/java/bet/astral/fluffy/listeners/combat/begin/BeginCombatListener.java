@@ -12,7 +12,6 @@ import bet.astral.fluffy.messenger.Placeholders;
 import bet.astral.fluffy.messenger.Translations;
 import bet.astral.messenger.v2.Messenger;
 import bet.astral.messenger.v2.placeholder.Placeholder;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -73,10 +72,19 @@ public class BeginCombatListener implements Listener {
 			return false;
 		}
 
-        return !fluffyCombat.getRegionManager().canEnterCombat(player, player.getLocation());
+		// Make sure regions protect the players
+		if (fluffyCombat.getRegionManager().isWithinNoCombatRegion(player.getLocation())){
+			return false;
+		}
+
+		return !fluffyCombat.getRegionManager().canEnterCombat(player, player.getLocation());
 	}
 
 	public static void handle(Player victim, OfflinePlayer attacker, CombatCause combatCause, ItemStack itemStack, boolean fireTicks) {
+		if (FluffyCombat.emergencyStop){
+			return;
+		}
+
 		if (victim.getUniqueId() == attacker.getUniqueId() && !FluffyCombat.debug) {
 			return;
 		}
@@ -136,6 +144,10 @@ public class BeginCombatListener implements Listener {
 	}
 
 	public static void handle(Player victim, Block attacker, CombatCause combatCause, @Nullable ItemStack itemStack) {
+		if (FluffyCombat.emergencyStop){
+			return;
+		}
+
 		if (victim.isDead()){
 			return;
 		}
@@ -159,6 +171,10 @@ public class BeginCombatListener implements Listener {
 	}
 
 	public static void handle(Player victim, BlockCombatUser attacker, CombatCause combatCause, @Nullable ItemStack itemStack) {
+		if (FluffyCombat.emergencyStop){
+			return;
+		}
+
 		if (victim.isDead()){
 			return;
 		}
@@ -198,6 +214,7 @@ public class BeginCombatListener implements Listener {
 			if (owner == null) {
 				return;
 			}
+
 			Material material = nearest.getType();
 			if (material == Material.FIRE || material == Material.SOUL_FIRE) {
 				OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(owner);
@@ -221,7 +238,6 @@ public class BeginCombatListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	private void onEntityDamage(EntityDamageByEntityEvent event) {
-
 		if (!(event.getEntity() instanceof Player victim)) {
 			return;
 		}
@@ -251,6 +267,7 @@ public class BeginCombatListener implements Listener {
 					if (bytes != null) {
 						itemStack = ItemStack.deserializeBytes(bytes);
 					}
+
 
 					if (projectile instanceof Arrow arrow) {
 						handle(victim, player, CombatCause.PROJECTILE, itemStack, arrow.getFireTicks() > 0);

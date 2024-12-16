@@ -27,6 +27,13 @@ public class WGRegionManager extends RegionManager {
         this.worldGuardHook = worldGuardHook;
     }
 
+    public boolean isWithinNoCombatRegion(Location location){
+        return false;
+//        boolean value = !worldGuardHook.getWorldGuard().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(location.getWorld()))
+  //              .getApplicableRegions(BukkitAdapter.asBlockVector(location)).testState(null, FluffyWGFlags.ALLOW_COMBAT_TAG);
+    //    return value;
+    }
+
     @Override
     public boolean canEnterCombat(Player victim, @NotNull Location location) {
         World world = BukkitAdapter.adapt(location.getWorld());

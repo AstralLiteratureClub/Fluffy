@@ -27,6 +27,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -70,7 +71,7 @@ public class DeathListener implements Listener {
 	}
 
 
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
 	private void onDeath(PlayerDeathEvent event) {
 		EntityDamageEvent entityDamageEvent = event.getEntity().getLastDamageCause();
 		if (entityDamageEvent == null) {
@@ -87,6 +88,26 @@ public class DeathListener implements Listener {
 		final EntityDamageEvent.DamageCause cause = entityDamageEvent.getCause();
 		final CombatManager combatManager = fluffy.getCombatManager();
 		final CombatTag tag = combatManager.getLatest(player);
+
+
+		// Cancel all combat tags of victim
+		if (combatManager.hasTags(event.getPlayer())){
+			Bukkit.getAsyncScheduler().runDelayed(fluffy, t->{
+				if (combatManager.hasTags(player)){
+					List<CombatTag> tags = combatManager.getTags(player);
+					tags.forEach(cyclingTag->{
+						// Set the tag ticks to -1 as it's instantly removed from the player
+						cyclingTag.setAttackerTicksLeft(-1);
+						cyclingTag.setVictimTicksLeft(-1);
+						if (cyclingTag.getAttacker().getUniqueId().equals(player.getUniqueId())){
+							cyclingTag.setDeadAttacker(true);
+						} else {
+							cyclingTag.setDeadVictim(true);
+						}
+					});
+				}
+			}, 100, TimeUnit.MILLISECONDS);
+		}
 		final ItemStack weapon;
 		boolean isVictim = false;
 		boolean isBlock = false;

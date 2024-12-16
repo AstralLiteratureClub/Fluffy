@@ -13,7 +13,6 @@ import bet.astral.fluffy.messenger.Translations;
 import bet.astral.shine.Shine;
 import bet.astral.shine.ShineColor;
 import bet.astral.more4j.tuples.Quartet;
-import net.kyori.adventure.util.Ticks;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
@@ -26,9 +25,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Antritus
@@ -76,6 +73,14 @@ public final class CombatManager {
 			 */
 			@Override
 			public void run() {
+				if (FluffyCombat.emergencyStop){
+					ended.clear();
+					alreadyEnded.clear();
+					tags.clear();
+					latest.clear();
+					task.cancel();
+					return;
+				}
 				try {
 					for (UUID uniqueId : List.copyOf(ended)) {
 						if (!hasTags(Bukkit.getOfflinePlayer(uniqueId)) && (alreadyEnded.get(uniqueId)==null||!alreadyEnded.get(uniqueId))) {
@@ -410,6 +415,9 @@ public final class CombatManager {
 	 */
 	@NotNull
 	public synchronized CombatTag create(Player playerVictim, OfflinePlayer playerAttacker){
+		if (FluffyCombat.emergencyStop){
+			return null;
+		}
 		NPCManager npcManager = getMain().getNpcManager();
 		if (playerVictim == null){
 			playerVictim = (Player) playerAttacker;
@@ -457,6 +465,9 @@ public final class CombatManager {
 	 */
 	@NotNull
 	public synchronized CombatTag create(Player playerVictim, BlockCombatUser block){
+		if (FluffyCombat.emergencyStop){
+			return null;
+		}
 		alreadyEnded.remove(playerVictim.getUniqueId());
 		CombatUser combatUserVictim = main.getUserManager().getUser(playerVictim);
 

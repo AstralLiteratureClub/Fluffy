@@ -4,7 +4,6 @@ import bet.astral.fluffy.FluffyCombat;
 
 import bet.astral.fluffy.events.AccountLoadEvent;
 import bet.astral.fluffy.statistic.Account;
-import bet.astral.fluffy.statistic.Statistics;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -50,7 +49,6 @@ public class StatisticManager implements Listener {
 	@EventHandler()
 	public void onQuit(PlayerQuitEvent event) {
 		Account user = users.get(event.getPlayer().getUniqueId());
-		System.out.println(user.getStatistic(Statistics.DEATHS_TOTEM));
 		user.save().thenRun(() -> users.remove(user.getId())).thenRun(()->fluffy.getComponentLogger().info("Saved user "+ event.getPlayer().getName()));
 	}
 
