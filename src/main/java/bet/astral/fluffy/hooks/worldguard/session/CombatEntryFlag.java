@@ -37,7 +37,7 @@ public class CombatEntryFlag extends FluffyHandler {
             if (now- this.lastMessage > 1000L){
                 MessageInfo messageInfo = new MessageInfoBuilder(Translations.REGION_ENTER_IN_COMBAT)
                         .withReceiver(player)
-                        .create();
+                        .build();
 
                 getMessenger().send(messageInfo);
                 this.lastMessage = now;
@@ -46,7 +46,7 @@ public class CombatEntryFlag extends FluffyHandler {
             if (extend && now-this.lastExtended > 1000){
                 MessageInfo lastExtended = new MessageInfoBuilder(Translations.REGION_ENTER_IN_COMBAT_COMBAT_EXTENDED)
                         .withReceiver(player)
-                        .create();
+                        .build();
 
                 getMessenger().send(lastExtended);
 
