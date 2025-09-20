@@ -12,7 +12,6 @@ group 'bet.astral'
 version '1.2.0'
 
 repositories {
-    mavenLocal()
     mavenCentral()
     maven { url "https://repo.papermc.io/repository/maven-public/" }
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
@@ -41,11 +40,11 @@ repositories {
 }
 
 dependencies {
-    implementation 'bet.astral:shine:1.0.0' // Shine
-    implementation 'bet.astral:messenger:2.3.2' // Messenger
-    implementation 'bet.astral:cloudplusplus:1.3.0' // Cloud Plus Plus
-    implementation("bet.astral:more4j:1.0.2") // More 4 J
-    implementation 'bet.astral:guiman:1.2.1' // GUIMAN
+    implementation 'com.github.AstralLiteratureClub:MoreForJava:1.0.2'
+    implementation 'com.github.AstralLiteratureClub:MessageManager:2.4.1'
+    implementation 'com.github.AstralLiteratureClub:GUIMan:1.3.1-3'
+    implementation 'com.github.AstralLiteratureClub:ChatGameCore:1.0.1'
+    implementation 'com.github.AstralLiteratureClub:CloudPlusPlus:1.3.0'
 
     // LOMBOK
     compileOnly 'org.projectlombok:lombok:1.18.34'
@@ -58,12 +57,12 @@ dependencies {
     compileOnly 'me.clip:placeholderapi:2.11.5'
 
     // World Guard
-    compileOnly('com.sk89q.worldedit:worldedit-bukkit:7.3.0') {
+    compileOnly('com.sk89q.worldedit:worldedit-bukkit:7.4.0-SNAPSHOT') {
         exclude group: 'com.google.guava', module: '*'
         exclude group: 'com.google.code.gson', module: '*'
         exclude group: 'org.apache.logging.log4j', module: '*'
     }
-    compileOnly('com.sk89q.worldguard:worldguard-bukkit:7.0.13-SNAPSHOT') {
+    compileOnly('com.sk89q.worldguard:worldguard-bukkit:7.1.0-SNAPSHOT') {
         exclude group: 'com.google.guava', module: '*'
         exclude group: 'com.google.code.gson', module: '*'
         exclude group: 'org.apache.logging.log4j', module: '*'
