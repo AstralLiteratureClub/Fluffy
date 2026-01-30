@@ -17,7 +17,6 @@ public class FluffyLoader implements PluginLoader {
 		// Maven Central
 		resolver.addRepository(new RemoteRepository.Builder("central", "default", "https://repo1.maven.org/maven2/").build());
 
-
 		// Cloud
 		String cloudFramework = "2.0.0-beta.8";
 		resolver.addDependency(new Dependency(new DefaultArtifact("org.incendo:cloud-paper:"+cloudFramework), null));

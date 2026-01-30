@@ -39,7 +39,7 @@ public final class Placeholders {
 				placeholders.add(Placeholder.plain("attacker_is_online", String.valueOf(attacker.isOnline())));
 			}
 		}
-		if (itemStack != null){
+		if (itemStack != null && itemStack.getAmount() > 0){
 			placeholders.addAll(itemPlaceholders("attacker_tool", itemStack));
 		}
 		placeholders.add(Placeholder.plain("cause", cause.name()));
