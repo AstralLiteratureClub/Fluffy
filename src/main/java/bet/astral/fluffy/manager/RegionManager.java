@@ -212,7 +212,7 @@ public abstract class RegionManager {
 
         if (materialData == null){
             org.bukkit.Material material = location.getBlock().getType();
-            if (material.isEmpty()){
+            if (material.isAir()){
                 return Pair.immutable(blockFace, false);
             }
 

@@ -1,11 +1,19 @@
 package bet.astral.fluffy.utils;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.*;
 import java.util.Objects;
 import java.util.stream.Stream;
 
 public final class Resource {
-	private static File loadResourceAsFile(String fileName) {
+	/**
+	 * Loads the file as an file resource from the plugin jar
+	 * @param fileName file name
+	 * @return file
+	 */
+	private static @Nullable File loadResourceAsFile(String fileName) {
 		InputStream inputStream = Resource.class.getResourceAsStream(fileName);
 		if (inputStream == null) {
 			return null;
@@ -43,28 +51,18 @@ public final class Resource {
 		}
 	}
 
-	public static File loadResourceAsTemp(String fileName, String end) {
+	/**
+	 * Loads the file as a temporary file from the jare
+	 * @param fileName file name
+	 * @param end file type
+	 * @return file as temporary file
+	 */
+	public static @NotNull File loadResourceAsTemp(String fileName, String end) {
 		try {
 			try {
 				File file = loadResourceAsFile(fileName+"." + end);
 				File temp = File.createTempFile(fileName, end);
-				BufferedReader fileReader = new BufferedReader(new FileReader(file));
-				BufferedWriter fileWriter = new BufferedWriter(new FileWriter(temp));
-				Stream<String> lines = fileReader.lines();
-				lines.forEachOrdered(line -> {
-					try {
-						fileWriter.write(line);
-						fileWriter.newLine();
-					} catch (IOException e) {
-						throw new RuntimeException(e);
-					}
-				});
-				fileWriter.flush();
-
-				fileReader.close();
-				fileWriter.close();
-
-				return temp;
+				return writeFile(file, temp);
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
@@ -73,7 +71,43 @@ public final class Resource {
 		}
 	}
 
-	public static File loadResourceToFile(String fileName, String end, File file, boolean exists){
+	/**
+	 * Writes the temporary file data to the existing file
+	 * @param file file
+	 * @param temp temp file
+	 * @return file written
+	 * @throws IOException if exception occurs during write up
+	 */
+	@NotNull
+	private static File writeFile(File file, File temp) throws IOException {
+		BufferedReader fileReader = new BufferedReader(new FileReader(file));
+		BufferedWriter fileWriter = new BufferedWriter(new FileWriter(temp));
+		Stream<String> lines = fileReader.lines();
+		lines.forEachOrdered(line -> {
+			try {
+				fileWriter.write(line);
+				fileWriter.newLine();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		});
+		fileWriter.flush();
+
+		fileReader.close();
+		fileWriter.close();
+
+		return temp;
+	}
+
+	/**
+	 * Loads the resource from the file to the file created
+	 * @param fileName file name
+	 * @param end file ending
+	 * @param file file
+	 * @param exists if the file exists return
+	 * @return file
+	 */
+	public static @NotNull File loadResourceToFile(String fileName, String end, @NotNull File file, boolean exists){
 		if (file.exists() && exists){
 			return file;
 		} else if (!file.exists()){
@@ -91,23 +125,7 @@ public final class Resource {
 			if (fileTemp == null){
 				throw new RuntimeException("Could not find file for id: "+ file);
 			}
-			BufferedReader  fileReader = new BufferedReader(new FileReader(fileTemp));
-			BufferedWriter fileWriter = new BufferedWriter(new FileWriter(file));
-			Stream<String> lines = fileReader.lines();
-			lines.forEachOrdered(line->{
-				try {
-					fileWriter.write(line);
-					fileWriter.newLine();
-				} catch (IOException e) {
-					throw new RuntimeException(e);
-				}
-			});
-			fileWriter.flush();
-
-			fileReader.close();
-			fileWriter.close();
-
-			return file;
+			return writeFile(fileTemp, file);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

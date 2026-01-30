@@ -75,9 +75,9 @@ block_explosion:
     default: "%death% <color:#ff3636>%victim% <color:#5be359>died suddenly without a good explanation"
     "minecraft:respawn_anchor": "%death% <color:#ff3636>%victim% <color:#5be359>died to a %respawn-anchor%<color:#5be359>."
     "minecraft:red_bed": "%death% <color:#ff3636>%victim% <color:#5be359>died to a <red>Red Bed<color:#5be359>."
+#
 # COMPLETED END
-# COMPLETED END
-# COMPLETED END
+#
 
 
 void:

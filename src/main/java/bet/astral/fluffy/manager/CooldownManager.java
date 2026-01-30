@@ -48,9 +48,9 @@ public class CooldownManager implements Listener {
 		if (!fluffy.getCombatConfig().isCustomCooldowns()){
 			return;
 		}
-		@SuppressWarnings("removal") FileConfiguration configuration = fluffy.getConfig();
+		FileConfiguration configuration = fluffy.getConfig();
 		List<Map<?, ?>> cooldownListMap = configuration.getMapList("cooldowns.cooldowns");
-		Registry<Material> materials = Registry.MATERIAL;
+		Registry<@NotNull Material> materials = Registry.MATERIAL;
 		for (Map<?, ?> cooldownMap : cooldownListMap){
 			Material material = materials.get(Objects.requireNonNull(NamespacedKey.fromString((String) cooldownMap.get("material"))));
 			if (material==null){
@@ -112,29 +112,47 @@ public class CooldownManager implements Listener {
 				}
 				Cooldown cooldown = cooldowns.get(material);
 				if (!cooldown.hasCooldown(player)) {
-					cooldown.handleCooldown(player);
-					if (cooldown.sound() != null){
-						assert cooldown.sound() != null;
-						Sound sound = Sound.sound(
-								Objects.requireNonNull(cooldown.sound()).key(),
-								Sound.Source.PLAYER,
-								1,
-								1
-						);
-						player.playSound(sound);
-					}
+					handleCooldown(player, cooldown);
 				} else {
 					event.setCancelled(true);
-					if (cooldown.message()){
-						TranslationKey key = TranslationKey.of("listener.cooldown."+ cooldown.material().getKey());
-						if (fluffy.getMessenger().getBaseComponent(key, Locale.US)==null){
-							key = Translations.LISTENER_COOLDOWN_DEFAULT;
-						}
-						fluffy.getMessenger()
-								.message(player, key, Placeholder.of("cooldown", cooldown.seconds()), Placeholder.of("type", Component.translatable(cooldown.material().translationKey())));
-					}
+					message(player, cooldown);
 				}
 			}
+		}
+	}
+
+	/**
+	 * Handles the cooldown process. Sends the cooldown sound and handles {@link Cooldown#handleCooldown(Player)}
+	 * @param player player
+	 * @param cooldown cooldown
+	 */
+	private void handleCooldown(Player player, @NotNull Cooldown cooldown) {
+		cooldown.handleCooldown(player);
+		if (cooldown.sound() != null){
+			assert cooldown.sound() != null;
+			Sound sound = Sound.sound(
+					Objects.requireNonNull(cooldown.sound()).key(),
+					Sound.Source.PLAYER,
+					1,
+					1
+			);
+			player.playSound(sound);
+		}
+	}
+
+	/**
+	 * Handles messaging of the player
+	 * @param player player
+	 * @param cooldown cooldown
+	 */
+	private void message(Player player, @NotNull Cooldown cooldown) {
+		if (cooldown.message()){
+			TranslationKey key = TranslationKey.of("listener.cooldown."+ cooldown.material().getKey());
+			if (fluffy.getMessenger().getBaseComponent(key, Locale.US)==null){
+				key = Translations.LISTENER_COOLDOWN_DEFAULT;
+			}
+			fluffy.getMessenger()
+					.message(player, key, Placeholder.of("cooldown", cooldown.seconds()), Placeholder.of("type", Component.translatable(cooldown.material().translationKey())));
 		}
 	}
 
@@ -153,25 +171,8 @@ public class CooldownManager implements Listener {
 				if (combatManager.hasTags(player)) {
 					Cooldown cooldown = cooldowns.get(material);
 					if (!cooldown.hasCooldown(player)) {
-						cooldown.handleCooldown(player);
-						if (cooldown.sound() != null){
-							assert cooldown.sound() != null;
-							Sound sound = Sound.sound(
-									Objects.requireNonNull(cooldown.sound()).key(),
-									Sound.Source.PLAYER,
-									1,
-									1
-							);
-							player.playSound(sound);
-						}
-						if (cooldown.message()) {
-							TranslationKey key = TranslationKey.of("listener.cooldown." + cooldown.material().getKey());
-							if (fluffy.getMessenger().getBaseComponent(key, Locale.US) == null) {
-								key = Translations.LISTENER_COOLDOWN_DEFAULT;
-							}
-							fluffy.getMessenger()
-									.message(player, key, Placeholder.of("cooldown", cooldown.seconds()), Placeholder.of("type", Component.translatable(cooldown.material().translationKey())));
-						}
+						handleCooldown(player, cooldown);
+						message(player, cooldown);
 					} else {
 						event.setCancelled(true);
 					}

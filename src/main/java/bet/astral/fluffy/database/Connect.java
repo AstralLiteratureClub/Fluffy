@@ -7,10 +7,10 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.function.Function;
 
+@Getter
 public abstract class Connect {
     private final FluffyCombat fluffy;
-    @Getter
-    private Connection connection;
+    private final Connection connection;
 
     public Connect(FluffyCombat fluffyCombat) {
         this.fluffy = fluffyCombat;
@@ -22,10 +22,6 @@ public abstract class Connect {
 
     public boolean isClosed() throws SQLException {
         return getConnection().isClosed();
-    }
-
-    public FluffyCombat getFluffy(){
-        return fluffy;
     }
 
     public <T> Function<Throwable, T> exception(String name){

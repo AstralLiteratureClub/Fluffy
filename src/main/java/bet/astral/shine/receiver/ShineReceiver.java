@@ -1,10 +1,12 @@
 package bet.astral.shine.receiver;
 
-import org.bukkit.block.Block;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ShineReceiver {
-    public static ShineReceiver of(@NotNull Object block) {
+    @Contract(pure = true)
+    public static @Nullable ShineReceiver of(@NotNull Object block) {
         return null;
     }
 }

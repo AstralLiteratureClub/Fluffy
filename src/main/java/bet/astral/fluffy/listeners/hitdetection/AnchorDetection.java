@@ -19,6 +19,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -69,9 +70,7 @@ public class AnchorDetection implements Listener {
 		}
 		if (detectionMap.get(location) != null) {
 			fluffyCombat.getServer().getAsyncScheduler().runDelayed(fluffyCombat,
-					(x) -> {
-						detectionMap.remove(location);
-					},
+					(x) -> detectionMap.remove(location),
 					100, TimeUnit.MILLISECONDS);
 		}
 	}
@@ -121,7 +120,7 @@ public class AnchorDetection implements Listener {
 
 	public record AnchorTag(Location location, Player owner, ItemStack itemStack, int charges) {
 		@Override
-			public String toString() {
+			public @NotNull String toString() {
 				return "AnchorTag[" +
 						"location=" + location + ", " +
 						"owner=" + owner + ", " +

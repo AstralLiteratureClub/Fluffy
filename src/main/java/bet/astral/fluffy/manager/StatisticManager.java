@@ -1,7 +1,6 @@
 package bet.astral.fluffy.manager;
 
 import bet.astral.fluffy.FluffyCombat;
-
 import bet.astral.fluffy.events.AccountLoadEvent;
 import bet.astral.fluffy.statistic.Account;
 import org.bukkit.Bukkit;
@@ -10,12 +9,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class StatisticManager implements Listener {
@@ -40,16 +41,14 @@ public class StatisticManager implements Listener {
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-	public void onLogin(PlayerLoginEvent event) {
-		if (event.getResult() == PlayerLoginEvent.Result.ALLOWED) {
-			load(event.getPlayer());
-		}
+	public void onLogin(PlayerJoinEvent event) {
+		load(event.getPlayer());
 	}
 
 	@EventHandler()
 	public void onQuit(PlayerQuitEvent event) {
 		Account user = users.get(event.getPlayer().getUniqueId());
-		user.save().thenRun(() -> users.remove(user.getId())).thenRun(()->fluffy.getComponentLogger().info("Saved user "+ event.getPlayer().getName()));
+		user.save().thenRun(() -> users.remove(user.getId())).thenRun(()-> fluffy.getComponentLogger().info("Saved user {}", event.getPlayer().getName()));
 	}
 
 	@Nullable

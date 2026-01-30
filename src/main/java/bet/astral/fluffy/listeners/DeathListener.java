@@ -441,9 +441,7 @@ public class DeathListener implements Listener {
 		if (victimAcc instanceof PlaceholderAccount placeholderAccount) {
 			Account realAccount = fluffy.getStatisticManager().get(placeholderAccount.getId());
 			if (realAccount == null) {
-				Bukkit.getAsyncScheduler().runDelayed(fluffy, t -> {
-					placeholderAccount.apply(realAccount);
-				}, 20, TimeUnit.MILLISECONDS);
+				Bukkit.getAsyncScheduler().runDelayed(fluffy, t -> placeholderAccount.apply(null), 20, TimeUnit.MILLISECONDS);
 			}
 			placeholderAccount.apply(realAccount);
 			victimAcc.save();

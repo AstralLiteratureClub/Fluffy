@@ -18,7 +18,7 @@ public class AccountLoadEvent extends Event {
 	}
 
 	@NotNull
-	public static final HandlerList getHandlerList(){
+	public static HandlerList getHandlerList(){
 		return HANDLER_LIST;
 	}
 

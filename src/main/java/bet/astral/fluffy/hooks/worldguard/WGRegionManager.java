@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 public class WGRegionManager extends RegionManager {
@@ -27,11 +28,9 @@ public class WGRegionManager extends RegionManager {
         this.worldGuardHook = worldGuardHook;
     }
 
-    public boolean isWithinNoCombatRegion(Location location){
-        return false;
-//        boolean value = !worldGuardHook.getWorldGuard().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(location.getWorld()))
-  //              .getApplicableRegions(BukkitAdapter.asBlockVector(location)).testState(null, FluffyWGFlags.ALLOW_COMBAT_TAG);
-    //    return value;
+    public boolean isWithinNoCombatRegion(@NotNull Location location){
+        return !Objects.requireNonNull(worldGuardHook.getWorldGuard().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(location.getWorld())))
+                .getApplicableRegions(BukkitAdapter.asBlockVector(location)).testState(null, FluffyWGFlags.ALLOW_COMBAT_TAG);
     }
 
     @Override

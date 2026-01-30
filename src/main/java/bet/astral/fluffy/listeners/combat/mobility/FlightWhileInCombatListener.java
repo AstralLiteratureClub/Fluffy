@@ -24,7 +24,8 @@ public class FlightWhileInCombatListener implements Listener {
 		OfflinePlayer player = event.player();
 		if (player instanceof Player oPlayer){
 			CombatUser user = fluffy.getUserManager().getUser(oPlayer);
-			BukkitTask task = user.getTaskFlightTimer();
+            assert user != null;
+            BukkitTask task = user.getTaskFlightTimer();
 			if (task != null && !task.isCancelled()){
 				task.cancel();
 				user.setFlightTimer(fluffy.getCombatConfig().getFlightTicks());
@@ -46,7 +47,8 @@ public class FlightWhileInCombatListener implements Listener {
 			boolean toggleOn = player.isFlying();
 			if (!toggleOn) {
 				CombatUser user = fluffy.getUserManager().getUser(player);
-				if (user.getTaskFlightTimer() != null && !user.getTaskFlightTimer().isCancelled()){
+                assert user != null;
+                if (user.getTaskFlightTimer() != null && !user.getTaskFlightTimer().isCancelled()){
 					user.getTaskFlightTimer().cancel();
 					user.setTaskFlightTimer(null);
 				}
@@ -58,7 +60,8 @@ public class FlightWhileInCombatListener implements Listener {
 
 			}
 			CombatUser user = fluffy.getUserManager().getUser(player);
-			if (user.getTaskFlightTimer() != null && !user.getTaskFlightTimer().isCancelled()){
+            assert user != null;
+            if (user.getTaskFlightTimer() != null && !user.getTaskFlightTimer().isCancelled()){
 				user.getTaskFlightTimer().cancel();
 				user.setTaskFlightTimer(null);
 			}

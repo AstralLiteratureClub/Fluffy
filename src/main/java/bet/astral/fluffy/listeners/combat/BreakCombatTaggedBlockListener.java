@@ -16,10 +16,6 @@ public class BreakCombatTaggedBlockListener implements Listener {
 		this.fluffy = fluffyCombat;
 	}
 
-	public void onBlockExplodeEvent(){
-
-	}
-
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	private void onBlockBreak(BlockBreakEvent event){
 		BlockUserManager blockUserManager = fluffy.getBlockUserManager();
@@ -27,7 +23,7 @@ public class BreakCombatTaggedBlockListener implements Listener {
 		if (blockCombatUser == null){
 			return;
 		}
-		blockCombatUser.setAlive(event.isCancelled());
+		blockCombatUser.setAlive(false);
 		if (fluffy.getCombatConfig().isCombatGlow()) {
 			try {
 				fluffy.getShine().removeGlowing(ShineReceiver.of(event.getBlock()), event.getPlayer());

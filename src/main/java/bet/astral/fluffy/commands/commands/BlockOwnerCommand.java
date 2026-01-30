@@ -1,9 +1,9 @@
 package bet.astral.fluffy.commands.commands;
 
 import bet.astral.cloudplusplus.annotations.Cloud;
-import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.FluffyCommandRegisterer;
 import bet.astral.fluffy.commands.FluffyCommand;
+import bet.astral.fluffy.listeners.hitdetection.DetectionHelper;
 import bet.astral.fluffy.messenger.Translations;
 import bet.astral.messenger.v2.placeholder.collection.PlaceholderList;
 import bet.astral.more4j.tuples.Pair;
@@ -46,7 +46,7 @@ public class BlockOwnerCommand extends FluffyCommand {
 			}
 			Location location = locationOptional.get();
 			Block block = location.getBlock();
-			Pair<UUID, Material> blockInfo = FluffyCombat.getBlockData(block);
+			Pair<UUID, Material> blockInfo = DetectionHelper.getBlockData(block);
 			PlaceholderList placeholders = new PlaceholderList();
 			placeholders.add("x", location.getX());
 			placeholders.add("y", location.getY());

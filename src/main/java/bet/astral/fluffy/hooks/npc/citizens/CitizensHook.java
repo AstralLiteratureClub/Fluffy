@@ -32,6 +32,9 @@ public class CitizensHook implements Hook {
 
     @Override
     public void onEnable() {
+        if (citizens == null) {
+            return;
+        }
         citizens.getTraitFactory().registerTrait(TraitInfo.create(FluffyTrait.class));
 
         fluffy.setNpcManager(new CitizensNPCManager(this));

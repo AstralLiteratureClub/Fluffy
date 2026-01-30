@@ -15,7 +15,7 @@ public class PlayerNewHighStreakEvent extends Event {
     private final Account account;
     private final Statistic streak;
     private final Statistic highestStreak;
-    private int value;
+    private final int value;
 
 
     public PlayerNewHighStreakEvent(OfflinePlayer player, Account account, Statistic streak, Statistic highestStreak) {

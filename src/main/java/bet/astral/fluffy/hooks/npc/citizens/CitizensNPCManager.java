@@ -128,7 +128,6 @@ public class CitizensNPCManager extends NPCManager implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onNPCDeath(NPCDeathEvent event) {
-        Bukkit.broadcastMessage("hello2)");
         if (isFluffyNPC(event.getNPC())){
             NPC npc = event.getNPC();
             Inventory inventory = npc.getOrAddTrait(Inventory.class);
@@ -185,6 +184,7 @@ public class CitizensNPCManager extends NPCManager implements Listener {
         if (isNPC(obj)){
             NPC player = (NPC) obj;
             NPC npc = getNPC(player.getUniqueId());
+            assert npc != null;
             npc.despawn(DespawnReason.REMOVAL);
             npc.destroy();
             return;

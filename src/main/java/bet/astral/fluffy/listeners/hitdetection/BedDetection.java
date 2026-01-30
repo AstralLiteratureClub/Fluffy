@@ -88,9 +88,7 @@ public class BedDetection implements Listener {
 		detectionMap.put(headLoc, tag);
 		detectionMap.put(footLoc, tag);
 		fluffy.getServer().getAsyncScheduler().runDelayed(fluffy,
-				(x) -> {
-					clear(headLoc != null ? headLoc : footLoc);
-				},
+				(x) -> clear(headLoc != null ? headLoc : footLoc),
 				2,
 				TimeUnit.SECONDS
 		);

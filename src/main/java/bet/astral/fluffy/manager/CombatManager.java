@@ -229,7 +229,7 @@ public final class CombatManager {
 							OfflinePlayer attackerOP = tag.getAttacker().getPlayer();
 							if (config.isCombatGlow() && config.isCombatGlowLatest()
 									&& victimOP.isOnline() && attackerOP.isOnline()) {
-								makeGlow(main, victimOP.getPlayer(), attackerOP.getPlayer(), tag);
+								makeGlow(main, Objects.requireNonNull(victimOP.getPlayer()), Objects.requireNonNull(attackerOP.getPlayer()), tag);
 								if (!victimOP.equals(attackerOP)) {
 									makeGlow(main, attackerOP.getPlayer(), victimOP.getPlayer(), tag);
 								}
@@ -253,7 +253,7 @@ public final class CombatManager {
 						}
 					});
 				} catch (Exception e) {
-					e.printStackTrace();
+					getMain().getComponentLogger().error("Error accorded while running combat timer!", e);
 				}
 			}
 		}.runTaskTimerAsynchronously(main, 20, 10);
@@ -340,12 +340,12 @@ public final class CombatManager {
 		if (getLatest(whoSees) == null){
 			return false;
 		}
-		return getLatest(whoSees).equals(tag);
+		return Objects.equals(getLatest(whoSees), tag);
 	}
 
 	/**
 	 * Returns true if the given players have no combat tag.
-	 * This is check by using getTag(..., ...)
+	 * This is checked by using getTag(..., ...)
 	 * @see #getTag(OfflinePlayer, OfflinePlayer)
 	 * @param player player
 	 * @param player2 player 2
@@ -357,7 +357,7 @@ public final class CombatManager {
 
 	/**
 	 * Returns true if the given players have no combat tag.
-	 * This is check by using getTag(..., ...)
+	 * This is checked by using getTag(..., ...)
 	 * @see #getTag(OfflinePlayer, OfflinePlayer)
 	 * @param player player
 	 * @param block block

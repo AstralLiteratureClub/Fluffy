@@ -1,12 +1,14 @@
 package bet.astral.fluffy.listeners;
 
 import bet.astral.fluffy.FluffyCombat;
-import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent;
+import bet.astral.fluffy.api.CombatTag;
 import com.jeff_media.armorequipevent.ArmorEquipEvent;
+import io.papermc.paper.datacomponent.DataComponentTypes;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.HashSet;
 import java.util.List;
@@ -21,7 +23,12 @@ public class ArmorChangeListener implements Listener {
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
 	private void onArmorHotSwapEvent(PlayerInteractEvent event) {
-		if (PlayerArmorChangeEvent.SlotType.isEquipable(event.getMaterial())) {
+		CombatTag tag = fluffy.getCombatManager().getLatest(event.getPlayer());
+		if (tag == null) {
+			return;
+		}
+		ItemStack item = event.getPlayer().getInventory().getItemInMainHand();
+		if (item.hasData(DataComponentTypes.EQUIPPABLE)) {
 			if (!fluffy.getCombatConfig().isArmorHotSwapAllowed()) {
 				event.setCancelled(true);
 			}
@@ -31,6 +38,11 @@ public class ArmorChangeListener implements Listener {
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
 	private void onArmorEquipEvent(ArmorEquipEvent event) {
+		CombatTag tag = fluffy.getCombatManager().getLatest(event.getPlayer());
+		if (tag == null) {
+			return;
+		}
+
 		Set<ArmorEquipEvent.EquipMethod> methods = new HashSet<>(List.of(
 				ArmorEquipEvent.EquipMethod.SHIFT_CLICK,
 				ArmorEquipEvent.EquipMethod.DRAG,

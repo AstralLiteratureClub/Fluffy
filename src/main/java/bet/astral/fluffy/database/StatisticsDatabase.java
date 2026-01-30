@@ -19,10 +19,6 @@ public class StatisticsDatabase extends Connect{
     }
 
     @Override
-    public void onDisable() {
-    }
-
-    @Override
     public Connection connect() {
         File file = new File(getFluffy().getDataFolder(), "users.db");
         if (file.getParentFile().exists()) {

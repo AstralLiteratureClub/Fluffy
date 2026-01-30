@@ -33,10 +33,6 @@ public class CombatLogDB extends Connect{
 
 
     @Override
-    public void onDisable() {
-    }
-
-    @Override
     public void onEnable() {
         try {
             PreparedStatement statement = getConnection().prepareStatement("CREATE TABLE IF NOT EXISTS combatlog (uniqueId VARCHAR(36), date BIGINT, wasKilled BOOL DEFAULT false, killer VARCHAR(36))");

@@ -71,7 +71,7 @@ public class AccountImpl implements Account {
 			return;
 		}
 		if (!has(statistic)){
-			setDefault(statistic, -1);
+			setDefault(statistic, 0);
 			return;
 		}
 		statistics.put(statistic, statistics.get(statistic)-1);

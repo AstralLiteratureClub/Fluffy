@@ -4,8 +4,6 @@ import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.hooks.Hook;
 import bet.astral.fluffy.hooks.HookState;
 import lombok.Getter;
-import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.mcmonkey.sentinel.SentinelIntegration;

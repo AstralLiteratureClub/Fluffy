@@ -29,8 +29,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public class TNTDetection implements Listener {
-    public static final NamespacedKey FLUFFY_TNT_RPIMER_ENTITY = new NamespacedKey("fluffy", "tnt_primer_entity");
-    public static final NamespacedKey FLUFFY_TNT_RPIMER_BLOCK = new NamespacedKey("fluffy", "tnt_primer_block");
+    public static final NamespacedKey FLUFFY_TNT_PRIMER_ENTITY = new NamespacedKey("fluffy", "tnt_primer_entity");
+    public static final NamespacedKey FLUFFY_TNT_PRIMER_BLOCK = new NamespacedKey("fluffy", "tnt_primer_block");
     public static final NamespacedKey FLUFFY_TNT_LOCATION = new NamespacedKey("fluffy", "tnt_location");
     /**
      * Used to detect TNT lit by CRYSTALS
@@ -81,7 +81,7 @@ public class TNTDetection implements Listener {
     public static void setTNTPrimer(@NotNull Player player, @NotNull TNTPrimed primed) {
         // Use persistent data container to split completely from metadata
         PersistentDataContainer container = primed.getPersistentDataContainer();
-        container.set(FLUFFY_TNT_RPIMER_ENTITY, DataType.UUID, player.getUniqueId());
+        container.set(FLUFFY_TNT_PRIMER_ENTITY, DataType.UUID, player.getUniqueId());
     }
 
     /**
@@ -93,7 +93,7 @@ public class TNTDetection implements Listener {
     @Nullable
     public static EntityType type(@NotNull TNTPrimed tntPrimed) {
         PersistentDataContainer container = tntPrimed.getPersistentDataContainer();
-        UUID who = container.get(FLUFFY_TNT_RPIMER_ENTITY, DataType.UUID);
+        UUID who = container.get(FLUFFY_TNT_PRIMER_ENTITY, DataType.UUID);
         if (who == null) {
             return null;
         }
@@ -114,10 +114,10 @@ public class TNTDetection implements Listener {
     @Nullable
     private static Object getPrimer(@NotNull TNTPrimed tntPrimed) {
         PersistentDataContainer container = tntPrimed.getPersistentDataContainer();
-        UUID who = container.get(FLUFFY_TNT_RPIMER_ENTITY, DataType.UUID);
+        UUID who = container.get(FLUFFY_TNT_PRIMER_ENTITY, DataType.UUID);
         if (who == null) {
             // Find location of the primer
-            Location location = container.get(FLUFFY_TNT_RPIMER_BLOCK, DataType.LOCATION);
+            Location location = container.get(FLUFFY_TNT_PRIMER_BLOCK, DataType.LOCATION);
             if (location == null) {
                 return null;
             }
@@ -287,7 +287,6 @@ public class TNTDetection implements Listener {
             Entity entity = event.getPrimingEntity();
             switch (entity) {
                 case null -> {
-                    return;
                 }
                 // Ender crystal
                 case EnderCrystal crystal -> {
@@ -381,7 +380,7 @@ public class TNTDetection implements Listener {
                         DetectionHelper.timedRemovalKey(fluffy, fireOwners, tnt, 150);
                     }
                     blockPrimers.remove(location);
-                    container.set(FLUFFY_TNT_RPIMER_BLOCK, DataType.LOCATION, block.getLocation());
+                    container.set(FLUFFY_TNT_PRIMER_BLOCK, DataType.LOCATION, block.getLocation());
 
                     // Cache block data for later use
                     Pair<Long, Block> data = Pair.immutable(System.currentTimeMillis(), block);
@@ -404,7 +403,7 @@ public class TNTDetection implements Listener {
                 default -> throw new IllegalStateException("Unexpected value: " + entity);
             }
             primers.remove(location);
-            container.set(FLUFFY_TNT_RPIMER_ENTITY, DataType.UUID, entity.getUniqueId());
+            container.set(FLUFFY_TNT_PRIMER_ENTITY, DataType.UUID, entity.getUniqueId());
         }
     }
 
@@ -434,7 +433,7 @@ public class TNTDetection implements Listener {
         }
         if (event.getDamager() instanceof TNTPrimed tnt) {
             PersistentDataContainer container = tnt.getPersistentDataContainer();
-            UUID owner = container.get(FLUFFY_TNT_RPIMER_ENTITY, DataType.UUID);
+            UUID owner = container.get(FLUFFY_TNT_PRIMER_ENTITY, DataType.UUID);
             if (owner != null) {
                 Object value = getStartingEntityPrimer(tnt);
                 if (value == null) {

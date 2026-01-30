@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 public final class DetectionHelper implements Listener {
     public static Material[] FIRE_BLOCKS = {Material.SOUL_FIRE, Material.FIRE, Material.FIRE};
-    private static Map<Chunk, Map<Location, Pair<UUID, Material>>> blockOwners = new HashMap<>();
+    private static final Map<Chunk, Map<Location, Pair<UUID, Material>>> blockOwners = new HashMap<>();
 
     /**
      * Times a removal of the key from the map.
@@ -173,7 +173,6 @@ public final class DetectionHelper implements Listener {
      */
     private static @NotNull List<Block> getSurroundingBlocks(Location location, int radius, Material... materials) {
         Set<Material> set = Arrays.stream(materials).collect(Collectors.toSet());
-        ;
         List<Block> surroundingBlocks = new ArrayList<>();
         for (int x = -radius; x <= radius; x++) {
             for (int y = -radius; y <= radius; y++) {

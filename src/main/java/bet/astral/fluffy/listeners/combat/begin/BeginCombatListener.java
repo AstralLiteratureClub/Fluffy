@@ -41,7 +41,6 @@ import static org.bukkit.persistence.PersistentDataType.BYTE_ARRAY;
  * @author Antritus
  * @since 1.0-SNAPSHOT
  */
-@SuppressWarnings("removal")
 public class BeginCombatListener implements Listener {
 	private final FluffyCombat combat;
 

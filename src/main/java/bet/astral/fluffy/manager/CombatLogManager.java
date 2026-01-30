@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class CombatLogManager {
-	private static Map<UUID, Boolean> combatLogged = new HashMap<>();
+	private static final Map<UUID, Boolean> combatLogged = new HashMap<>();
 
 
 	public boolean hasCombatLogged(Player player) {

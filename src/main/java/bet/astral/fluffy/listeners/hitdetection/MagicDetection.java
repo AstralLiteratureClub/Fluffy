@@ -66,8 +66,8 @@ public class MagicDetection implements Listener {
 		}
 
 		List<PotionEffectType> types = effects(areaEffectCloud);
-		List<PotionEffectType> combat = combatConfig.getPotionsToBeginCombat();;
-		boolean isCombatEnabling = isCombat(types, combat);
+		List<PotionEffectType> combat = combatConfig.getPotionsToBeginCombat();
+        boolean isCombatEnabling = isCombat(types, combat);
 		if (!isCombatEnabling) {
 			return;
 		}
@@ -93,7 +93,7 @@ public class MagicDetection implements Listener {
 	private static boolean isCombat(List<PotionEffectType> types, List<PotionEffectType> combatPotions){
 		for (PotionEffectType type : types) {
 			for (PotionEffectType other : combatPotions){
-				if (other.getName().equals(type.getName())){
+				if (other.getKey().equals(type.getKey())){
 					return true;
 				}
 			}
@@ -153,7 +153,7 @@ public class MagicDetection implements Listener {
 			return;
 		}
 
-		if (event.getAffectedEntities().size()==0){
+		if (event.getAffectedEntities().isEmpty()){
 			return;
 		}
 		for (LivingEntity livingEntity : event.getAffectedEntities().stream().filter(entity -> entity instanceof Player player && player.getGameMode() != GameMode.CREATIVE && player.getGameMode() != GameMode.SPECTATOR ).toList()) {
@@ -257,8 +257,7 @@ public class MagicDetection implements Listener {
 			if (source instanceof Player attacker){
 				if (event.getEntity() instanceof Player victim) {
 					BeginCombatListener.handle(victim, attacker, CombatCause.SPLASH_POTION);
-					return;
-				}
+                }
 			}
 		}
 	}

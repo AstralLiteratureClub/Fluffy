@@ -16,9 +16,9 @@ import org.slf4j.LoggerFactory;
 
 public class FluffyCommandRegisterer implements BootstrapCommandRegisterer<CommandSender> {
 	private final Logger logger = LoggerFactory.getLogger("FluffyCommandRegisterer");
-	private PaperCommandManager.Bootstrapped<CommandSender> commandManager;
+	private final PaperCommandManager.Bootstrapped<CommandSender> commandManager;
 	private final BootstrapHandler handler = new BootstrapHandler();
-	private FluffyMessenger messenger;
+	private final FluffyMessenger messenger;
 	public FluffyCommandRegisterer(BootstrapContext context, FluffyMessenger messenger){
 		commandManager = PaperCommandManager
 				.builder(new CommandSourceStackToCommandSenderMapper())
@@ -53,7 +53,7 @@ public class FluffyCommandRegisterer implements BootstrapCommandRegisterer<Comma
 	}
 
 	@Override
-	public PaperCommandManager.Bootstrapped<CommandSender> getCommandManager() {
+	public PaperCommandManager.@NotNull Bootstrapped<CommandSender> getCommandManager() {
 		return commandManager;
 	}
 

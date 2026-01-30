@@ -2,6 +2,7 @@ package bet.astral.fluffy.statistic;
 
 import bet.astral.fluffy.events.player.PlayerNewHighStreakEvent;
 import bet.astral.messenger.v2.placeholder.values.PlaceholderValue;
+import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.OfflinePlayer;
 import org.incendo.cloud.description.Description;
@@ -10,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 
 public interface Statistic extends PlaceholderValue {
-	static void incrementStreak(OfflinePlayer player, Account account, Statistic streak, Statistic highestStreak){
+	static void incrementStreak(OfflinePlayer player, @NotNull Account account, Statistic streak, Statistic highestStreak){
 		account.increment(streak);
 		if (account.getStatistic(streak) > account.getStatistic(highestStreak)) {
 			account.increment(highestStreak);
@@ -47,7 +48,8 @@ public interface Statistic extends PlaceholderValue {
 	class StatisticImpl implements Statistic {
 		@NotNull
 		private final String name;
-		private final boolean canBeReset;
+		@Getter
+        private final boolean canBeReset;
 		protected StatisticImpl(@NotNull String name, boolean canBeReset){
 			this.name = name;
             this.canBeReset = canBeReset;
@@ -72,7 +74,8 @@ public interface Statistic extends PlaceholderValue {
 		public boolean equals(Object obj) {
 			return (obj instanceof Statistic && ((Statistic) obj).getName().contentEquals(getName()));
 		}
-	}
+
+    }
 	class StatisticDescriptionImpl extends StatisticImpl implements StatisticDescription {
 		private final Description description;
 
