@@ -6,6 +6,7 @@ import bet.astral.fluffy.api.CombatCause;
 import bet.astral.fluffy.api.CombatTag;
 import bet.astral.fluffy.api.CombatUser;
 import bet.astral.fluffy.events.*;
+import bet.astral.fluffy.listeners.hitdetection.DetectionHelper;
 import bet.astral.fluffy.manager.BlockUserManager;
 import bet.astral.fluffy.manager.CombatManager;
 import bet.astral.fluffy.messenger.Placeholders;
@@ -206,11 +207,11 @@ public class BeginCombatListener implements Listener {
 			return;
 		}
 		if (event.getCause() == FIRE) {
-			Block nearest = findNearestOwnedBlock(player, Material.FIRE, Material.SOUL_FIRE);
+			Block nearest = DetectionHelper.findNearestOwnedBlock(player, Material.FIRE, Material.SOUL_FIRE);
 			if (nearest == null) {
 				return;
 			}
-			UUID owner = FluffyCombat.getBlockOwner(nearest);
+			UUID owner = DetectionHelper.getBlockOwner(nearest);
 			if (owner == null) {
 				return;
 			}
@@ -221,11 +222,11 @@ public class BeginCombatListener implements Listener {
 				handle(player, offlinePlayer, CombatCause.FIRE);
 			}
 		} else if (event.getCause() == LAVA) {
-			Block block = FluffyCombat.findNearestOwnedBlock(player, Material.LAVA);
+			Block block = DetectionHelper.findNearestOwnedBlock(player, Material.LAVA);
 			if (block == null){
 				return;
 			}
-			UUID owner = FluffyCombat.getBlockOwner(block);
+			UUID owner = DetectionHelper.getBlockOwner(block);
 			if (owner == null) {
 				return;
 			}
@@ -243,6 +244,9 @@ public class BeginCombatListener implements Listener {
 		}
 		if (event.getCause() == FIRE_TICK) {
 			CombatUser user = combat.getUserManager().getUser(victim);
+			if (user == null) {
+				return;
+			}
 			if (user.getLastFireDamage() != null) {
 				if (!combat.getCombatManager().hasTags(victim)) {
 					return;

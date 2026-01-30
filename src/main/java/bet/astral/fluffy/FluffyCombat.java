@@ -63,108 +63,6 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 	public static final NamespacedKey PROJECTILE_ITEM_KEY = new NamespacedKey("fluffy", "shooter_tool");
 	@Getter(AccessLevel.NONE)
 	private static final MiniMessage miniMessage = MiniMessage.miniMessage();
-	@Getter(AccessLevel.NONE)
-	private static Map<Chunk, Map<Location, Pair<UUID, Material>>> blockOwners = new HashMap<>();
-
-	public static Pair<UUID, Material> getBlockData(Block block){
-		if (blockOwners.get(block.getChunk()) == null){
-			return null;
-		}
-
-		Pair<UUID, Material> data = blockOwners.get(block.getChunk()).get(block.getLocation());
-		if (data == null){
-			return null;
-		}
-		if (data.getSecond() != block.getType()){
-			return null;
-		}
-		return data;
-	}
-	public static boolean isOwned(Block block){
-		return getBlockData(block) != null;
-	}
-	public static UUID getBlockOwner(Block block){
-		Pair<UUID, Material> blockData = getBlockData(block);
-		if (blockData == null){
-			return null;
-		}
-		if (blockData.getSecond() != block.getType()){
-			return null;
-		}
-		return blockData.getFirst();
-	}
-	public static @Nullable Block findNearestOwnedBlock(Player player, Material... allowedMaterials) {
-		Validate.notNull(player, "Player cannot be null.");
-
-		Location playerLocation = player.getLocation();
-		List<Block> surroundingBlocks = getSurroundingBlocks(playerLocation, allowedMaterials);
-
-		return getNearestOwnedBlock(player, surroundingBlocks);
-	}
-
-	private static List<Block> getSurroundingBlocks(Location playerLocation, Material... materials) {
-		Set<Material> set = Arrays.stream(materials).collect(Collectors.toSet());;
-		List<Block> surroundingBlocks = new ArrayList<>();
-		int radius = 1; // Adjust as needed
-		for (int x = -radius; x <= radius; x++) {
-			for (int y = -radius; y <= radius; y++) {
-				for (int z = -radius; z <= radius; z++) {
-					Block block = playerLocation.clone().add(x, y, z).getBlock();
-					if (set.contains(block.getType())) {
-						surroundingBlocks.add(block);
-					}
-				}
-			}
-		}
-		return surroundingBlocks;
-	}
-
-	public static @Nullable Block getNearestOwnedBlock(Player player, List<Block> blocks) {
-		Block nearestBlock = null;
-		double shortestDistance = Double.MAX_VALUE;
-		for (Block block : blocks) {
-			if (isOwned(block)) {
-				double distance = block.getLocation().distanceSquared(player.getLocation());
-				if (distance < shortestDistance) {
-					shortestDistance = distance;
-					nearestBlock = block;
-				}
-			}
-		}
-		return nearestBlock;
-	}
-	public static void clearBlockData(Chunk chunk, Location location){
-		if (blockOwners.get(chunk) != null) {
-			blockOwners.get(chunk).remove(location);
-		}
-	}
-	public static void clearIncorrectBlockData(Chunk chunk){
-		List<Block> remove = new ArrayList<>();
-		if (blockOwners.get(chunk) != null) {
-			for (Location location : blockOwners.get(chunk).keySet()) {
-				if (blockOwners.get(chunk).get(location).getSecond()!=location.getBlock().getType()){
-					if (blockOwners.get(chunk).get(location).getSecond()==Material.FIRE && location.getBlock().getType() == Material.SOUL_FIRE){
-						continue;
-					}
-					if (blockOwners.get(chunk).get(location).getSecond()==Material.SOUL_FIRE && location.getBlock().getType() == Material.FIRE){
-						continue;
-					}
-					remove.add(location.getBlock());
-				}
-			}
-		}
-		for (Block block : remove){
-			blockOwners.get(block.getChunk()).remove(block.getLocation());
-		}
-	}
-	public static void setBlockOwner(OfflinePlayer player, Block block){
-		blockOwners.putIfAbsent(block.getChunk(), new HashMap<>());
-		blockOwners.get(block.getChunk()).put(block.getLocation(), Pair.immutable(player.getUniqueId(), block.getType()));
-	}
-	public static void setBlockOwner(OfflinePlayer player, Block block, Material material) {
-		blockOwners.putIfAbsent(block.getChunk(), new HashMap<>());
-		blockOwners.get(block.getChunk()).put(block.getLocation(), Pair.immutable(player.getUniqueId(), material));
-	}
 
 	public static boolean isPaper;
 
@@ -260,6 +158,8 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		registerListeners(new ArmorChangeListener(this));
 		registerListeners(new RegionWallListener(this));
 		registerListeners(new DeathListener(this));
+		// Register detection helper to improve better block registration and chunk loading
+		registerListeners(new DetectionHelper());
 		if (npcManager instanceof Listener listener) {
 			registerListeners(listener);
 		}
@@ -300,25 +200,6 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		}, 1, 1);
 
 		getLogger().info("Fluffy Combat Management plugin has loaded!");
-	}
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void onChunkLoad(ChunkLoadEvent event) {
-		clearIncorrectBlockData(event.getChunk());
-	}
-
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	private void blockBreak(BlockBreakEvent event){
-		FluffyCombat.clearBlockData(event.getBlock().getChunk(), event.getPlayer().getLocation());
-	}
-
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void bucketFill(PlayerBucketFillEvent event){
-		clearBlockData(event.getBlock().getChunk(), event.getBlock().getLocation());
-	}
-
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void blockFade(BlockFadeEvent event){
-		clearBlockData(event.getBlock().getChunk(), event.getBlock().getLocation());
 	}
 
 	@Override

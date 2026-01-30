@@ -1,6 +1,7 @@
 package bet.astral.fluffy.listeners.block;
 
 import bet.astral.fluffy.FluffyCombat;
+import bet.astral.fluffy.listeners.hitdetection.DetectionHelper;
 import lombok.Getter;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -24,9 +25,9 @@ public class LiquidOwnerListener implements Listener {
 	private void onLiquidMove(BlockFromToEvent event) {
 		//if (event.getBlock().getType() == Material.WATER || event.getBlock().getType() == Material.LAVA){
 		if (event.getBlock().getType()==Material.LAVA){
-			UUID owner = FluffyCombat.getBlockOwner(event.getBlock());
+			UUID owner = DetectionHelper.getBlockOwner(event.getBlock());
 			if (owner != null)
-				FluffyCombat.setBlockOwner(Bukkit.getOfflinePlayer(owner), event.getToBlock(), event.getBlock().getType());
+				DetectionHelper.setBlockOwner(Bukkit.getOfflinePlayer(owner), event.getToBlock(), event.getBlock().getType());
 		}
 	}
 
@@ -35,7 +36,7 @@ public class LiquidOwnerListener implements Listener {
 	private void onLiquidPlace(PlayerBucketEmptyEvent event) {
 		Block block = event.getBlock().getLocation().getBlock();
 		if (event.getBucket() == Material.LAVA_BUCKET) {
-			FluffyCombat.setBlockOwner(event.getPlayer(), block, Material.LAVA);
+			DetectionHelper.setBlockOwner(event.getPlayer(), block, Material.LAVA);
 		}
 	}
 

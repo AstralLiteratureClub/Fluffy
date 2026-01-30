@@ -51,6 +51,8 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.34'
     // Armor Change Event
     implementation 'com.jeff-media:armor-equip-event:1.0.2'
+    // Persistent data container types
+    implementation 'com.jeff-media:MorePersistentDataTypes:2.4.0'
     // Reflections
     implementation 'io.github.classgraph:classgraph:4.8.165'
     // PAPI

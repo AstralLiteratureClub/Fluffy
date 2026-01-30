@@ -21,6 +21,7 @@ import java.util.UUID;
 
 @Getter
 public class FireDetection implements Listener {
+	public static Material[] SOUL_FIRE_BLOCKS = {Material.SOUL_SOIL, Material.SOUL_SAND};
 	private final FluffyCombat fluffy;
 	public FireDetection(FluffyCombat fluffyCombat){
 		this.fluffy = fluffyCombat;
@@ -28,20 +29,20 @@ public class FireDetection implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	private void onFirePlace(BlockPlaceEvent event) {
 		Block block = event.getBlock();
-		if (block.getType() == Material.FIRE || block.getType() == Material.SOUL_FIRE) {
+		if (DetectionHelper.isAny(block.getType(), DetectionHelper.FIRE_BLOCKS)) {
 			Player player = event.getPlayer();
-			FluffyCombat.setBlockOwner(player, block);
+			DetectionHelper.setBlockOwner(player, block);
 		}
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	private void onFireExtinguishBDE(BlockDestroyEvent event){
 		Block block = event.getBlock();
-		if (block.getType() == Material.FIRE || block.getType() == Material.SOUL_FIRE) {
-			if (event.getNewState().getMaterial() == Material.FIRE || event.getNewState().getMaterial() == Material.SOUL_FIRE){
+		if (DetectionHelper.isAny(block.getType(), DetectionHelper.FIRE_BLOCKS)) {
+			if (DetectionHelper.isAny(event.getNewState().getMaterial(), DetectionHelper.FIRE_BLOCKS)){
 				return;
 			}
-			FluffyCombat.clearBlockData(block.getChunk(), block.getLocation());
+			DetectionHelper.clearBlockData(block.getChunk(), block.getLocation());
 		}
 	}
 
@@ -49,15 +50,15 @@ public class FireDetection implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	private void onFireSpreadEvent(BlockSpreadEvent event){
 		Block block = event.getBlock();
-		if (block.getType() == Material.FIRE || block.getType() == Material.SOUL_FIRE) {
-			if (event.getSource().getType() == Material.FIRE || event.getSource().getType() == Material.SOUL_FIRE) {
+		if (DetectionHelper.isAny(block.getType(), DetectionHelper.FIRE_BLOCKS)) {
+			if (DetectionHelper.isAny(event.getSource().getType(), DetectionHelper.FIRE_BLOCKS)) {
 				@Nullable
-				UUID owner = FluffyCombat.getBlockOwner(event.getSource());
+				UUID owner = DetectionHelper.getBlockOwner(event.getSource());
 				if (owner == null){
 					return;
 				}
 				OfflinePlayer player = Bukkit.getOfflinePlayer(owner);
-				FluffyCombat.setBlockOwner(player, block);
+				DetectionHelper.setBlockOwner(player, block);
 			}
 		}
 	}
@@ -69,17 +70,17 @@ public class FireDetection implements Listener {
 				return;
 			}
 			@Nullable
-			UUID owner = FluffyCombat.getBlockOwner(event.getIgnitingBlock());
+			UUID owner = DetectionHelper.getBlockOwner(event.getIgnitingBlock());
 			if (owner == null){
 				return;
 			}
 			OfflinePlayer player = Bukkit.getOfflinePlayer(owner);
 			Material fireMaterial = Material.FIRE;
-			if (event.getIgnitingBlock().getRelative(BlockFace.DOWN).getType()==Material.SOUL_SAND ||
-					event.getIgnitingBlock().getRelative(BlockFace.DOWN).getType()==Material.SOUL_SOIL){
+			Material down = event.getIgnitingBlock().getRelative(BlockFace.DOWN).getType();
+			if (DetectionHelper.isAny(down, SOUL_FIRE_BLOCKS)) {
 				fireMaterial = Material.SOUL_FIRE;
 			}
-			FluffyCombat.setBlockOwner(player, event.getIgnitingBlock(), fireMaterial);
+			DetectionHelper.setBlockOwner(player, event.getIgnitingBlock(), fireMaterial);
 		}
 	}
 }

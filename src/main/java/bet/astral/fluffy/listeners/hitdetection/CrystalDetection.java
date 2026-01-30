@@ -49,9 +49,7 @@ public class CrystalDetection implements Listener {
 			CrystalTag crystalTag = new CrystalTag(enderCrystal, entity, itemStack);
 			detectionMap.put(enderCrystal, crystalTag);
 		}
-		fluffy.getServer().getScheduler().runTaskLaterAsynchronously(fluffy, () -> {
-			detectionMap.remove(enderCrystal);
-		}, 3);
+		DetectionHelper.timedRemovalKey(fluffy, detectionMap, enderCrystal, 3);
 	}
 
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
@@ -66,7 +64,8 @@ public class CrystalDetection implements Listener {
 		if (tag == null) {
 			return;
 		}
-		detectionMap.remove(crystal);
+		// Timed removal to allow TNT to be flagged by this crystal.
+		DetectionHelper.timedRemovalKey(fluffy, detectionMap, crystal, 3);
 		Entity entity = tag.entity;
 		if (entity instanceof Projectile projectile){
 			if (projectile.getShooter() instanceof BlockProjectileSource){

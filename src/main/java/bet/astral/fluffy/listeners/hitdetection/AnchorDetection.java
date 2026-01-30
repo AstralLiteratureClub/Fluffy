@@ -91,6 +91,9 @@ public class AnchorDetection implements Listener {
 		Location location = blockState.getLocation().toBlockLocation();
 		location.setWorld(victim.getWorld());
 		AnchorTag tag = detectionMap.get(location);
+		// Clear the tag after 3 ticks
+		DetectionHelper.timedRemovalKeyIfSameValue(fluffyCombat, detectionMap, location, tag, 3);
+
 		if (tag == null) {
 			return;
 		}
@@ -109,7 +112,6 @@ public class AnchorDetection implements Listener {
 				fluffyCombat, combatTag, victim, tag.owner, blockState, event.getDamager(), tag.itemStack);
 		combatTag.setDamageDealt(tag.owner, event.getFinalDamage());
 		damageEvent.callEvent();
-
 	}
 
 
