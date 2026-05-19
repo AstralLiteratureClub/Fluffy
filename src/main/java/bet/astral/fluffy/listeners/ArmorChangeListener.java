@@ -37,16 +37,41 @@ public class ArmorChangeListener implements Listener {
 				ArmorEquipEvent.EquipMethod.PICK_DROP,
 				ArmorEquipEvent.EquipMethod.HOTBAR_SWAP,
 				ArmorEquipEvent.EquipMethod.DISPENSER));
-		if (methods.contains(event.getMethod())){
+		if (methods.contains(event.getMethod())) {
 			event.setCancelled(!fluffy.getCombatConfig().isArmorChangeAllowed());
-		} else if (event.getMethod() == ArmorEquipEvent.EquipMethod.HOTBAR){
-			if (event.getOldArmorPiece() != null){
+		} else if (event.getMethod() == ArmorEquipEvent.EquipMethod.HOTBAR) {
+			if (event.getOldArmorPiece() != null) {
 				if (!fluffy.getCombatConfig().isArmorHotSwapAllowed()) {
 					event.setCancelled(true);
 				}
-			} else if (!fluffy.getCombatConfig().isArmorHotBarEquipAllowed()){
+			} else if (!fluffy.getCombatConfig().isArmorHotBarEquipAllowed()) {
 				event.setCancelled(true);
 			}
+		}
+	}
+
+	@EventHandler
+	public void onArmorEquip(bet.astral.armorer.ArmorEquipEvent event) {
+		event.getPlayer().sendMessage("§e============ ARMOR EVENT ============");
+		event.getPlayer().sendMessage("§bMethod: §f" + event.getMethod().name());
+		event.getPlayer().sendMessage("§bSlot: §f" + event.getArmorType().name());
+		event.getPlayer().sendMessage("§bAction: §f" +
+				(event.isEquipping() ? "EQUIPPING" :
+						event.isUnequipping() ? "UNEQUIPPING" : "SWAPPING"));
+
+		if (event.getOldArmorPiece() != null) {
+			event.getPlayer().sendMessage("§cOld: §f" + event.getOldArmorPiece().getType());
+		}
+		if (event.getNewArmorPiece() != null) {
+			event.getPlayer().sendMessage("§aNew: §f" + event.getNewArmorPiece().getType());
+		}
+
+		// Example: Cancel if player tries to equip leather armor via dispenser
+		if (event.getMethod() == bet.astral.armorer.ArmorEquipEvent.EquipMethod.DISPENSER &&
+				event.getNewArmorPiece() != null &&
+				event.getNewArmorPiece().getType().name().contains("LEATHER")) {
+			event.setCancelled(true);
+			event.getPlayer().sendMessage("§cYou cannot equip leather armor via dispenser!");
 		}
 	}
 }

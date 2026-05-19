@@ -2,13 +2,10 @@ package bet.astral.fluffy.listeners;
 
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.*;
-import bet.astral.fluffy.database.CombatLogDB;
+import bet.astral.fluffy.database.ICombatLogDatabase;
 import bet.astral.fluffy.manager.CombatManager;
 import bet.astral.fluffy.messenger.DeathTranslations;
-import bet.astral.fluffy.statistic.Account;
-import bet.astral.fluffy.statistic.PlaceholderAccount;
-import bet.astral.fluffy.statistic.Statistic;
-import bet.astral.fluffy.statistic.Statistics;
+import bet.astral.fluffy.statistic.*;
 import bet.astral.messenger.v2.placeholder.collection.PlaceholderMap;
 import bet.astral.messenger.v2.translation.TranslationKey;
 import org.bukkit.Bukkit;
@@ -42,7 +39,7 @@ public class DeathListener implements Listener {
 	}
 
 	@EventHandler(ignoreCancelled = true)
-	public void onEntityResurrect(EntityResurrectEvent event) {
+	public void onEntityResurrect(@NotNull EntityResurrectEvent event) {
 		if (event.getEntity() instanceof Player player){
 			Account account = fluffy.getStatisticManager().get(player);
 
@@ -72,7 +69,7 @@ public class DeathListener implements Listener {
 
 
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-	private void onDeath(PlayerDeathEvent event) {
+	private void onDeath(@NotNull PlayerDeathEvent event) {
 		EntityDamageEvent entityDamageEvent = event.getEntity().getLastDamageCause();
 		if (entityDamageEvent == null) {
 			return;
@@ -131,8 +128,7 @@ public class DeathListener implements Listener {
 
 		incrementStreak(player, victimAcc, Statistics.STREAK_DEATHS, Statistics.STREAK_DEATHS_HIGHEST);
 		victimAcc.increment(Statistics.DEATHS_GLOBAL);
-		victimAcc.reset(Statistics.STREAK_KILLS);
-		victimAcc.reset(Statistics.STREAK_KILLS_TOTEM);
+		victimAcc.reset(StatisticType.KILL_STREAKS);
 //		victimAcc.reset(Statistics.STREAK_COMBAT_LOGS);
 
 		PlaceholderMap placeholders = new PlaceholderMap();
@@ -143,7 +139,7 @@ public class DeathListener implements Listener {
 				attackerAcc.increment(Statistics.KILLS_GLOBAL);
 				OfflinePlayer attackerPlayer = Bukkit.getOfflinePlayer(tag.getAttacker().getUniqueId());
 				incrementStreak(attackerPlayer, attackerAcc, Statistics.STREAK_KILLS, Statistics.STREAK_KILLS_HIGHEST);
-				attackerAcc.reset(Statistics.STREAK_DEATHS);
+				attackerAcc.reset(StatisticType.DEATH_STREAKS);
 				attackerAcc.reset(Statistics.STREAK_DEATHS_TOTEM);
 				attackerAcc.reset(Statistics.STREAK_COMBAT_LOGS);
 			}
@@ -297,7 +293,7 @@ public class DeathListener implements Listener {
 					return;
 				}
 
-				CombatLogDB combatLogDB = fluffy.getCombatLogDB();
+				ICombatLogDatabase combatLogDB = fluffy.getCombatLogDatabase();
 				Objects.requireNonNull(combatLogDB.getLog(player.getUniqueId())).thenAccept((log) -> {
 					if (log != null) {
 						combatLogDB.save(owner);
@@ -426,7 +422,7 @@ public class DeathListener implements Listener {
 			UUID owner = fluffy.getNpcManager().getUniqueId(player);
 			if (owner != null) {
 
-				CombatLogDB combatLogDB = fluffy.getCombatLogDB();
+				ICombatLogDatabase combatLogDB = fluffy.getCombatLogDatabase();
 				Objects.requireNonNull(combatLogDB.getLog(player.getUniqueId())).thenAccept((log) -> {
 					if (log != null) {
 						combatLogDB.save(owner);

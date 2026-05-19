@@ -58,11 +58,5 @@ as you need to download multiple jar files for them.
 In fluffy you can just disable features in the config.
 
 ### Dependencies
-Fluffy uses [Messenger](https://github.com/AstralLiteratureClub/MessageManager) to parse and send messages to players.
-It's a local host dependency and is required to be published to the local host.
-(Fluffy will be switching to messenger 2.0 soon when 2.0 is ready for testing) **(Needs to be published to maven local)**
-
-Fluffy uses [Shine](https://github.com/AstralLiteratureClub/Shine)
-to handle glowing effects automatically between [Glowing Entities](https://www.spigotmc.org/threads/glowing-entities-and-blocks-1-17-1-20.558927/) and [Apollo (Lunar Client)](https://lunarclient.dev/)
-(lunar client glowing support to 1.7 and custom colors).
-**(Needs to be published to maven local)**
+[Messenger](https://github.com/AstralLiteratureClub/MessageManager) to parse and send messages to players.
+[Aura](https://github.com/Antritus/Aura) to show glowing effect to players and entities.

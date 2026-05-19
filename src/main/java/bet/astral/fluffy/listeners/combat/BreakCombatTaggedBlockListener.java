@@ -1,6 +1,5 @@
 package bet.astral.fluffy.listeners.combat;
 
-import bet.astral.shine.receiver.ShineReceiver;
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.BlockCombatUser;
 import bet.astral.fluffy.manager.BlockUserManager;
@@ -27,13 +26,10 @@ public class BreakCombatTaggedBlockListener implements Listener {
 		if (blockCombatUser == null){
 			return;
 		}
-		blockCombatUser.setAlive(event.isCancelled());
+		blockCombatUser.setAlive(false);
 		if (fluffy.getCombatConfig().isCombatGlow()) {
-			try {
-				fluffy.getShine().removeGlowing(ShineReceiver.of(event.getBlock()), event.getPlayer());
-			} catch (ReflectiveOperationException e) {
-				throw new RuntimeException(e);
-			}
-		}
+            // TODO update aura to allow glowing blocks
+//				fluffy.getShine().removeGlowing(ShineReceiver.of(event.getBlock()), event.getPlayer());
+        }
 	}
 }

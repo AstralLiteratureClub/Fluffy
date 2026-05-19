@@ -24,6 +24,7 @@ public interface Statistic extends PlaceholderValue {
 	boolean canOnlyIncrement();
 	@Nullable
 	StatisticType getType();
+	boolean canBeReset();
 
 	@NotNull
 	static Statistic of(@NotNull String name){
@@ -34,28 +35,28 @@ public interface Statistic extends PlaceholderValue {
 		return new StatisticImpl(name, true, type);
 	}
 	@NotNull
-	static Statistic of(@NotNull String name, boolean canOnlyIncrement){
-		return new StatisticImpl(name, canOnlyIncrement, null);
+	static Statistic of(@NotNull String name, boolean canReset, boolean canOnlyIncrement){
+		return new StatisticImpl(name, canReset, canOnlyIncrement, null);
 	}
 	@NotNull
-	static Statistic of(@NotNull String name, StatisticType type, boolean canOnlyIncrement){
-		return new StatisticImpl(name, canOnlyIncrement, type);
+	static Statistic of(@NotNull String name, StatisticType type, boolean canReset, boolean canOnlyIncrement){
+		return new StatisticImpl(name, canReset, canOnlyIncrement, type);
 	}
 	@NotNull
 	static Statistic of(@NotNull String name, @NotNull Description description){
-		return new StatisticDescriptionImpl(name, true, null, description);
+		return new StatisticDescriptionImpl(name, true, false, null, description);
 	}
 	@NotNull
 	static Statistic of(@NotNull String name, StatisticType statisticType, @NotNull Description description){
-		return new StatisticDescriptionImpl(name, true, statisticType, description);
+		return new StatisticDescriptionImpl(name, true, false, statisticType, description);
 	}
 	@NotNull
-	static Statistic of(@NotNull String name, boolean canOnlyIncrement, @NotNull Description description){
-		return new StatisticDescriptionImpl(name, canOnlyIncrement, null, description);
+	static Statistic of(@NotNull String name, boolean canReset, boolean canOnlyIncrement, @NotNull Description description){
+		return new StatisticDescriptionImpl(name, canReset, canOnlyIncrement, null, description);
 	}
 	@NotNull
-	static Statistic of(@NotNull String name, boolean canOnlyIncrement, StatisticType type, @NotNull Description description){
-		return new StatisticDescriptionImpl(name, canOnlyIncrement, type, description);
+	static Statistic of(@NotNull String name, boolean canReset, boolean canOnlyIncrement, StatisticType type, @NotNull Description description){
+		return new StatisticDescriptionImpl(name, canReset, canOnlyIncrement, type, description);
 	}
 
 	@Override
@@ -67,10 +68,12 @@ public interface Statistic extends PlaceholderValue {
 		@NotNull
 		private final String name;
 		private final boolean canBeReset;
+		private final boolean canOnlyIncrement;
 		private final StatisticType statisticType;
-		protected StatisticImpl(@NotNull String name, boolean canBeReset, StatisticType statisticType){
+		protected StatisticImpl(@NotNull String name, boolean canBeReset, boolean canOnlyIncrement, StatisticType statisticType){
 			this.name = name;
             this.canBeReset = canBeReset;
+			this.canOnlyIncrement = canOnlyIncrement;
             this.statisticType = statisticType;
         }
 
@@ -81,7 +84,17 @@ public interface Statistic extends PlaceholderValue {
 
 		@Override
 		public boolean canOnlyIncrement() {
-			return false;
+			return canOnlyIncrement;
+		}
+
+		@Override
+		public @Nullable StatisticType getType() {
+			return statisticType;
+		}
+
+		@Override
+		public boolean canBeReset() {
+			return canBeReset;
 		}
 
 		@Override
@@ -97,8 +110,8 @@ public interface Statistic extends PlaceholderValue {
 	class StatisticDescriptionImpl extends StatisticImpl implements StatisticDescription {
 		private final Description description;
 
-		protected StatisticDescriptionImpl(@NotNull String name, boolean canOnlyIncrement, StatisticType statisticType, Description description) {
-			super(name, canOnlyIncrement, statisticType);
+		protected StatisticDescriptionImpl(@NotNull String name, boolean canReset, boolean canOnlyIncrement, StatisticType statisticType, Description description) {
+			super(name, canReset, canOnlyIncrement, statisticType);
 			this.description = description;
 		}
 

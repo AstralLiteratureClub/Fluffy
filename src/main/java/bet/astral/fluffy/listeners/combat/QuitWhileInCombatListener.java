@@ -5,7 +5,7 @@ import bet.astral.fluffy.api.BlockCombatUser;
 import bet.astral.fluffy.api.CombatTag;
 import bet.astral.fluffy.api.CombatUser;
 import bet.astral.fluffy.configs.CombatConfig;
-import bet.astral.fluffy.database.CombatLogDB;
+import bet.astral.fluffy.database.ICombatLogDatabase;
 import bet.astral.fluffy.events.CombatLogEvent;
 import bet.astral.fluffy.manager.CombatManager;
 import bet.astral.fluffy.manager.NPCManager;
@@ -44,7 +44,7 @@ public class QuitWhileInCombatListener implements Listener {
 	private void onJoin(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
 		boolean logged = fluffy.getCombatLogManager().hasCombatLogged(player); // Automatically deleted
-		fluffy.getCombatLogDB().getLog(player.getUniqueId())
+		fluffy.getCombatLogDatabase().getLog(player.getUniqueId())
 				.thenAccept(log -> {
 					if (log != null) {
 						Messenger messenger = fluffy.getMessenger();
@@ -113,7 +113,7 @@ public class QuitWhileInCombatListener implements Listener {
 
 			messenger.broadcast(Translations.COMBAT_LOGGED_BROADCAST, placeholders);
 
-			CombatLogDB combatLogDB = fluffy.getCombatLogDB();
+			ICombatLogDatabase combatLogDB = fluffy.getCombatLogDatabase();
 			combatLogDB.save(player.getUniqueId());
 
 			if (fluffy.getCombatConfig().getCombatLogAction() == CombatConfig.CombatLogAction.NOTHING){
@@ -211,7 +211,7 @@ public class QuitWhileInCombatListener implements Listener {
 				account.reset(Statistics.STREAK_KILLS_TOTEM);
 				account.save();
 
-				fluffy.getCombatLogDB().update(event.getPlayer().getUniqueId(), null);
+				fluffy.getCombatLogDatabase().update(event.getPlayer().getUniqueId(), null);
 			}
 		}
 	}
