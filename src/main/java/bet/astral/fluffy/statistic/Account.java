@@ -20,6 +20,7 @@ public interface Account extends Placeholderable {
 	void decrement(Statistic statistic);
 	void remove(Statistic statistic, @Range(from = -1, to = Integer.MAX_VALUE) int amount);
 	void reset(Statistic statistic);
+	void reset(StatisticType statisticType);
 	void set(Statistic statistic, @Range(from = -1, to = Integer.MAX_VALUE) int amount);
 	void setDefault(Statistic statistic, @Range(from = -1, to = Integer.MAX_VALUE) int amount);
 	CompletableFuture<Void> delete(Statistic statistic);

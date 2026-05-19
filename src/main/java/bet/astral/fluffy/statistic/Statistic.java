@@ -6,6 +6,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.OfflinePlayer;
 import org.incendo.cloud.description.Description;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -21,22 +22,40 @@ public interface Statistic extends PlaceholderValue {
 	@NotNull
 	String getName();
 	boolean canOnlyIncrement();
+	@Nullable
+	StatisticType getType();
 
 	@NotNull
 	static Statistic of(@NotNull String name){
-		return new StatisticImpl(name, true);
+		return new StatisticImpl(name, true, null);
+	}
+	@NotNull
+	static Statistic of(@NotNull String name, StatisticType type){
+		return new StatisticImpl(name, true, type);
 	}
 	@NotNull
 	static Statistic of(@NotNull String name, boolean canOnlyIncrement){
-		return new StatisticImpl(name, canOnlyIncrement);
+		return new StatisticImpl(name, canOnlyIncrement, null);
+	}
+	@NotNull
+	static Statistic of(@NotNull String name, StatisticType type, boolean canOnlyIncrement){
+		return new StatisticImpl(name, canOnlyIncrement, type);
 	}
 	@NotNull
 	static Statistic of(@NotNull String name, @NotNull Description description){
-		return new StatisticDescriptionImpl(name, true, description);
+		return new StatisticDescriptionImpl(name, true, null, description);
+	}
+	@NotNull
+	static Statistic of(@NotNull String name, StatisticType statisticType, @NotNull Description description){
+		return new StatisticDescriptionImpl(name, true, statisticType, description);
 	}
 	@NotNull
 	static Statistic of(@NotNull String name, boolean canOnlyIncrement, @NotNull Description description){
-		return new StatisticDescriptionImpl(name, canOnlyIncrement, description);
+		return new StatisticDescriptionImpl(name, canOnlyIncrement, null, description);
+	}
+	@NotNull
+	static Statistic of(@NotNull String name, boolean canOnlyIncrement, StatisticType type, @NotNull Description description){
+		return new StatisticDescriptionImpl(name, canOnlyIncrement, type, description);
 	}
 
 	@Override
@@ -48,9 +67,11 @@ public interface Statistic extends PlaceholderValue {
 		@NotNull
 		private final String name;
 		private final boolean canBeReset;
-		protected StatisticImpl(@NotNull String name, boolean canBeReset){
+		private final StatisticType statisticType;
+		protected StatisticImpl(@NotNull String name, boolean canBeReset, StatisticType statisticType){
 			this.name = name;
             this.canBeReset = canBeReset;
+            this.statisticType = statisticType;
         }
 
 		@Override
@@ -76,8 +97,8 @@ public interface Statistic extends PlaceholderValue {
 	class StatisticDescriptionImpl extends StatisticImpl implements StatisticDescription {
 		private final Description description;
 
-		protected StatisticDescriptionImpl(@NotNull String name, boolean canOnlyIncrement, Description description) {
-			super(name, canOnlyIncrement);
+		protected StatisticDescriptionImpl(@NotNull String name, boolean canOnlyIncrement, StatisticType statisticType, Description description) {
+			super(name, canOnlyIncrement, statisticType);
 			this.description = description;
 		}
 

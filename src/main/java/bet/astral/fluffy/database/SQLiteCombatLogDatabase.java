@@ -11,9 +11,9 @@ import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-public class CombatLogDB extends Connect{
+public class SQLiteCombatLogDatabase extends Connect implements ICombatLogDatabase{
     private Connection connection;
-    public CombatLogDB(FluffyCombat fluffyCombat) {
+    public SQLiteCombatLogDatabase(FluffyCombat fluffyCombat) {
         super(fluffyCombat);
     }
 
@@ -82,7 +82,7 @@ public class CombatLogDB extends Connect{
         return result.exceptionally(exception("Encountered error while trying to get combat log of "+ uniqueId.toString()));
     }
 
-    void delete(UUID uniqueId) throws SQLException {
+    public void delete(UUID uniqueId) throws SQLException {
         PreparedStatement statement = getConnection().prepareStatement("DELETE FROM combatlog WHERE uniqueId = ?");
         statement.setString(1, uniqueId.toString());
         statement.executeUpdate();
@@ -129,4 +129,5 @@ public class CombatLogDB extends Connect{
             }
         }).exceptionally(exception("Encountered an exception while trying to save "+uniqueId +" combat log killer " + killer+"!"));
     }
+
 }

@@ -3,7 +3,8 @@ package bet.astral.fluffy;
 import bet.astral.cloudplusplus.minecraft.paper.bootstrap.BootstrapHandler;
 import bet.astral.fluffy.api.CombatUser;
 import bet.astral.fluffy.configs.CombatConfig;
-import bet.astral.fluffy.database.CombatLogDB;
+import bet.astral.fluffy.database.ICombatLogDatabase;
+import bet.astral.fluffy.database.SQLiteCombatLogDatabase;
 import bet.astral.fluffy.database.StatisticsDatabase;
 import bet.astral.fluffy.listeners.ConnectionListener;
 import bet.astral.fluffy.listeners.ArmorChangeListener;
@@ -22,7 +23,6 @@ import bet.astral.fluffy.listeners.region.RegionWallListener;
 import bet.astral.fluffy.manager.*;
 import bet.astral.fluffy.messenger.FluffyMessenger;
 import bet.astral.messenger.v3.minecraft.paper.PaperMessenger;
-import bet.astral.shine.Shine;
 import bet.astral.more4j.tuples.Pair;
 import com.jeff_media.armorequipevent.ArmorEquipEvent;
 import lombok.AccessLevel;
@@ -179,7 +179,6 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 
     public static boolean isStopping = false;
 	public static boolean debug = false;
-	private Shine shine;
 	private FluffyMessenger messenger;
 	private CombatManager combatManager;
 	private UserManager userManager;
@@ -203,7 +202,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 	private FileConfiguration configuration;
 	private BootstrapHandler handler;
 	private StatisticsDatabase statisticsDatabase;
-	private CombatLogDB combatLogDB;
+	private ICombatLogDatabase combatLogDatabase;
 
 	public FluffyCombat(@NotNull BootstrapHandler handler, FluffyMessenger messenger) {
 		this.handler = handler;
@@ -225,15 +224,14 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		uploadUploads();
 		reloadConfig();
 		debug = getConfig().getBoolean("debug");
-		combatLogDB = new CombatLogDB(this);
+		combatLogDatabase = new SQLiteCombatLogDatabase(this);
 		statisticsDatabase = new StatisticsDatabase(this);
-		combatLogDB.onEnable();
+		combatLogDatabase.onEnable();
 		statisticsDatabase.onEnable();
 
 		statisticManager = new StatisticManager(this);
 		statisticManager.onEnable();
 
-		shine = new Shine(this);
 		combatManager = new CombatManager(this);
 		userManager = new UserManager(this);
 		blockUserManager = new BlockUserManager(this);
@@ -327,7 +325,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		userManager.onDisable();
 		combatManager.onDisable();
 		statisticsDatabase.onDisable();
-		combatLogDB.onDisable();
+		combatLogDatabase.onDisable();
 		statisticManager.onDisable();
 	}
 
