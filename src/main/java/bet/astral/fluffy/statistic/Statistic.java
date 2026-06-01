@@ -28,11 +28,11 @@ public interface Statistic extends PlaceholderValue {
 
 	@NotNull
 	static Statistic of(@NotNull String name){
-		return new StatisticImpl(name, true, null);
+		return new StatisticImpl(name, true, false, null);
 	}
 	@NotNull
 	static Statistic of(@NotNull String name, StatisticType type){
-		return new StatisticImpl(name, true, type);
+		return new StatisticImpl(name, true, false, type);
 	}
 	@NotNull
 	static Statistic of(@NotNull String name, boolean canReset, boolean canOnlyIncrement){
