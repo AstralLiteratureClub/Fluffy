@@ -5,7 +5,7 @@ import bet.astral.fluffy.api.BlockCombatUser;
 import bet.astral.fluffy.api.CombatTag;
 import bet.astral.fluffy.api.CombatUser;
 import bet.astral.fluffy.configs.CombatConfig;
-import bet.astral.fluffy.database.CombatLogDB;
+import bet.astral.fluffy.database.ICombatLogDatabase;
 import bet.astral.fluffy.events.CombatLogEvent;
 import bet.astral.fluffy.manager.CombatManager;
 import bet.astral.fluffy.manager.NPCManager;
@@ -31,7 +31,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
 import java.util.UUID;
 
 public class QuitWhileInCombatListener implements Listener {
@@ -45,7 +44,7 @@ public class QuitWhileInCombatListener implements Listener {
 	private void onJoin(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
 		boolean logged = fluffy.getCombatLogManager().hasCombatLogged(player); // Automatically deleted
-		fluffy.getCombatLogDB().getLog(player.getUniqueId())
+		fluffy.getCombatLogDatabase().getLog(player.getUniqueId())
 				.thenAccept(log -> {
 					if (log != null) {
 						Messenger messenger = fluffy.getMessenger();
@@ -60,7 +59,7 @@ public class QuitWhileInCombatListener implements Listener {
 							playerMessage = Translations.COMBAT_REJOINED_PLAYER_KILLED;
 							UUID killer = log.getKilledBy();
 							if (killer != null) {
-								placeholders.add("killer", Objects.requireNonNull(Bukkit.getOfflinePlayer(killer).getName()));
+								placeholders.add("killer", Bukkit.getOfflinePlayer(killer).getName());
 							}
 
 							if (fluffy.getCombatConfig().getCombatLogAction() == CombatConfig.CombatLogAction.SPAWN_NPC) {
@@ -114,14 +113,16 @@ public class QuitWhileInCombatListener implements Listener {
 
 			messenger.broadcast(Translations.COMBAT_LOGGED_BROADCAST, placeholders);
 
-			CombatLogDB combatLogDB = fluffy.getCombatLogDB();
+			ICombatLogDatabase combatLogDB = fluffy.getCombatLogDatabase();
 			combatLogDB.save(player.getUniqueId());
 
 			if (fluffy.getCombatConfig().getCombatLogAction() == CombatConfig.CombatLogAction.NOTHING){
-            } else if (fluffy.getCombatConfig().getCombatLogAction() == CombatConfig.CombatLogAction.SPAWN_NPC){
+				return;
+			} else if (fluffy.getCombatConfig().getCombatLogAction() == CombatConfig.CombatLogAction.SPAWN_NPC){
 				NPCManager npcManager = fluffy.getNpcManager();
 				npcManager.spawnNPC(player.getLocation(), player);
-            } else if (fluffy.getCombatConfig().getCombatLogAction() == CombatConfig.CombatLogAction.KILL) {
+				return;
+			} else if (fluffy.getCombatConfig().getCombatLogAction() == CombatConfig.CombatLogAction.KILL) {
 				boolean destroyed = false;
 				user.setting("logged", true);
 				while (true){
@@ -170,6 +171,7 @@ public class QuitWhileInCombatListener implements Listener {
 		}
 	}
 
+	@SuppressWarnings("removal")
 	@EventHandler(priority = EventPriority.LOWEST)
 	private void onDeath(PlayerDeathEvent event) {
 		if (FluffyCombat.isStopping) {
@@ -193,8 +195,8 @@ public class QuitWhileInCombatListener implements Listener {
 				user.setting("logged", null);
 				World world = player.getWorld();
 				CombatConfig config = fluffy.getCombatConfig();
-				boolean keepInventory = config.getIsCombatLogKillKeepExp().toBooleanOrElseGet(()-> Boolean.TRUE.equals(world.getGameRuleValue(GameRule.KEEP_INVENTORY)));
-				boolean keepExp = config.getIsCombatLogKillKeepExp().toBooleanOrElseGet(()-> Boolean.TRUE.equals(world.getGameRuleValue(GameRule.KEEP_INVENTORY)));
+				boolean keepInventory = config.getIsCombatLogKillKeepExp().toBooleanOrElseGet(()-> world.getGameRuleValue(GameRule.KEEP_INVENTORY));
+				boolean keepExp = config.getIsCombatLogKillKeepExp().toBooleanOrElseGet(()-> world.getGameRuleValue(GameRule.KEEP_INVENTORY));
 
 				event.setKeepLevel(keepExp);
 				event.setKeepInventory(keepInventory);
@@ -203,15 +205,13 @@ public class QuitWhileInCombatListener implements Listener {
 				}
 
 				Account account = fluffy.getStatisticManager().get(player.getUniqueId());
-				if (account != null) {
-					account.increment(Statistics.STREAK_COMBAT_LOGS);
-					account.increment(Statistics.COMBAT_LOGS);
-					account.reset(Statistics.STREAK_KILLS);
-					account.reset(Statistics.STREAK_KILLS_TOTEM);
-					account.save();
+				account.increment(Statistics.STREAK_COMBAT_LOGS);
+				account.increment(Statistics.COMBAT_LOGS);
+				account.reset(Statistics.STREAK_KILLS);
+				account.reset(Statistics.STREAK_KILLS_TOTEM);
+				account.save();
 
-					fluffy.getCombatLogDB().update(event.getPlayer().getUniqueId(), null);
-				}
+				fluffy.getCombatLogDatabase().update(event.getPlayer().getUniqueId(), null);
 			}
 		}
 	}

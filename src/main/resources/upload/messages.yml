@@ -65,13 +65,46 @@ statistics:
     - "<dark_gray> | <yellow>Deathstreak: <white>%statistic_streak_deaths%"
     - ""
   self:
-    - ""
-    - "<yellow>Your<white> statistics"
-    - "<hover:show_text:'<gold><bold>KILLS <!bold>\n<dark_gray> | <dark_red>Global: <white>%statistic_kills_global%\n<dark_gray> | <light_purple>Respawn Anchor<white>: <white>%statistic_kills_anchor%\n<dark_gray> | <light_purple>End Crystal<white>: <white>%statistic_kills_crystal%\n<dark_gray> | <yellow>TNT<white>: <white>%statistic_kills_tnt%\n<dark_gray> | <yellow>Bed<white>: <white>%statistic_kills_bed%'><dark_gray> | <yellow>Kills: <white>%statistic_kills_global%"
-    - "<hover:show_text:'<gold><bold>DEATHS <!bold>\n<dark_gray> | <dark_red>Global: <white>%statistic_deaths_global%\n<dark_gray> | <light_purple>Respawn Anchor<white>: <white>%statistic_deaths_anchor%\n<dark_gray> | <light_purple>End Crystal<white>: <white>%statistic_deaths_crystal%\n<dark_gray> | <yellow>TNT<white>: <white>%statistic_deaths_tnt%\n<dark_gray> | <yellow>Bed<white>: <white>%statistic_deaths_bed%'><dark_gray> | <yellow>Deaths: <white>%statistic_deaths_global%"
-    - "<dark_gray> | <yellow>Killstreak: <white>%statistic_streak_kills%"
-    - "<dark_gray> | <yellow>Deathstreak: <white>%statistic_streak_deaths%"
-    - ""
+    1:
+      - ""
+      - "<yellow>Your <red>global<white> statistics"
+      - "<hover:show_text:'<gold><bold>KILLS <!bold>\n<dark_gray> | <dark_red>Global: <white>%statistic_kills_global%\n<dark_gray> | <light_purple>Respawn Anchor<white>: <white>%statistic_kills_anchor%\n<dark_gray> | <light_purple>End Crystal<white>: <white>%statistic_kills_crystal%\n<dark_gray> | <yellow>TNT<white>: <white>%statistic_kills_tnt%\n<dark_gray> | <yellow>Bed<white>: <white>%statistic_kills_bed%'><dark_gray> | <yellow>Kills: <white>%statistic_kills_global%"
+      - "<hover:show_text:'<gold><bold>DEATHS <!bold>\n<dark_gray> | <dark_red>Global: <white>%statistic_deaths_global%\n<dark_gray> | <light_purple>Respawn Anchor<white>: <white>%statistic_deaths_anchor%\n<dark_gray> | <light_purple>End Crystal<white>: <white>%statistic_deaths_crystal%\n<dark_gray> | <yellow>TNT<white>: <white>%statistic_deaths_tnt%\n<dark_gray> | <yellow>Bed<white>: <white>%statistic_deaths_bed%'><dark_gray> | <yellow>Deaths: <white>%statistic_deaths_global%"
+      - "<dark_gray> | <yellow>Killstreak: <white>%statistic_streak_kills%"
+      - "<dark_gray> | <yellow>Deathstreak: <white>%statistic_streak_deaths%"
+      - ""
+    2:
+      - ""
+      - "<yellow>Your <light_purple>respawn anchor<white> statistics"
+      - "<dark_gray> | <yellow>Kills <white>%statistic_kills_anchor%"
+      - "<dark_gray> | <yellow>Deaths <white>%statistic_deaths_anchor%"
+      - "<dark_gray> | <yellow>Killstreak: <white>%statistic_streak_kills_respawn_anchor%"
+      - "<dark_gray> | <yellow>Deathstreak: <white>%statistic_streak_deaths_respawn_anchor%"
+      - ""
+    3:
+      - ""
+      - "<yellow>Your <light_purple>end crystal <white> statistics"
+      - "<dark_gray> | <yellow>Kills <white>%statistic_kills_end_crystal"
+      - "<dark_gray> | <yellow>Deaths <white>%statistic_deaths_end_crystal%"
+      - "<dark_gray> | <yellow>Killstreak: <white>%statistic_streak_kills_end_crystal%"
+      - "<dark_gray> | <yellow>Deathstreak: <white>%statistic_streak_deaths_end_crystal%"
+      - ""
+    4:
+      - ""
+      - "<yellow>Your <red>bed <white> statistics"
+      - "<dark_gray> | <yellow>Kills <white>%statistic_kills_bed"
+      - "<dark_gray> | <yellow>Deaths <white>%statistic_deaths_bed%"
+      - "<dark_gray> | <yellow>Killstreak: <white>%statistic_streak_kills_end_crystal%"
+      - "<dark_gray> | <yellow>Deathstreak: <white>%statistic_streak_deaths_end_crystal%"
+      - ""
+    5:
+      - ""
+      - "<yellow>Your <gold>totem <white> statistics"
+      - "<hover:show_text:'<gold><bold>KILLS <light_purple>Respawn Anchor<white>: <white>%statistic_kills_anchor%\n<dark_gray> | <light_purple>End Crystal<white>: <white>%statistic_kills_crystal%\n<dark_gray> | <yellow>TNT<white>: <white>%statistic_kills_tnt%\n<dark_gray> | <yellow>Bed<white>: <white>%statistic_kills_bed%'><dark_gray> | <yellow>Kills: <white>%statistic_kills_global%"
+      - "<hover:show_text:'<gold><bold>DEATHS <light_purple>Respawn Anchor<white>: <white>%statistic_deaths_anchor%\n<dark_gray> | <light_purple>End Crystal<white>: <white>%statistic_deaths_crystal%\n<dark_gray> | <yellow>TNT<white>: <white>%statistic_deaths_tnt%\n<dark_gray> | <yellow>Bed<white>: <white>%statistic_deaths_bed%'><dark_gray> | <yellow>Deaths: <white>%statistic_deaths_global%"
+      - "<dark_gray> | <yellow>Killstreak: <white>%statistic_streak_kills%"
+      - "<dark_gray> | <yellow>Deathstreak: <white>%statistic_streak_deaths%"
+      - ""
 
 editstatistics:
   help:

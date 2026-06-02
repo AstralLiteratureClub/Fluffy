@@ -8,31 +8,43 @@ import java.util.Collection;
 import java.util.HashSet;
 
 public final class Statistics {
-	public static final Statistic KILLS_GLOBAL = Statistic.of("kills_global", true);
-	public static final Statistic KILLS_ANCHOR = Statistic.of("kills_anchor", true);
-	public static final Statistic KILLS_CRYSTAL= Statistic.of("kills_crystal", true);
-	public static final Statistic KILLS_TNT = Statistic.of("kills_tnt", true);
-	public static final Statistic KILLS_BED = Statistic.of("kills_bed", true);
-	public static final Statistic KILLS_TOTEM = Statistic.of("kills_totem", true);
+	public static final Statistic KILLS_GLOBAL = Statistic.of("kills_global", StatisticType.KILLS, true, true);
+	public static final Statistic KILLS_ANCHOR = Statistic.of("kills_anchor", StatisticType.KILLS, true, true);
+	public static final Statistic KILLS_CRYSTAL= Statistic.of("kills_crystal", StatisticType.KILLS, true, true);
+	public static final Statistic KILLS_TNT = Statistic.of("kills_tnt", StatisticType.KILLS, true, true);
+	public static final Statistic KILLS_BED = Statistic.of("kills_bed", StatisticType.KILLS, true, true);
+	public static final Statistic KILLS_TOTEM = Statistic.of("kills_totem", StatisticType.KILLS, true, true);
 
-	public static final Statistic DEATHS_GLOBAL = Statistic.of("deaths_global", true);
-	public static final Statistic DEATHS_ANCHOR = Statistic.of("deaths_anchor", true);
-	public static final Statistic DEATHS_CRYSTAL= Statistic.of("deaths_crystal", true);
-	public static final Statistic DEATHS_TNT = Statistic.of("deaths_tnt", true);
-	public static final Statistic DEATHS_BED = Statistic.of("deaths_bed", true);
-	public static final Statistic DEATHS_TOTEM = Statistic.of("deaths_totem", true);
+	public static final Statistic DEATHS_GLOBAL = Statistic.of("deaths_global", StatisticType.DEATHS, true, true);
+	public static final Statistic DEATHS_ANCHOR = Statistic.of("deaths_anchor", StatisticType.DEATHS, true, true);
+	public static final Statistic DEATHS_CRYSTAL= Statistic.of("deaths_crystal", StatisticType.DEATHS, true, true);
+	public static final Statistic DEATHS_TNT = Statistic.of("deaths_tnt", StatisticType.DEATHS, true, true);
+	public static final Statistic DEATHS_BED = Statistic.of("deaths_bed", StatisticType.DEATHS, true, true);
+	public static final Statistic DEATHS_TOTEM = Statistic.of("deaths_totem", StatisticType.DEATHS, true, true);
 
-	public static final Statistic STREAK_KILLS = Statistic.of("streak_kills");
-	public static final Statistic STREAK_KILLS_HIGHEST = Statistic.of("streak_kills_highest", true);
-	public static final Statistic STREAK_DEATHS = Statistic.of("streak_deaths");
-	public static final Statistic STREAK_DEATHS_HIGHEST = Statistic.of("streak_deaths_highest", true);
-	public static final Statistic STREAK_KILLS_TOTEM = Statistic.of("streak_kills_totem");
-	public static final Statistic STREAK_DEATHS_TOTEM = Statistic.of("streak_deaths_totem");
-	public static final Statistic STREAK_KILLS_TOTEM_HIGHEST = Statistic.of("streak_kills_totem_highest", true);
-	public static final Statistic STREAK_DEATHS_TOTEM_HIGHEST = Statistic.of("streak_deaths_totem_highest", true);
+	public static final Statistic STREAK_KILLS = Statistic.of("streak_kills", StatisticType.KILL_STREAKS, true, true);
+	public static final Statistic STREAK_KILLS_HIGHEST = Statistic.of("streak_kills_highest", StatisticType.KILL_STREAKS, false, true);
+	public static final Statistic STREAK_DEATHS = Statistic.of("streak_deaths", StatisticType.DEATH_STREAKS, true, true);
+	public static final Statistic STREAK_DEATHS_HIGHEST = Statistic.of("streak_deaths_highest", StatisticType.DEATH_STREAKS, false, true);
+	public static final Statistic STREAK_KILLS_TOTEM = Statistic.of("streak_kills_totem", StatisticType.KILL_STREAKS, true, true);
+	public static final Statistic STREAK_DEATHS_TOTEM = Statistic.of("streak_deaths_totem", StatisticType.DEATHS, true, true);
+	public static final Statistic STREAK_KILLS_TOTEM_HIGHEST = Statistic.of("streak_kills_totem_highest", StatisticType.KILL_STREAKS, false, true);
+	public static final Statistic STREAK_DEATHS_TOTEM_HIGHEST = Statistic.of("streak_deaths_totem_highest", StatisticType.DEATH_STREAKS, false, true);
 
-	public static final Statistic COMBAT_LOGS = Statistic.of("combat_logs", true);
+	public static final Statistic STREAK_DEATHS_GLOBAL = Statistic.of("streak_deaths_global", true, true);
+	public static final Statistic STREAK_KILLS_GLOBAL = Statistic.of("streak_kills_global", true, true);
+	public static final Statistic STREAK_DEATHS_ANCHOR = Statistic.of("streak_deaths_anchor", true, true);
+	public static final Statistic STREAK_KILLS_ANCHOR = Statistic.of("streak_kills_anchor", true, true);
+	public static final Statistic STREAK_DEATHS_CRYSTAL= Statistic.of("streak_deaths_crystal", true, true);
+	public static final Statistic STREAK_KILLS_CRYSTAL= Statistic.of("streak_kills_crystal", true, true);
+	public static final Statistic STREAK_DEATHS_TNT = Statistic.of("streak_deaths_tnt", true, true);
+	public static final Statistic STREAK_KILLS_TNT = Statistic.of("streak_kills_tnt", true, true);
+	public static final Statistic STREAK_DEATHS_BED = Statistic.of("streak_deaths_bed", true, true);
+	public static final Statistic STREAK_KILLS_BED = Statistic.of("streak_kills_bed", true, true);
+
+	public static final Statistic COMBAT_LOGS = Statistic.of("combat_logs", true, true);
 	public static final Statistic STREAK_COMBAT_LOGS = Statistic.of("streak_combat_logs");
+
 
 	private static final Statistic[] statistics;
 	static {

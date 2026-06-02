@@ -2,6 +2,7 @@ package bet.astral.fluffy.statistic;
 
 import bet.astral.fluffy.FluffyCombat;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
 import java.util.HashMap;
@@ -66,7 +67,7 @@ public class AccountImpl implements Account {
 	}
 
 	@Override
-	public void decrement(Statistic statistic) {
+	public void decrement(@NotNull Statistic statistic) {
 		if (statistic.canOnlyIncrement()){
 			return;
 		}
@@ -78,7 +79,7 @@ public class AccountImpl implements Account {
 	}
 
 	@Override
-	public void remove(Statistic statistic, @Range(from = 0, to = Integer.MAX_VALUE) int amount) {
+	public void remove(@NotNull Statistic statistic, @Range(from = 0, to = Integer.MAX_VALUE) int amount) {
 		if (statistic.canOnlyIncrement()){
 			return;
 		}
@@ -93,7 +94,7 @@ public class AccountImpl implements Account {
 	}
 
 	@Override
-	public void reset(Statistic statistic) {
+	public void reset(@NotNull Statistic statistic) {
 		if (statistic.canOnlyIncrement()){
 			return;
 		}
@@ -101,7 +102,26 @@ public class AccountImpl implements Account {
 	}
 
 	@Override
-	public void set(Statistic statistic, @Range(from = 0, to = Integer.MAX_VALUE) int amount) {
+	public void reset(StatisticType statisticType) {
+		StatisticType[] types = new StatisticType[]{statisticType};
+		if (statisticType == StatisticType.STREAKS) {
+			types = new StatisticType[]{StatisticType.STREAKS, StatisticType.KILL_STREAKS, StatisticType.DEATH_STREAKS};
+		}
+		
+		for (StatisticType type : types) {
+			for (Statistic statistic : statistics.keySet()) {
+				if (statistic.getType() == null){
+					continue;
+				}
+				if (statistic.getType().equals(type)) {
+					reset(statistic);
+				}
+			}
+		}
+	}
+
+	@Override
+	public void set(@NotNull Statistic statistic, @Range(from = 0, to = Integer.MAX_VALUE) int amount) {
 		if (statistic.canOnlyIncrement()) {
 			if (amount - getStatistic(statistic) != 1) {
 				return;
@@ -117,7 +137,7 @@ public class AccountImpl implements Account {
 
 
 	@Override
-	public CompletableFuture<Void> delete(Statistic statistic) {
+	public CompletableFuture<Void> delete(@NotNull Statistic statistic) {
 		if (statistic.canOnlyIncrement()) {
 			return new CompletableFuture<>();
 		}

@@ -7,6 +7,7 @@ import bet.astral.fluffy.messenger.FluffyMessenger;
 import bet.astral.messenger.v2.Messenger;
 import bet.astral.messenger.v2.receiver.Receiver;
 import io.papermc.paper.plugin.bootstrap.BootstrapContext;
+import lombok.Getter;
 import org.bukkit.command.CommandSender;
 import org.incendo.cloud.execution.ExecutionCoordinator;
 import org.incendo.cloud.paper.PaperCommandManager;
@@ -16,9 +17,11 @@ import org.slf4j.LoggerFactory;
 
 public class FluffyCommandRegisterer implements BootstrapCommandRegisterer<CommandSender> {
 	private final Logger logger = LoggerFactory.getLogger("FluffyCommandRegisterer");
-	private final PaperCommandManager.Bootstrapped<CommandSender> commandManager;
+	private PaperCommandManager.Bootstrapped<CommandSender> commandManager;
 	private final BootstrapHandler handler = new BootstrapHandler();
-	private final FluffyMessenger messenger;
+	private FluffyMessenger messenger;
+	@Getter
+	private BootstrapContext bootstrapContext;
 	public FluffyCommandRegisterer(BootstrapContext context, FluffyMessenger messenger){
 		commandManager = PaperCommandManager
 				.builder(new CommandSourceStackToCommandSenderMapper())
@@ -30,6 +33,7 @@ public class FluffyCommandRegisterer implements BootstrapCommandRegisterer<Comma
 		} catch (Exception e){
 			logger.error("e: ", e);
 		}
+		this.bootstrapContext = context;
 	}
 
 	@Override
@@ -53,7 +57,7 @@ public class FluffyCommandRegisterer implements BootstrapCommandRegisterer<Comma
 	}
 
 	@Override
-	public PaperCommandManager.@NotNull Bootstrapped<CommandSender> getCommandManager() {
+	public PaperCommandManager.Bootstrapped<CommandSender> getCommandManager() {
 		return commandManager;
 	}
 
