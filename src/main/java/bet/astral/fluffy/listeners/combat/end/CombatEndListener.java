@@ -6,8 +6,6 @@ import bet.astral.fluffy.api.CombatTag;
 import bet.astral.fluffy.api.CombatUser;
 import bet.astral.fluffy.configs.CombatConfig;
 import bet.astral.fluffy.events.CombatTagEndEvent;
-import bet.astral.shine.Shine;
-import bet.astral.shine.receiver.ShineReceiver;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -29,11 +27,14 @@ public class CombatEndListener implements Listener {
 		CombatUser attacker = tag.getAttacker();
 		if (attacker instanceof BlockCombatUser blockAttacker){
 			if (victim.getPlayer() instanceof Player player) {
+				/*
 				try {
 					fluffy.getShine().removeGlowing(ShineReceiver.of(blockAttacker.getBlock()), player);
 				} catch (ReflectiveOperationException e) {
 					throw new RuntimeException(e);
 				}
+
+				 */
 			}
 			return;
 		}
@@ -45,6 +46,7 @@ public class CombatEndListener implements Listener {
 			OfflinePlayer attackerOP = attacker.getPlayer();
 			OfflinePlayer victimOP = victim.getPlayer();
 			if (victimOP instanceof Player victimP && attackerOP instanceof Player attackerP) {
+				/*
 				Shine glowingEntities = fluffy.getShine();
 				try {
 					glowingEntities.removeGlowing(attackerP, victimP);
@@ -52,6 +54,7 @@ public class CombatEndListener implements Listener {
 				} catch (ReflectiveOperationException e) {
 					throw new RuntimeException(e);
 				}
+				 */
 			}
 		}
 	}

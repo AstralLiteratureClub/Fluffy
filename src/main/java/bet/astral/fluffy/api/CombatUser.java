@@ -2,7 +2,6 @@ package bet.astral.fluffy.api;
 
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.statistic.Account;
-import bet.astral.shine.ShineColor;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.OfflinePlayer;
@@ -69,11 +68,11 @@ public class CombatUser {
 
 	// Custom Glowing color support
 	@Getter(NONE)
-	private ShineColor latestGlowColor = null;
+	private Object latestGlowColor = null;
 	@Getter(NONE)
-	private ShineColor taggedGlowColor = null;
+	private Object taggedGlowColor = null;
 	@Getter(NONE)
-	private ShineColor rejoinedGlowColor = null;
+	private Object rejoinedGlowColor = null;
 
 	/**
 	 * Generates new user lol
@@ -135,15 +134,15 @@ public class CombatUser {
 		data.put(key, value);
 	}
 
-	public Optional<ShineColor> getLatestGlowColor() {
+	public Optional<Object> getLatestGlowColor() {
 		return Optional.ofNullable(latestGlowColor);
 	}
 
-	public Optional<ShineColor> getTaggedGlowColor() {
+	public Optional<Object> getTaggedGlowColor() {
 		return Optional.ofNullable(taggedGlowColor);
 	}
 
-	public Optional<ShineColor> getRejoinedGlowColor() {
+	public Optional<Object> getRejoinedGlowColor() {
 		return Optional.ofNullable(rejoinedGlowColor);
 	}
 }

@@ -1,6 +1,5 @@
 package bet.astral.fluffy.configs;
 
-import bet.astral.shine.ShineColor;
 import lombok.Getter;
 import bet.astral.fluffy.FluffyCombat;
 import net.kyori.adventure.util.TriState;
@@ -58,9 +57,9 @@ public class CombatConfig {
 	private boolean isCombatGlowLatest;
 	private boolean isCombatGlowAllTagged;
 	private boolean isCombatGlowCombatLogRejoin;
-	private ShineColor combatGlowLatest;
-	private ShineColor combatGlowAllTagged;
-	private ShineColor combatGlowTagRejoin;
+	private Object combatGlowLatest;
+	private Object combatGlowAllTagged;
+	private Object combatGlowTagRejoin;
 
 	private ElytraMode elytraMode;
 	private boolean isElytraBoostAllowed;
@@ -121,9 +120,9 @@ public class CombatConfig {
 //		combatGlowLatest = EnumUtils.getEnumIgnoreCase(ChatColor.class, configuration.getString("glowing.latest.color"), ChatColor.RED);
 //		combatGlowAllTagged = EnumUtils.getEnumIgnoreCase(ChatColor.class, configuration.getString("glowing.regular.color"), ChatColor.GOLD);
 //		combatGlowTagRejoin = EnumUtils.getEnumIgnoreCase(ChatColor.class, configuration.getString("glowing.combat-log.color"), ChatColor.BLUE);
-		combatGlowLatest = ShineColor.RED;
-		combatGlowAllTagged = ShineColor.GRAY;
-		combatGlowTagRejoin = ShineColor.GOLD;
+		combatGlowLatest = null;//ShineColor.RED;
+		combatGlowAllTagged = null;//ShineColor.GRAY;
+		combatGlowTagRejoin = null;//ShineColor.GOLD;
 
 		isCommandsDisabled = configuration.getBoolean("commands.combat.enabled", true);
 		commandsToDisable = configuration.getStringList("commands.combat.disabled-list");

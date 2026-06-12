@@ -22,6 +22,7 @@ public class FluffyLoader implements PluginLoader {
 //	public static final String CHAT_GAME_CORE_VERSION = "1.0.1";
 	public static final String CLOUD_PLUS_PLUS_VERSION = "1.3.0";
 	public static final String AURA_VERSION = "-SNAPSHOT";
+	public static final String MORE_PERSISTENT_DATA_TYPES = "2.4.0";
 
 	@Contract(pure = true)
 	public static @NotNull String cloudMinecraftDependency(@NotNull String dependency) {
@@ -50,6 +51,7 @@ public class FluffyLoader implements PluginLoader {
 //			astralLiteratureClubDependency("ChatGameCore",   CHAT_GAME_CORE_VERSION),
 			astralLiteratureClubDependency("CloudPlusPlus",  CLOUD_PLUS_PLUS_VERSION),
 			antritusDependency("Aura", AURA_VERSION),
+			"com.jeff-media:MorePersistentDataTypes:"+MORE_PERSISTENT_DATA_TYPES,
 	};
 
 
