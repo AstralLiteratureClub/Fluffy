@@ -21,8 +21,10 @@ public class Cooldown implements Listener {
 	private final long millis;
 	private final NamespacedKey sound;
 	private final boolean message;
+	private final boolean resetCombatTime;
 
-	public Cooldown(FluffyCombat fluffy, Material material, double seconds, NamespacedKey sound, boolean message) {
+
+	public Cooldown(FluffyCombat fluffy, Material material, double seconds, NamespacedKey sound, boolean message, boolean resetCombatTime) {
 		this.fluffy = fluffy;
 		this.material = material;
 		this.seconds = seconds;
@@ -30,15 +32,17 @@ public class Cooldown implements Listener {
 		millis = (long) (seconds*1000);
 		this.sound = sound;
 		this.message = message;
-	}
-	public Cooldown(FluffyCombat fluffy, Material material, double seconds, boolean message) {
+        this.resetCombatTime = resetCombatTime;
+    }
+	public Cooldown(FluffyCombat fluffy, Material material, double seconds, boolean message, boolean resetCombatTime) {
 		this.fluffy = fluffy;
 		this.material = material;
 		this.seconds = seconds;
 		ticks = (int) (seconds * 20);
 		millis = (long) (seconds*1000);
 		this.message = message;
-		this.sound = null;
+        this.resetCombatTime = resetCombatTime;
+        this.sound = null;
 	}
 
 
@@ -55,9 +59,6 @@ public class Cooldown implements Listener {
 		cooldowns.remove(player.getUniqueId());
 		player.setCooldown(material, 0);
 	}
-
-
-
 
 	public Material material() {
 		return material;
@@ -86,5 +87,9 @@ public class Cooldown implements Listener {
 
 	public boolean message() {
 		return message;
+	}
+
+	public boolean resetCombatTime() {
+		return resetCombatTime;
 	}
 }

@@ -336,6 +336,7 @@ cooldowns:
       message: false
       sounds:
         use: minecraft:entity.enderman.hurt
+      reset-combat-time: true
     - material: minecraft:enchanted_golden_apple
       cooldown: 95
       message: true

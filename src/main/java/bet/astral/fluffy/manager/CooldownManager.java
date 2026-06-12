@@ -35,11 +35,11 @@ public class CooldownManager implements Listener {
 		loadCooldowns();
 	}
 
-	public void register(@NotNull Material material, double seconds, @Nullable NamespacedKey sound, boolean message){
+	public void register(@NotNull Material material, double seconds, @Nullable NamespacedKey sound, boolean message, boolean resetCombatTime) {
 		if (material==Material.ENDER_PEARL){
-			cooldowns.put(material, new EnderPearlCooldown(fluffy, seconds, sound, message));
+			cooldowns.put(material, new EnderPearlCooldown(fluffy, seconds, sound, message, resetCombatTime));
 		} else {
-			cooldowns.put(material, new Cooldown(fluffy, material, seconds, sound, message));
+			cooldowns.put(material, new Cooldown(fluffy, material, seconds, sound, message, resetCombatTime));
 		}
 	}
 
@@ -72,8 +72,11 @@ public class CooldownManager implements Listener {
 					soundKeyUse = NamespacedKey.fromString(soundKeyUseString);
 				}
 			}
+
+			boolean resetCombatTime = Optional.of((boolean) cooldownMap.get("reset-combat-time")).orElse(false);
+
 			boolean message = (cooldownMap.get("message") != null ? (Boolean) cooldownMap.get("message") : false);
-			register(material, seconds, soundKeyUse, message);
+			register(material, seconds, soundKeyUse, message, resetCombatTime);
 		}
 	}
 
@@ -137,6 +140,9 @@ public class CooldownManager implements Listener {
 					1
 			);
 			player.playSound(sound);
+		}
+		if (cooldown.resetCombatTime()){
+			fluffy.getCombatManager().resetTagTicks(player);
 		}
 	}
 

@@ -7,8 +7,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class EnderPearlCooldown extends Cooldown {
-	public EnderPearlCooldown(FluffyCombat fluffy, double seconds, NamespacedKey sound, boolean message) {
-		super(fluffy, Material.ENDER_PEARL, seconds, sound, message);
+	public EnderPearlCooldown(FluffyCombat fluffy, double seconds, NamespacedKey sound, boolean message, boolean resetCombatTime) {
+		super(fluffy, Material.ENDER_PEARL, seconds, sound, message, resetCombatTime);
 	}
 
 	@Override
