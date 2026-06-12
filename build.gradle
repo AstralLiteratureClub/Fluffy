@@ -56,10 +56,10 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.34'
     annotationProcessor 'org.projectlombok:lombok:1.18.34'
     // Armor Change Event
-    compileOnly 'com.jeff-media:armor-equip-event:1.0.2'
-    compileOnly 'com.jeff-media:MorePersistentDataTypes:2.4.0'
+    implementation 'com.jeff-media:armor-equip-event:1.0.2'
+    implementation 'com.jeff-media:MorePersistentDataTypes:2.4.0'
     // Reflections
-    compileOnly 'io.github.classgraph:classgraph:4.8.165'
+    implementation 'io.github.classgraph:classgraph:4.8.165'
     // PAPI
     compileOnly 'me.clip:placeholderapi:2.11.5'
 
@@ -85,10 +85,13 @@ dependencies {
         exclude group: '*', module: '*'
     }
 
-    var cloudVer = "2.0.0-beta.10"
-    compileOnly 'org.incendo:cloud-paper:'+cloudVer
-    compileOnly 'org.incendo:cloud-brigadier:'+cloudVer
-    compileOnly 'org.incendo:cloud-minecraft-extras:'+cloudVer
+    var cloudVer = "2.0.0-beta.15"
+    var cloudTranslationsVersion = "1.0.0-beta.2"
+    implementation 'org.incendo:cloud-paper:'+cloudVer
+    implementation 'org.incendo:cloud-brigadier:'+cloudVer
+    implementation 'org.incendo:cloud-minecraft-extras:'+cloudVer
+    implementation 'org.incendo:cloud-translations-bukkit:'+cloudTranslationsVersion
+
 
     // PAPER MC
     paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT")

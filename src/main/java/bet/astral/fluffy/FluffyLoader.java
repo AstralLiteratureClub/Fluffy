@@ -15,6 +15,7 @@ public class FluffyLoader implements PluginLoader {
 	public static final RemoteRepository JITPACK_REPOSITORY = new RemoteRepository.Builder("jitpack", "default", "https://jitpack.io").build();
 
 	public static final String CLOUD_MINECRAFT_VERSION = "2.0.0-beta.10";
+	public static final String CLOUD_MINECRAFT_EXTRAS_VERSION = "2.0.0-beta.10";
 	public static final String CLASSGRAPH_VERSION = "4.8.184";
 	public static final String MORE_FOR_JAVA_VERSION = "1.0.2";
 	public static final String MESSAGE_MANAGER_VERSION = "2.4.1";
@@ -40,9 +41,10 @@ public class FluffyLoader implements PluginLoader {
 	}
 
 	public static final String[] DEPENDENCIES = {
-			cloudMinecraftDependency("cloud-minecraft"),
-			cloudMinecraftDependency("cloud-brigadier"),
-			cloudMinecraftDependency("cloud-minecraft-extras"),
+//			"org.incendo:cloud-paper:2.0.0-beta.10",
+//			"org.incendo:cloud-minecraft-extras:"+CLOUD_MINECRAFT_EXTRAS_VERSION,
+//			"io.github.classgraph:classgraph:"+CLASSGRAPH_VERSION,
+
 			"io.github.classgraph:classgraph:"+CLASSGRAPH_VERSION,
 			"com.jeff-media.armor-equip-event:1.0.2",
 			astralLiteratureClubDependency("MoreForJava",    MORE_FOR_JAVA_VERSION),

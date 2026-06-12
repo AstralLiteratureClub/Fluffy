@@ -53,6 +53,8 @@ public class StatisticsCommand extends FluffyCommand {
         menuSelf = loadMessagesAndCreateMenu(registerer, false);
         menuOther = loadMessagesAndCreateMenu(registerer, true);
 
+        if (true)
+            return;
         command("statistics", Translations.COMMAND_STATISTICS_DESCRIPTION,
                 b -> b.permission(Permission.of("fluffy.plugin-hooks"))
                         .senderType(Player.class)
@@ -62,6 +64,8 @@ public class StatisticsCommand extends FluffyCommand {
 
     }
     public ChatMenu loadMessagesAndCreateMenu(@NotNull FluffyCommandRegisterer registerer, boolean otherPlayer) {
+        if (true)
+            return null;
         File file = new File(
                 registerer.getBootstrapContext().getDataDirectory().toFile(),
                 "config.json");
