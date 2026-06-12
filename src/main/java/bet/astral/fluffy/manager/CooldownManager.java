@@ -130,7 +130,9 @@ public class CooldownManager implements Listener {
 	 * @param cooldown cooldown
 	 */
 	private void handleCooldown(Player player, @NotNull Cooldown cooldown) {
-		cooldown.handleCooldown(player);
+		if (cooldown.seconds()>0){
+			cooldown.handleCooldown(player);
+		}
 		if (cooldown.sound() != null){
 			assert cooldown.sound() != null;
 			Sound sound = Sound.sound(
