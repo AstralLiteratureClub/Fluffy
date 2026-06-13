@@ -73,7 +73,8 @@ public class CooldownManager implements Listener {
 				}
 			}
 
-			boolean resetCombatTime = Optional.ofNullable((boolean) cooldownMap.get("reset-combat-time")).orElse(false);
+			Object objResetCombatTime = cooldownMap.get("reset-combat-time");
+			boolean resetCombatTime = objResetCombatTime != null && (boolean) objResetCombatTime;
 
 			boolean message = (cooldownMap.get("message") != null ? (Boolean) cooldownMap.get("message") : false);
 			register(material, seconds, soundKeyUse, message, resetCombatTime);
