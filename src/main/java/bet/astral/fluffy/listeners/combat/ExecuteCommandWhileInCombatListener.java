@@ -30,7 +30,14 @@ public class ExecuteCommandWhileInCombatListener implements Listener {
 			final String finalCommand = event.getMessage();
 			if (fluffy.getCombatConfig().getCommandsToDisable().stream().
 					anyMatch(
-							cmd -> cmd.toLowerCase().startsWith(finalCommand)
+							cmd -> {
+								if (cmd.startsWith("/")) {
+									return cmd.toLowerCase().startsWith(finalCommand);
+								} else {
+									String slashCMD = "/" + cmd;
+									return slashCMD.toLowerCase().startsWith(finalCommand);
+								}
+							}
 					)
 			) {
 				event.setCancelled(true);
