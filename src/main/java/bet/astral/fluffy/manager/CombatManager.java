@@ -107,7 +107,7 @@ public final class CombatManager {
 
 							tag.setVictimTicksLeft(tag.getVictimTicksLeft() - 5);
 							tag.setAttackerTicksLeft(tag.getAttackerTicksLeft() - 5);
-							if (tag.getVictimTicksLeft() < 0 && tag.getAttackerTicksLeft() < 0) {
+							if (tag.getVictimTicksLeft() < 0 || tag.getAttackerTicksLeft() < 0 ) {
 								deleteList.add(key);
 							} else {
 								userTags.get(ids[0]).add(tag);
