@@ -321,6 +321,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 
 	@Override
 	public void onDisable() {
+		emergencyStop = true;
 		isStopping = true;
 		userManager.onDisable();
 		combatManager.onDisable();

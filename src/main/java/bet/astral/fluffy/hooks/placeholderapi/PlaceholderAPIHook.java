@@ -15,6 +15,7 @@ import me.clip.placeholderapi.PlaceholderAPIPlugin;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
@@ -68,6 +69,36 @@ public class PlaceholderAPIHook extends PlaceholderExpansion implements Hook {
 			//noinspection UnstableApiUsage
 			hookPlugin.getLocalExpansionManager().register(this);
 		}
+	}
+
+	@Override
+	public void onCombatBegin(Player player, OfflinePlayer player2) {
+
+	}
+
+	@Override
+	public void onCombatEnd(Player player, OfflinePlayer player2) {
+
+	}
+
+	@Override
+	public void onCombatUpdate(Player player, OfflinePlayer player2) {
+
+	}
+
+	@Override
+	public void onCombatBegin(Player player, Block player2) {
+
+	}
+
+	@Override
+	public void onCombatEnd(Player player, Block player2) {
+
+	}
+
+	@Override
+	public void onCombatUpdate(Player player, Block player2) {
+
 	}
 
 	@Override

@@ -87,6 +87,8 @@ hooks:
     enabled: false
   sentinel:
     enabled: false
+  gsit:
+    enabled: true
 
 elytra:
   # Denies use of elytra in combat

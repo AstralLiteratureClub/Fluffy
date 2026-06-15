@@ -9,6 +9,9 @@ import bet.astral.fluffy.manager.RegionManager;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import lombok.Getter;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -49,6 +52,36 @@ public class WorldGuardHook implements Hook {
                 .registerHandler(FluffyWGHandlers.COMBAT_ENTRY_HANDLER_FACTORY, null);
 
         fluffy.getMessenger().registerReceiverConverter(new WGReceiverConverter());
+    }
+
+    @Override
+    public void onCombatBegin(Player player, OfflinePlayer player2) {
+
+    }
+
+    @Override
+    public void onCombatEnd(Player player, OfflinePlayer player2) {
+
+    }
+
+    @Override
+    public void onCombatUpdate(Player player, OfflinePlayer player2) {
+
+    }
+
+    @Override
+    public void onCombatBegin(Player player, Block player2) {
+
+    }
+
+    @Override
+    public void onCombatEnd(Player player, Block player2) {
+
+    }
+
+    @Override
+    public void onCombatUpdate(Player player, Block player2) {
+
     }
 
 

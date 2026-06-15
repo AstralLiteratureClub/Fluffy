@@ -114,7 +114,12 @@ public class BeginCombatListener implements Listener {
 			tag = fluffy.getCombatManager().create(victim, attacker);
 			CombatEnterEvent enterEvent = new CombatEnterEvent(fluffy, tag);
 			enterEvent.callEvent();
+			// Allow hooks to see updated combat status
+			fluffy.getHookManager().onCombatBegin(victim, attacker);
+		} else {
+			fluffy.getHookManager().onCombatUpdate(victim, attacker);
 		}
+
 		if (victim.getUniqueId().equals(tag.getVictim().getUniqueId())) {
 			tag.setVictimCombatCause(combatCause);
 		} else {
@@ -198,6 +203,8 @@ public class BeginCombatListener implements Listener {
 		tag.resetTicks();
 		CombatEnterEvent enterEvent = new CombatEnterEvent(fluffy, tag);
 		enterEvent.callEvent();
+
+		fluffy.getHookManager().onCombatBegin(victim, attacker.getBlock());
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

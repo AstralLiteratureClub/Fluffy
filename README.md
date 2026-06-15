@@ -60,3 +60,17 @@ In fluffy you can just disable features in the config.
 ### Dependencies
 [Messenger](https://github.com/AstralLiteratureClub/MessageManager) to parse and send messages to players.
 [Aura](https://github.com/Antritus/Aura) to show glowing effect to players and entities.
+
+# Project setup
+When setting up the project, you need to download the hooks which require local jars.
+
+### Option 2: Using the Command Line
+If you are building from a terminal, run the setup task manually to download the required local assets before compiling:
+
+```bash
+# On Mac/Linux:
+./gradlew downloadHooks
+
+# On Windows:
+gradlew downloadHooks
+```

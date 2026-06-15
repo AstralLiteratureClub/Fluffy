@@ -192,6 +192,8 @@ public final class CombatManager {
 						}
 						CombatTagEndEvent event = new CombatTagEndEvent(main, tag);
 						event.callEvent();
+
+						handleHookTag(tag.getVictim(), tag.getAttacker());
 					});
 
 					combatEnded.forEach((key, value) -> {
@@ -255,6 +257,27 @@ public final class CombatManager {
 				}
 			}
 		}.runTaskTimerAsynchronously(main, 20, 10);
+	}
+
+	private void handleHookTag(CombatUser user, CombatUser secondUser) {
+		Player player = null;
+		Object second = null;
+		if (user instanceof BlockCombatUser) {
+			second = ((BlockCombatUser) user).getBlock();
+		}  else if (user instanceof Player) {
+			player = (Player) user;
+		}
+		if (second instanceof BlockCombatUser) {
+			second = ((BlockCombatUser) second).getBlock();
+		} else {
+			second = (Player) second;
+		}
+
+		if (second instanceof Block) {
+			main.getHookManager().onCombatEnd(player, (Block) secondUser);
+		} else {
+			main.getHookManager().onCombatEnd(player, (OfflinePlayer) second);
+		}
 	}
 
 	public static void makeGlow(@NotNull FluffyCombat fluffy, @NotNull Player whoSees, @NotNull OfflinePlayer ignore, @NotNull CombatTag tag){

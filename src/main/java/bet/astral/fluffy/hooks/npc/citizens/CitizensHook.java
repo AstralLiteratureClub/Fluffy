@@ -9,6 +9,9 @@ import lombok.Getter;
 import net.citizensnpcs.Citizens;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.trait.TraitInfo;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,6 +48,36 @@ public class CitizensHook implements Hook {
             }
             return null;
         });
+    }
+
+    @Override
+    public void onCombatBegin(Player player, OfflinePlayer player2) {
+
+    }
+
+    @Override
+    public void onCombatEnd(Player player, OfflinePlayer player2) {
+
+    }
+
+    @Override
+    public void onCombatUpdate(Player player, OfflinePlayer player2) {
+
+    }
+
+    @Override
+    public void onCombatBegin(Player player, Block player2) {
+
+    }
+
+    @Override
+    public void onCombatEnd(Player player, Block player2) {
+
+    }
+
+    @Override
+    public void onCombatUpdate(Player player, Block player2) {
+
     }
 
 
