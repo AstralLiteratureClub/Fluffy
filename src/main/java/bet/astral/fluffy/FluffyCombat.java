@@ -239,7 +239,9 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		combatLogManager = new CombatLogManager();
 		combatManager.onEnable();
 		userManager.onEnable();
+		getComponentLogger().info("Starting hook manager...");
 		hookManager.onEnable();
+		getComponentLogger().info("Hook manager loaded!");
 
 		registerListeners(this);
 		registerListeners(cooldownManager);
