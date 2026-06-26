@@ -30,6 +30,7 @@ import java.util.*;
  * @since 1.0-SNAPSHOT
  */
 public final class CombatManager {
+	static public final int TICK_TIMER = 5;
 	private final Constructor<?> combatTagConstructor;
 	private final Constructor<BlockCombatTag> blockCombatTagConstructor;
 	{
@@ -80,13 +81,16 @@ public final class CombatManager {
 					return;
 				}
 				try {
-					for (UUID uniqueId : List.copyOf(ended)) {
-						if (!hasTags(Bukkit.getOfflinePlayer(uniqueId)) && (alreadyEnded.get(uniqueId)==null||!alreadyEnded.get(uniqueId))) {
-							OfflinePlayer player = main.getServer().getOfflinePlayer(uniqueId);
-							PlayerCombatFullEndEvent event = new PlayerCombatFullEndEvent(true, main, player);
-							event.callEvent();
-							alreadyEnded.put(uniqueId, true);
-							ended.remove(uniqueId);
+					// Make sure the ended list is not empty before looping them and copying the list
+					if (!ended.isEmpty()) {
+						for (UUID uniqueId : List.copyOf(ended)) {
+							if (!hasTags(Bukkit.getOfflinePlayer(uniqueId)) && (alreadyEnded.get(uniqueId) == null || !alreadyEnded.get(uniqueId))) {
+								OfflinePlayer player = main.getServer().getOfflinePlayer(uniqueId);
+								PlayerCombatFullEndEvent event = new PlayerCombatFullEndEvent(true, main, player);
+								event.callEvent();
+								alreadyEnded.put(uniqueId, true);
+								ended.remove(uniqueId);
+							}
 						}
 					}
 
@@ -105,8 +109,8 @@ public final class CombatManager {
 							userTags.putIfAbsent(ids[0], new ArrayList<>());
 							userTags.putIfAbsent(ids[1], new ArrayList<>());
 
-							tag.setVictimTicksLeft(tag.getVictimTicksLeft() - 5);
-							tag.setAttackerTicksLeft(tag.getAttackerTicksLeft() - 5);
+							tag.setVictimTicksLeft(tag.getVictimTicksLeft() - TICK_TIMER);
+							tag.setAttackerTicksLeft(tag.getAttackerTicksLeft() - TICK_TIMER);
 							if (tag.getVictimTicksLeft() < 0 || tag.getAttackerTicksLeft() < 0 ) {
 								deleteList.add(key);
 							} else {
@@ -256,7 +260,7 @@ public final class CombatManager {
 					getMain().getComponentLogger().error("Error accorded while running combat timer!", e);
 				}
 			}
-		}.runTaskTimerAsynchronously(main, 20, 10);
+		}.runTaskTimerAsynchronously(main, 20, TICK_TIMER);
 	}
 
 	private void handleHookTag(CombatUser user, CombatUser secondUser) {
