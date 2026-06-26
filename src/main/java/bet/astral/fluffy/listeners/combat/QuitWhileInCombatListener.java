@@ -20,6 +20,7 @@ import bet.astral.messenger.v2.placeholder.collection.PlaceholderList;
 import bet.astral.messenger.v2.placeholder.collection.PlaceholderMap;
 import bet.astral.messenger.v2.translation.TranslationKey;
 import org.bukkit.*;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -128,12 +129,20 @@ public class QuitWhileInCombatListener implements Listener {
 				while (true){
 					if (destroyed){
 						CombatTag latest = fluffy.getCombatManager().getLatest(player);
-						CombatUser opposite = latest.getOpposite(player);
-						if (opposite instanceof BlockCombatUser || opposite.getUniqueId().equals(player.getUniqueId())) {
-							player.damage(100000D);
-						} else {
-							player.damage(100000D, Bukkit.getEntity(opposite.getUniqueId()));
+						CombatUser opposite = latest != null ? latest.getOpposite(player) : null;
+
+						// Patch armors not dropping / being destroyed by the plugin
+
+						Player killer = null;
+						if (opposite != null && !(opposite instanceof BlockCombatUser) && !opposite.getUniqueId().equals(player.getUniqueId())) {
+							Entity entity = Bukkit.getEntity(opposite.getUniqueId());
+							if (entity instanceof Player online) {
+								killer = online;
+							}
 						}
+						player.setKiller(killer);
+						player.setHealth(0);
+
 						fluffy.getCombatManager().getTags(player)
 								.forEach(tag->{
 									tag.setVictimTicksLeft(-1);
