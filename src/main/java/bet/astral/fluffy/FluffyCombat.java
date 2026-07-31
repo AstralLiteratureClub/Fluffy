@@ -215,7 +215,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
     private BootstrapHandler handler;
     private StatisticsDatabase statisticsDatabase;
     private ICombatLogDatabase combatLogDatabase;
-    private EffectManager deathEffectManager = new EffectManager(this, "death-effects.json", Translations.HIT_EFFECT_CHOSEN, Translations.HIT_EFFECT_MENU_TITLE, Translations.HIT_EFFECT_MENU_CLOSE, Translations.HIT_EFFECT_MENU_RETURN);
+    private EffectManager deathEffectManager = new EffectManager(this, "death-effects.json", Translations.DEATH_EFFECT_CHOSEN, Translations.DEATH_EFFECT_MENU_TITLE, Translations.DEATH_EFFECT_MENU_CLOSE, Translations.DEATH_EFFECT_MENU_RETURN);
     private EffectManager hitEffectManager = new EffectManager(this, "hit-effects.json", Translations.HIT_EFFECT_CHOSEN, Translations.HIT_EFFECT_MENU_TITLE, Translations.HIT_EFFECT_MENU_CLOSE, Translations.HIT_EFFECT_MENU_RETURN);
     private Log4jConsoleStreamer consoleStreamer;
 

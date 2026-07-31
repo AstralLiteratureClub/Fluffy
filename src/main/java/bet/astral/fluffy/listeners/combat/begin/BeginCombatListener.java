@@ -57,12 +57,12 @@ public class BeginCombatListener implements Listener {
 		return false;
 	}
 
-	public static void handle(Player victim, OfflinePlayer attacker, Block damageBlock, CombatCause combatCause) {
-		handle(victim, attacker, damageBlock, combatCause, null);
+	public static void handle(Player victim, OfflinePlayer attacker, Block damageBlock, CombatCause combatCause, double damageDealt) {
+		handle(victim, attacker, damageBlock, combatCause, null, damageDealt);
 	}
 
-	public static void handle(Player victim, OfflinePlayer attacker, Block damageBlock, CombatCause combatCause, ItemStack itemStack) {
-		handle(victim, attacker, combatCause, damageBlock, itemStack, false);
+	public static void handle(Player victim, OfflinePlayer attacker, Block damageBlock, CombatCause combatCause, ItemStack itemStack, double damageDealt) {
+		handle(victim, attacker, combatCause, damageBlock, itemStack, false, damageDealt);
 	}
 
 	public static boolean cannotEnterCombat(Player player){
@@ -80,7 +80,7 @@ public class BeginCombatListener implements Listener {
 		return !fluffyCombat.getRegionManager().canEnterCombat(player, player.getLocation());
 	}
 
-	public static void handle(Player victim, OfflinePlayer attacker, CombatCause combatCause, Block damageBlock, ItemStack itemStack, boolean fireTicks) {
+	public static void handle(Player victim, OfflinePlayer attacker, CombatCause combatCause, Block damageBlock, ItemStack itemStack, boolean fireTicks, double damageDealt) {
 		if (FluffyCombat.emergencyStop){
 			return;
 		}
@@ -119,6 +119,9 @@ public class BeginCombatListener implements Listener {
 		} else {
 			fluffy.getHookManager().onCombatUpdate(victim, attacker);
 		}
+
+		// Set damage dealt
+		tag.setDamageDealt(attacker, tag.getDamageDealt(attacker) + damageDealt);
 
 		if (victim.getUniqueId().equals(tag.getVictim().getUniqueId())) {
 			tag.setVictimCombatCause(combatCause);
@@ -235,7 +238,7 @@ public class BeginCombatListener implements Listener {
 			Material material = nearest.getType();
 			if (material == Material.FIRE || material == Material.SOUL_FIRE) {
 				OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(owner);
-				handle(player, offlinePlayer, nearest, CombatCause.FIRE);
+				handle(player, offlinePlayer, nearest, CombatCause.FIRE, event.getFinalDamage());
 			}
 		} else if (event.getCause() == LAVA) {
 			Block block = DetectionHelper.findNearestOwnedBlock(player, Material.LAVA);
@@ -248,7 +251,7 @@ public class BeginCombatListener implements Listener {
 			}
 
 			OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(owner);
-			handle(player, offlinePlayer, block, CombatCause.FIRE);
+			handle(player, offlinePlayer, block, CombatCause.FIRE, event.getFinalDamage());
 		}
 	}
 
@@ -267,7 +270,7 @@ public class BeginCombatListener implements Listener {
 				if (!combat.getCombatManager().hasTags(victim)) {
 					return;
 				}
-				handle(victim, Bukkit.getOfflinePlayer(user.getLastFireDamage()), null, CombatCause.FIRE);
+				handle(victim, Bukkit.getOfflinePlayer(user.getLastFireDamage()), null, CombatCause.FIRE, event.getFinalDamage());
 				return;
 			}
 		}
@@ -290,10 +293,10 @@ public class BeginCombatListener implements Listener {
 
 
 					if (projectile instanceof Arrow arrow) {
-						handle(victim, player, CombatCause.PROJECTILE, null, itemStack, arrow.getFireTicks() > 0);
+						handle(victim, player, CombatCause.PROJECTILE, null, itemStack, arrow.getFireTicks() > 0, event.getFinalDamage());
 						return;
 					}
-					handle(victim, player, null, CombatCause.PROJECTILE, itemStack);
+					handle(victim, player, null, CombatCause.PROJECTILE, itemStack, event.getFinalDamage());
 					return;
 				} else {
 					return;
@@ -304,7 +307,7 @@ public class BeginCombatListener implements Listener {
 		} else {
 			attacker = player;
 		}
-		handle(victim, attacker, null, CombatCause.MELEE);
+		handle(victim, attacker, null, CombatCause.MELEE, event.getFinalDamage());
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

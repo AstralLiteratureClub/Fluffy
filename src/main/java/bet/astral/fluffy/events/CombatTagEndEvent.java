@@ -20,7 +20,7 @@ public class CombatTagEndEvent extends AbstractCombatEvent {
 	 * @param combatTag tag
 	 */
 	public CombatTagEndEvent(FluffyCombat fluffyCombat, CombatTag combatTag) {
-		super(true, fluffyCombat, combatTag);
+		super(fluffyCombat, combatTag);
 	}
 
 	private static final HandlerList HANDLERS = new HandlerList();

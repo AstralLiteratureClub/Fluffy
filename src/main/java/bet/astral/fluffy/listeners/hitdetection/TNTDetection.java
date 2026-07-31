@@ -440,14 +440,13 @@ public class TNTDetection implements Listener {
                     return;
                 }
                 if (value instanceof OfflinePlayer attacker) {
-                    BeginCombatListener.handle(victim, attacker, null, CombatCause.TNT, null);
+                    BeginCombatListener.handle(victim, attacker, null, CombatCause.TNT, null, event.getFinalDamage());
                     CombatTag combatTag = fluffy.getCombatManager().getLatest(victim);
                     if (combatTag == null) {
                         return;
                     }
                     CombatDamageUsingTNTEvent damageEvent = new CombatDamageUsingTNTEvent(
                             fluffy, combatTag, victim, attacker, null, tnt);
-                    combatTag.setDamageDealt(attacker, event.getFinalDamage());
                     damageEvent.callEvent();
                 }
             }

@@ -86,14 +86,13 @@ public class CrystalDetection implements Listener {
 		}
 
 		ItemStack itemStack = tag.itemStack;
-		BeginCombatListener.handle(victim, attacker, null, CombatCause.ENDER_CRYSTAL, itemStack);
+		BeginCombatListener.handle(victim, attacker, null, CombatCause.ENDER_CRYSTAL, itemStack, event.getFinalDamage());
 		CombatTag combatTag = fluffy.getCombatManager().getLatest(victim);
 		if (combatTag == null){
 			return;
 		}
 		CombatDamageUsingEnderCrystalEvent damageEvent = new CombatDamageUsingEnderCrystalEvent(
 				fluffy, combatTag, victim, attacker, tag.itemStack, crystal);
-		combatTag.setDamageDealt(attacker, event.getFinalDamage());
 		damageEvent.callEvent();
 
 	}

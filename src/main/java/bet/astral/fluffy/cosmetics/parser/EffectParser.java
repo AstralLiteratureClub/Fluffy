@@ -27,11 +27,11 @@ import java.util.function.Function;
 
 public class EffectParser {
     private final FluffyCombat fluffy;
-    private final EffectManager hitEffectManager;
+    private final EffectManager effectManager;
 
-    public EffectParser(FluffyCombat fluffy, EffectManager hitEffectManager) {
+    public EffectParser(FluffyCombat fluffy, EffectManager effectManager) {
         this.fluffy = fluffy;
-        this.hitEffectManager = hitEffectManager;
+        this.effectManager = effectManager;
     }
 
     public void parse(File file) {
@@ -53,7 +53,7 @@ public class EffectParser {
                         if (effect == null){
                             continue;
                         }
-                        hitEffectManager.registerEffect(effect);
+                        effectManager.registerEffect(effect);
                     }
                 }
             }
@@ -94,8 +94,8 @@ public class EffectParser {
             return new ConfigurableEffect(effects,
                     fluffy,
                     name,
-                    TranslationKey.of("hit-effect."+name.toLowerCase()+".name"),
-                    TranslationKey.of("hit-effect."+name.toLowerCase()+".description"),
+                    TranslationKey.of(effectManager.getName()+"."+name.toLowerCase()+".name"),
+                    TranslationKey.of(effectManager.getName()+"."+name.toLowerCase()+".description"),
                     ItemStack.of(material)
                     );
         } catch (NullPointerException | IllegalStateException e) {
@@ -195,6 +195,5 @@ public class EffectParser {
         TRANSLATION,
         TEXT,
         PARTICLE
-
     }
 }

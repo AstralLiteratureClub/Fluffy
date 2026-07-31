@@ -31,11 +31,9 @@ public class DeathEffectListener implements Listener {
 
         Effect effect = effectManager.getPlayerEffects().get(event.getDamager().getUniqueId());
         if (effect == null) {
-            Bukkit.broadcastMessage("Null;");
             Bukkit.broadcastMessage(event.getDamager().getName());
         }
         if (effect != null) {
-            Bukkit.broadcastMessage("?");
             PlaceholderList placeholders = new PlaceholderList();
             placeholders.add("total-damage", event.getAttackerDamageDealt());
             placeholders.addAll(Placeholders.combatPlaceholders(event.getVictim(), event.getDamager(), event.getCombatCause(), event.getItemStack()));

@@ -62,12 +62,15 @@ public class EffectMenu {
             }
             builder.clickable(slot, Clickable.general(effect.getDisplayItem(), context->{
                 effectManager.getPlayerEffects().put(player.getUniqueId(), effect);
+                player.sendMessage(effect.getName());
                 PlaceholderList placeholders = new PlaceholderList();
                 Component name = fluffy.getMessenger().disablePrefixForNextParse().parseComponent(new MessageInfoBuilder(effect.getFormattedName()).build(), ComponentType.CHAT);
                 Component description = fluffy.getMessenger().disablePrefixForNextParse().parseComponent(new MessageInfoBuilder(effect.getFormattedName()).build(), ComponentType.CHAT);
                 placeholders.add("effect", name != null ? name : Component.text(effect.getFormattedName().getKey()));
                 placeholders.add("description", description != null ? description : Component.text(effect.getDescription().getKey()));
                 fluffy.getMessenger().message(player, effectChosenTranslation, placeholders);
+
+                        player.sendMessage(effectManager.getPlayerEffects().get(player.getUniqueId()).getName());
             })
                     .title(effect.getFormattedName())
                     .description(effect.getDescription())

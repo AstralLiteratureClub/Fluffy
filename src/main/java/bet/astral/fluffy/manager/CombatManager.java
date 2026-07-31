@@ -48,7 +48,7 @@ public final class CombatManager implements Manager {
     private final FluffyCombat main;
     private BukkitTask task;
     private final Map<String, CombatTag> tags = new LinkedHashMap<>();
-    private final Map<UUID, CombatTag> latest = new HashMap<>();
+    private volatile Map<UUID, CombatTag> latest = new HashMap<>();
     private final Map<UUID, Boolean> alreadyEnded = new HashMap<>();
 
     /**
@@ -90,7 +90,7 @@ public final class CombatManager implements Manager {
                         for (UUID uniqueId : List.copyOf(ended)) {
                             if (!hasTags(Bukkit.getOfflinePlayer(uniqueId)) && (alreadyEnded.get(uniqueId) == null || !alreadyEnded.get(uniqueId))) {
                                 OfflinePlayer player = main.getServer().getOfflinePlayer(uniqueId);
-                                PlayerCombatFullEndEvent event = new PlayerCombatFullEndEvent(true, main, player);
+                                PlayerCombatFullEndEvent event = new PlayerCombatFullEndEvent(main, player);
                                 event.callEvent();
                                 alreadyEnded.put(uniqueId, true);
                                 ended.remove(uniqueId);
@@ -101,7 +101,7 @@ public final class CombatManager implements Manager {
                     CombatConfig config = main.getCombatConfig();
                     List<String> deleteList = new ArrayList<>();
                     List<String> nullList = new ArrayList<>();
-                    latest.clear();
+                    Map<UUID, CombatTag> latest = new HashMap<>();
                     Map<String, List<CombatTag>> userTags = new HashMap<>();
                     Map<CombatTag, Quartet<UUID, Boolean, UUID, Boolean>> combatEnded = new HashMap<>();
 
@@ -265,11 +265,13 @@ public final class CombatManager implements Manager {
                             }
                         }
                     });
+
+                    CombatManager.this.latest = latest;
                 } catch (Exception e) {
                     getMain().getComponentLogger().error("Error accorded while running combat timer!", e);
                 }
             }
-        }.runTaskTimerAsynchronously(main, 20, TICK_TIMER);
+        }.runTaskTimer(main, 20, TICK_TIMER);
     }
 
     private void handleHookTag(CombatUser user, CombatUser secondUser) {

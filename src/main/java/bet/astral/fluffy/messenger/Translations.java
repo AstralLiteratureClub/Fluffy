@@ -74,6 +74,11 @@ public class Translations {
 	public static final Translation HIT_EFFECT_MENU_RETURN = new Translation("hit-effect.menu.button.return").add(ComponentType.CHAT, text("<red>Return"));
 	public static final Translation HIT_EFFECT_MENU_CLOSE = new Translation("hit-effect.menu.button.close").add(ComponentType.CHAT, text("<red>Close"));
 
+	public static final Translation DEATH_EFFECT_CHOSEN = new Translation("death-effect.chosen").add(ComponentType.CHAT, text("You chose death effect: %effect%"));
+	public static final Translation DEATH_EFFECT_MENU_TITLE = new Translation("death-effect.menu.title").add(ComponentType.CHAT, text("Death Effects"));
+	public static final Translation DEATH_EFFECT_MENU_RETURN = new Translation("death-effect.menu.button.return").add(ComponentType.CHAT, text("<red>Return"));
+	public static final Translation DEATH_EFFECT_MENU_CLOSE = new Translation("death-effect.menu.button.close").add(ComponentType.CHAT, text("<red>Close"));
+
 	public static final Translation HIT_EFFECT_DAMAGE_INDICATOR_NAME = new Translation("hit-effect.effect.damage-indicator.name").add(ComponentType.CHAT, text("<red>Damage indicator"));
 	public static final Translation HIT_EFFECT_DAMAGE_INDICATOR_DESCRIPTION = new Translation("hit-effect.effect.damage-indicator.description").add(ComponentType.CHAT, text("<yellow>Hit effect: <red>-N ❤"));
 	public static final Translation HIT_EFFECT_DAMAGE_INDICATOR = new Translation("hit-effect.effect.damage-indicator").add(ComponentType.CHAT, text("<red>-%damage% ❤"));

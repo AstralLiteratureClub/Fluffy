@@ -102,14 +102,13 @@ public class AnchorDetection implements Listener {
 		}
 
 		ItemStack itemStack = tag.itemStack;
-		BeginCombatListener.handle(victim, tag.owner, blockState.getBlock(), CombatCause.RESPAWN_ANCHOR, itemStack);
+		BeginCombatListener.handle(victim, tag.owner, blockState.getBlock(), CombatCause.RESPAWN_ANCHOR, itemStack, event.getFinalDamage());
 		CombatTag combatTag = fluffyCombat.getCombatManager().getLatest(victim);
 		if (combatTag == null){
 			return;
 		}
 		CombatDamageUsingRespawnAnchorEvent damageEvent = new CombatDamageUsingRespawnAnchorEvent(
 				fluffyCombat, combatTag, victim, tag.owner, blockState, event.getDamager(), tag.itemStack);
-		combatTag.setDamageDealt(tag.owner, event.getFinalDamage());
 		damageEvent.callEvent();
 	}
 
