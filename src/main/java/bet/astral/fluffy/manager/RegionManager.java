@@ -13,8 +13,18 @@ import org.bukkit.util.Vector;
 import java.util.*;
 
 
-public abstract class RegionManager {
+public abstract class RegionManager implements Manager {
     public static final RegionManager NONE = new RegionManager(null) {
+        @Override
+        public boolean canDisplayHitEffects(Location location) {
+            return true;
+        }
+
+        @Override
+        public boolean canDisplayDeathEffects(Location location) {
+            return true;
+        }
+
         @Override
         public boolean canEnterCombat(Player victim, Location location) {
             return true;
@@ -44,9 +54,22 @@ public abstract class RegionManager {
     protected RegionManager(FluffyCombat fluffy) {
         this.fluffy = fluffy;
     }
+    @Override
+    public void onDisable() {
+
+    }
+
+    @Override
+    public void onEnable() {
+
+    }
+
     public boolean isWithinNoCombatRegion(Location location){
         return false;
     }
+
+    public abstract boolean canDisplayHitEffects(Location location);
+    public abstract boolean canDisplayDeathEffects(Location location);
 
     public abstract boolean canEnterCombat(Player victim, Location location);
     public abstract Color getBarrierColor(Location location);

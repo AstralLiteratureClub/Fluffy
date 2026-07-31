@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-public class StatisticManager implements Listener {
+public class StatisticManager implements Listener, Manager {
 	private final Map<UUID, Account> users = new HashMap<>();
 	private final FluffyCombat fluffy;
 

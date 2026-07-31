@@ -1,4 +1,4 @@
-package bet.astral.chat.menu;
+package bet.astral.fluffy.menu;
 
 import bet.astral.messenger.v2.Messenger;
 

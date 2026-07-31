@@ -1,26 +1,29 @@
 package bet.astral.fluffy.commands.commands;
 
-import bet.astral.chat.menu.ChatMenu;
-import bet.astral.chat.menu.ChatMenuBuilder;
-import bet.astral.chat.menu.MenuComponent;
 import bet.astral.cloudplusplus.annotations.Cloud;
 import bet.astral.fluffy.FluffyCommandRegisterer;
 import bet.astral.fluffy.commands.FluffyCommand;
+import bet.astral.fluffy.menu.ChatMenu;
+import bet.astral.fluffy.menu.ChatMenuBuilder;
+import bet.astral.fluffy.menu.MenuComponent;
+import bet.astral.fluffy.messenger.StatisticsLanguageSource;
 import bet.astral.fluffy.messenger.Translations;
 import bet.astral.fluffy.statistic.Account;
 import bet.astral.fluffy.statistic.Statistics;
-import bet.astral.messenger.v2.Messenger;
+import bet.astral.messenger.v2.AbstractMessenger;
 import bet.astral.messenger.v2.placeholder.Placeholder;
 import bet.astral.messenger.v2.placeholder.collection.PlaceholderCollection;
 import bet.astral.messenger.v2.placeholder.collection.PlaceholderList;
+import bet.astral.messenger.v2.source.source.LanguageSource;
 import bet.astral.messenger.v2.translation.TranslationKey;
+import bet.astral.messenger.v2.translation.TranslationKeyRegistry;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import com.google.gson.stream.JsonReader;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -37,10 +40,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 
 @Cloud
@@ -53,8 +53,6 @@ public class StatisticsCommand extends FluffyCommand {
         menuSelf = loadMessagesAndCreateMenu(registerer, false);
         menuOther = loadMessagesAndCreateMenu(registerer, true);
 
-        if (true)
-            return;
         command("statistics", Translations.COMMAND_STATISTICS_DESCRIPTION,
                 b -> b.permission(Permission.of("fluffy.plugin-hooks"))
                         .senderType(Player.class)
@@ -64,32 +62,46 @@ public class StatisticsCommand extends FluffyCommand {
 
     }
     public ChatMenu loadMessagesAndCreateMenu(@NotNull FluffyCommandRegisterer registerer, boolean otherPlayer) {
-        if (true)
-            return null;
         File file = new File(
                 registerer.getBootstrapContext().getDataDirectory().toFile(),
-                "config.json");
+                "statistics.json");
 
         try {
             JsonReader reader = new JsonReader(new FileReader(file));
             JsonObject obj = new GsonBuilder().disableHtmlEscaping()
                     .create().fromJson(reader, JsonObject.class);
 
-            JsonElement element = obj.get("stats.message.pages");
-            JsonPrimitive primitive = element.getAsJsonPrimitive();
-            int value = primitive.getAsInt();
+            JsonElement element = obj.get("pages-"+(otherPlayer ? "other" : "self"));
+            List<Map.Entry<TranslationKey, Component>> pages = new LinkedList<>();
 
+            if (element == null || element.isJsonNull()) {
+                return new ChatMenu(new ArrayList<>(), 1, messenger, true);
+            }
+
+            if (element.isJsonArray()) {
+                int i = 0;
+                for (JsonElement jsonElement : element.getAsJsonArray()) {
+                    String value = jsonElement.getAsString();
+                    pages.add(Map.entry(TranslationKey.of("fluffy.statistics.page."+value+(otherPlayer ? "other" : "self")), MiniMessage.miniMessage().deserialize(value)));
+                    i++;
+                }
+            } else if (element.isJsonPrimitive()){
+                pages.add(Map.entry(TranslationKey.of("fluffy.statistics.page.0"), MiniMessage.miniMessage().deserialize(element.getAsString())));
+            }
+
+            TranslationKeyRegistry registry = TranslationKeyRegistry.create();
             ChatMenuBuilder builder = new ChatMenuBuilder();
 
+            Map<TranslationKey, Component> translations = new HashMap<>();
             List<TranslationKey> keys = new LinkedList<>();
             ArrayList<MenuComponent> components = new ArrayList<>();
-
-            for (int i = 0; i < value; i++) {
-                String keyStr = otherPlayer ? "command.stats.page.other." + value : "command.stats.page.self."+value;
-                TranslationKey key =  TranslationKey.of(keyStr);
-                MenuComponent component = new MenuComponent(key, (player)->true);
-
+            for (Map.Entry<TranslationKey, Component> entry : pages) {
+                MenuComponent component = new MenuComponent(entry.getKey(), (player)->true);
+                keys.add(entry.getKey());
                 components.add(component);
+
+                translations.put(entry.getKey(), entry.getValue());
+                registry.register(entry.getKey());
             }
 
             builder
@@ -101,7 +113,12 @@ public class StatisticsCommand extends FluffyCommand {
 
 
 
-            Messenger messenger =  registerer.getMessenger();
+            AbstractMessenger messenger = (AbstractMessenger) registerer.getMessenger();
+            messenger.loadTranslations(keys);
+
+
+            LanguageSource source = new StatisticsLanguageSource(messenger, registry, Locale.US, translations);
+            messenger.getLanguageTable(Locale.US).addAdditionalLanguageSource(source);
             messenger.loadTranslations(keys);
 
             reader.close();

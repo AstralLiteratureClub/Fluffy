@@ -29,7 +29,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class HookManager {
+public class HookManager implements Manager {
 	private final Map<String, Hook> hookMap = new LinkedHashMap<>();
 	@Getter
 	private final FluffyCombat fluffyCombat;
@@ -50,6 +50,12 @@ public class HookManager {
 			}
 		});
 	}
+
+	@Override
+	public void onDisable() {
+
+	}
+
 	public void onEnable(){
 		fluffyCombat.getLogger().info("Loading hooks: onEnable!");
 		hookPlaceholderAPI();

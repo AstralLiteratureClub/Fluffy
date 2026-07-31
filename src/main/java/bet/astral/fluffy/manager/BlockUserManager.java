@@ -11,7 +11,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
-public class BlockUserManager {
+public class BlockUserManager implements Manager {
 	private final FluffyCombat fluffyCombat;
 	private final Map<Location, BlockCombatUser> users = new LinkedHashMap<>();
 	private final Map<Integer, BlockCombatUser> usersByHash = new HashMap<>();
@@ -28,7 +28,7 @@ public class BlockUserManager {
 
 	/**
 	 * Creates new instance of user manager.
-	 * @see FluffyCombat#
+	 * @see FluffyCombat
 	 * @param fluffyCombat main class instance
 	 */
 	public BlockUserManager(FluffyCombat fluffyCombat) {
@@ -121,5 +121,15 @@ public class BlockUserManager {
 	public void delete(Location location){
 		location = location.toBlockLocation();
 		users.remove(location);
+	}
+
+	@Override
+	public void onDisable() {
+
+	}
+
+	@Override
+	public void onEnable() {
+
 	}
 }

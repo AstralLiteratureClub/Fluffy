@@ -3,28 +3,29 @@ package bet.astral.fluffy;
 import bet.astral.cloudplusplus.minecraft.paper.bootstrap.BootstrapHandler;
 import bet.astral.fluffy.api.CombatUser;
 import bet.astral.fluffy.configs.CombatConfig;
+import bet.astral.fluffy.cosmetics.manager.EffectManager;
+import bet.astral.fluffy.cosmetics.parser.EffectParser;
 import bet.astral.fluffy.database.ICombatLogDatabase;
 import bet.astral.fluffy.database.SQLiteCombatLogDatabase;
 import bet.astral.fluffy.database.StatisticsDatabase;
-import bet.astral.fluffy.listeners.ConnectionListener;
-import bet.astral.fluffy.listeners.ArmorChangeListener;
-import bet.astral.fluffy.listeners.DeathListener;
 import bet.astral.fluffy.listeners.block.LiquidOwnerListener;
-import bet.astral.fluffy.listeners.combat.BreakCombatTaggedBlockListener;
-import bet.astral.fluffy.listeners.combat.end.CombatEndListener;
-import bet.astral.fluffy.listeners.combat.ExecuteCommandWhileInCombatListener;
-import bet.astral.fluffy.listeners.combat.QuitWhileInCombatListener;
-import bet.astral.fluffy.listeners.combat.begin.BeginCombatListener;
-import bet.astral.fluffy.listeners.combat.mobility.ElytraWhileInCombatListener;
-import bet.astral.fluffy.listeners.combat.mobility.FlightWhileInCombatListener;
-import bet.astral.fluffy.listeners.combat.mobility.TridentWhileInCombatListener;
 import bet.astral.fluffy.listeners.hitdetection.*;
-import bet.astral.fluffy.listeners.region.RegionWallListener;
 import bet.astral.fluffy.manager.*;
+import bet.astral.fluffy.messenger.DeathTranslations;
 import bet.astral.fluffy.messenger.FluffyMessenger;
+import bet.astral.fluffy.messenger.Translations;
+import bet.astral.guiman.GUIMan;
+import bet.astral.messenger.v2.source.LanguageTable;
+import bet.astral.messenger.v2.source.LanguageTableImpl;
+import bet.astral.messenger.v2.source.source.LanguageSource;
+import bet.astral.messenger.v2.source.source.gson.GsonLanguageSource;
+import bet.astral.messenger.v2.translation.TranslationKeyRegistry;
 import bet.astral.messenger.v3.minecraft.paper.PaperMessenger;
 import bet.astral.more4j.tuples.Pair;
 import com.jeff_media.armorequipevent.ArmorEquipEvent;
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ClassInfoList;
+import io.github.classgraph.ScanResult;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -50,6 +51,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -203,6 +208,9 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 	private BootstrapHandler handler;
 	private StatisticsDatabase statisticsDatabase;
 	private ICombatLogDatabase combatLogDatabase;
+	private EffectManager deathEffectManager = new EffectManager(this, "death-effects.json");
+	private EffectManager hitEffectManager = new EffectManager(this, "hit-effects.json");
+
 
 	public FluffyCombat(@NotNull BootstrapHandler handler, FluffyMessenger messenger) {
 		this.handler = handler;
@@ -220,8 +228,8 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 	@Override
 	public void onEnable() {
 		PaperMessenger.init(this);
+		GUIMan.init(this);
 		handler.init();
-		uploadUploads();
 		reloadConfig();
 		debug = getConfig().getBoolean("debug");
 		combatLogDatabase = new SQLiteCombatLogDatabase(this);
@@ -243,9 +251,15 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		hookManager.onEnable();
 		getComponentLogger().info("Hook manager loaded!");
 
+		registerDefaultListeners();
+		if (!getServer().getPluginManager().isPluginEnabled(this)) {
+			FluffyCombat.emergencyStop = true;
+			return;
+		}
 		registerListeners(this);
 		registerListeners(cooldownManager);
 		registerListeners(statisticManager);
+		/*
 		registerListeners(new LiquidOwnerListener(this));
 		registerListeners(new BeginCombatListener(this));
 		registerListeners(new ElytraWhileInCombatListener(this));
@@ -260,6 +274,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		registerListeners(new ArmorChangeListener(this));
 		registerListeners(new RegionWallListener(this));
 		registerListeners(new DeathListener(this));
+		 */
 		if (npcManager instanceof Listener listener) {
 			registerListeners(listener);
 		}
@@ -325,15 +340,113 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 	public void onDisable() {
 		emergencyStop = true;
 		isStopping = true;
-		userManager.onDisable();
-		combatManager.onDisable();
-		statisticsDatabase.onDisable();
-		combatLogDatabase.onDisable();
-		statisticManager.onDisable();
+
+		disableManagers();
 	}
 
+	private void disableManagers() {
+		Class<?> clazz = this.getClass();
 
-	public void registerListeners(Listener... listener){
+		for (Field field : clazz.getDeclaredFields()) {
+			field.setAccessible(true);
+            try {
+                if (!field.getDeclaringClass().isAssignableFrom(Manager.class)) {
+					return;
+                }
+
+				Manager obj = (Manager) field.get(this);
+				disableIfNotNull(obj);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+	}
+
+	void disableIfNotNull(Object obj) {
+		if (obj == null) {
+			return;
+		}
+
+		Class<?> clazz = obj.getClass();
+        try {
+            Method method = clazz.getDeclaredMethod("onDisable");
+			method.setAccessible(true);
+			method.invoke(clazz);
+        } catch (NoSuchMethodException e) {
+            getComponentLogger().error("Couldn't find onDisable() on class {}", clazz.getName(), e);
+        } catch (InvocationTargetException e) {
+            getComponentLogger().error("Couldn't invoke onDisable() on class {}", clazz.getName(), e);
+        } catch (IllegalAccessException e) {
+            getComponentLogger().error("Couldn't access onDisable() on class {}", clazz.getName(), e);
+        }
+    }
+
+	void registerDefaultListeners() {
+		ClassGraph classGraph = new ClassGraph().acceptPackages("bet.astral.fluffy.listeners").enableAllInfo();
+		ScanResult result = classGraph.scan();
+		ClassInfoList classInfo = result.getClassesImplementing(Listener.class.getName());
+
+		try {
+			List<String> classes = classInfo.getNames();
+			for (String clazzName : classes) {
+				Class<?> clazz = null;
+				try {
+					clazz = Class.forName(clazzName);
+					if (clazz.isInterface()) {
+						continue;
+					}
+					Listener listener = null;
+					if (isFluffyConstructorListener(clazz)) {
+						Constructor<?> constructor = clazz.getConstructor(this.getClass());
+						constructor.setAccessible(true);
+						listener = (Listener) constructor.newInstance(this);
+					} else if (isEmptyConstructorListener(clazz)) {
+						Constructor<?> constructor = clazz.getConstructor();
+						constructor.setAccessible(true);
+						listener = (Listener) constructor.newInstance();
+					} else {
+						continue;
+					}
+
+					registerListeners(listener);
+
+				} catch (ClassNotFoundException e) {
+					throw new RuntimeException("Couldn't find class " + clazzName + " when trying to register listeners", e);
+				} catch (InvocationTargetException e) {
+					throw new RuntimeException("Couldn't invoke constructor of " + clazzName + " when trying to register listeners", e);
+				} catch (InstantiationException e) {
+					throw new RuntimeException("Couldn't couldn't create a new instance of class " + clazzName + " when trying to register listeners", e);
+				} catch (IllegalAccessException e) {
+					throw new RuntimeException("Couldn't access constructor in class " + clazzName + " when trying to register listeners", e);
+				} catch (NoSuchMethodException e) {
+					throw new RuntimeException("Couldn't find constructor in class " + clazzName + " when trying to register listeners", e);
+				}
+			}
+		} catch (RuntimeException e) {
+			getComponentLogger().error("Couldn't register listeners when trying to initialize fluffy! Shutting down the plugin.", e);
+			getServer().getPluginManager().disablePlugin(this);
+		}
+	}
+
+	boolean isFluffyConstructorListener(Class<?> clazz) {
+        try {
+            Constructor<?> constructor = clazz.getDeclaredConstructor(FluffyCombat.class);
+			return true;
+        } catch (NoSuchMethodException e) {
+			return false;
+        }
+    }
+
+	boolean isEmptyConstructorListener(Class<?> clazz) {
+		try {
+			Constructor<?> constructor = clazz.getDeclaredConstructor();
+			return true;
+		} catch (NoSuchMethodException e) {
+			return false;
+		}
+	}
+
+	public void registerListeners(Listener @NotNull ... listener){
 		for (Listener list : listener) {
 			if (list == null){
 				continue;
@@ -349,8 +462,45 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 
 	@Override
 	public void reloadConfig() {
+		uploadUploads();
+
 		super.reloadConfig();
+		// Reload the plugin config
 		combatConfig.reload(getConfig());
+		// Clear registry to allow new registry of effects
+		hitEffectManager.clearRegistry();
+		deathEffectManager.clearRegistry();
+		// Parse hit effects
+		new EffectParser(this, hitEffectManager).parse(new File(getDataFolder(), "hit-effects.json"));
+		new EffectParser(this, deathEffectManager).parse(new File(getDataFolder(), "death-effects.json"));
+
+		// Clear all languages loaded.
+		messenger.getLanguages().clear();
+
+		// Register new US language source
+
+		registerGsonLanguageSource("/messages/en_us.json");
+
+		// Load all core translations
+		messenger.loadTranslations(Translations.class);
+		messenger.loadTranslations(DeathTranslations.class);
+
+		// Load translations from hit effects
+		registerEffectTranslations(hitEffectManager);
+		registerEffectTranslations(deathEffectManager);
+	}
+
+	void registerGsonLanguageSource(String path) {
+		TranslationKeyRegistry registry = TranslationKeyRegistry.create();
+		LanguageSource languageSource = new GsonLanguageSource(messenger, Locale.US, new File(getDataFolder(), path), MiniMessage.miniMessage());
+		LanguageTable languageTable = new LanguageTableImpl(registry, languageSource, languageSource.getLocale());
+		messenger.registerLanguageTable(languageTable.getLocale(), languageTable);
+	}
+
+	void registerEffectTranslations(EffectManager effectManager) {
+		registerGsonLanguageSource(effectManager.getFileName());
+
+		effectManager.loadTranslations();
 	}
 
 	private void uploadUploads(){
@@ -358,7 +508,9 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 				"config|yml",
 				"deaths|yml",
 				"deaths-npc|yml",
-				"messages|yml",
+				"statistics|json",
+				"hit-effects|json",
+				"death-effects|json",
 		};
 		for (String name : files){
 			name = name.replace("dm/", "discord-messages/");

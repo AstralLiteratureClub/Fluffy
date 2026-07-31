@@ -62,8 +62,9 @@ public class ArmorChangeListener implements Listener {
 		}
 	}
 
+	/*
 	@EventHandler
-	public void onArmorEquip(bet.astral.armorer.ArmorEquipEvent event) {
+	public void onArmorEquip(bet.astral.fluffy.armorer.ArmorEquipEvent event) {
 		event.getPlayer().sendMessage("§e============ ARMOR EVENT ============");
 		event.getPlayer().sendMessage("§bMethod: §f" + event.getMethod().name());
 		event.getPlayer().sendMessage("§bSlot: §f" + event.getArmorType().name());
@@ -79,11 +80,13 @@ public class ArmorChangeListener implements Listener {
 		}
 
 		// Example: Cancel if player tries to equip leather armor via dispenser
-		if (event.getMethod() == bet.astral.armorer.ArmorEquipEvent.EquipMethod.DISPENSER &&
+		if (event.getMethod() == bet.astral.fluffy.armorer.ArmorEquipEvent.EquipMethod.DISPENSER &&
 				event.getNewArmorPiece() != null &&
 				event.getNewArmorPiece().getType().name().contains("LEATHER")) {
 			event.setCancelled(true);
 			event.getPlayer().sendMessage("§cYou cannot equip leather armor via dispenser!");
 		}
 	}
+
+	 */
 }

@@ -1,4 +1,4 @@
-package bet.astral.armorer;
+package bet.astral.fluffy.armorer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;

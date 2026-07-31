@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class CombatLogManager {
+public class CombatLogManager implements Manager {
 	private static final Map<UUID, Boolean> combatLogged = new HashMap<>();
 
 
@@ -17,5 +17,15 @@ public class CombatLogManager {
 	}
 	public void setCombatLogged(Player player){
 		combatLogged.put(player.getUniqueId(), true);
+	}
+
+	@Override
+	public void onDisable() {
+
+	}
+
+	@Override
+	public void onEnable() {
+
 	}
 }

@@ -29,7 +29,7 @@ import java.util.*;
  * @author Antritus
  * @since 1.0-SNAPSHOT
  */
-public final class CombatManager {
+public final class CombatManager implements Manager {
 	static public final int TICK_TIMER = 5;
 	private final Constructor<?> combatTagConstructor;
 	private final Constructor<BlockCombatTag> blockCombatTagConstructor;

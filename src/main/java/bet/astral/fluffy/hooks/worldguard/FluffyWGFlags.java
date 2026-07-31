@@ -16,6 +16,8 @@ public class FluffyWGFlags {
     public static StateFlag ZONE_BARRIER_RENDER;
     public static EnumFlag<RegionManager.Color> ZONE_BARRIER_COLOR;
     public static EnumFlag<RegionManager.Material> ZONE_BARRIER_MATERIAL;
+    public static StateFlag ALLOW_HIT_EFFECTS;
+    public static StateFlag ALLOW_DEATH_EFFECTS;
 
     public static void register(@NotNull WorldGuardHook worldGuardHook) {
         WorldGuard worldGuard = worldGuardHook.getWorldGuard();
@@ -27,6 +29,8 @@ public class FluffyWGFlags {
         ZONE_BARRIER_RENDER = create(flags, new StateFlag("flf-zone-barrier", true));
         ZONE_BARRIER_COLOR = create(flags, new EnumFlag<>("flf-zone-barrier-color", RegionManager.Color.class));
         ZONE_BARRIER_MATERIAL = create(flags, new EnumFlag<>("flf-zone-barrier-material", RegionManager.Material.class));
+        ALLOW_HIT_EFFECTS = create(flags, new StateFlag("flf-allow-death-effects", true));
+        ALLOW_DEATH_EFFECTS = create(flags, new StateFlag("flf-allow-death-effects", true));
     }
 
     private static <T extends Flag<?>> T create(FlagRegistry flagRegistry, T flag){

@@ -9,6 +9,7 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.internal.platform.WorldGuardPlatform;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
 import org.bukkit.Location;
@@ -31,6 +32,36 @@ public class WGRegionManager extends RegionManager {
     public boolean isWithinNoCombatRegion(@NotNull Location location){
         return !Objects.requireNonNull(worldGuardHook.getWorldGuard().getPlatform().getRegionContainer().get(BukkitAdapter.adapt(location.getWorld())))
                 .getApplicableRegions(BukkitAdapter.asBlockVector(location)).testState(null, FluffyWGFlags.ALLOW_COMBAT_TAG);
+    }
+
+    @Override
+    public boolean canDisplayHitEffects(Location location) {
+        return canDo(location, FluffyWGFlags.ALLOW_HIT_EFFECTS);
+    }
+
+    @Override
+    public boolean canDisplayDeathEffects(Location location) {
+        return canDo(location, FluffyWGFlags.ALLOW_DEATH_EFFECTS);
+    }
+
+    private boolean canDo(Location location, StateFlag flag) {
+        World world = BukkitAdapter.adapt(location.getWorld());
+        WorldGuardPlatform platform = worldGuardHook.getWorldGuard().getPlatform();
+
+        com.sk89q.worldguard.protection.managers.RegionManager regionManager =
+                platform.getRegionContainer().get(world);
+
+        if (regionManager == null){
+            return true;
+        }
+
+        BlockVector3 vector3 = new BlockVector3(
+                location.getBlockX(),
+                location.getBlockY(),
+                location.getBlockZ()
+        );
+        ApplicableRegionSet regions = regionManager.getApplicableRegions(vector3);
+        return regions.testState(null, flag);
     }
 
     @Override

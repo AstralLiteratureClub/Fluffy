@@ -26,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class CooldownManager implements Listener {
+public class CooldownManager implements Listener, Manager {
 	private final Map<Material, Cooldown> cooldowns = new HashMap<>();
 	private final FluffyCombat fluffy;
 
@@ -188,5 +188,15 @@ public class CooldownManager implements Listener {
 				}
 			}
 		}
+	}
+
+	@Override
+	public void onDisable() {
+
+	}
+
+	@Override
+	public void onEnable() {
+
 	}
 }

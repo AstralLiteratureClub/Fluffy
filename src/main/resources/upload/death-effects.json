@@ -1,0 +1,32 @@
+{
+  "death-effect.total-damage-dealt": "<red>%attacker% <yellow>dealt total damage of <red>%total-damage-dealt%",
+  "effects": [
+    {
+      "name": "total-damage-dealt",
+      "material": "minecraft:pink_dye",
+      "action": [
+        {
+          "type": "translation",
+          "translation": "death-effect.total-damage-dealt"
+        }
+      ]
+    },
+    {
+      "name": "bleed",
+      "material": "minecraft:beetroot",
+      "action": [
+        {
+          "type": "particle",
+          "particle": "minecraft:dust_pillar",
+          "data": "minecraft:redstone_block",
+          "extra": 1,
+          "amount": 5,
+          "spread": 0.5,
+          "x": 0,
+          "y": 0,
+          "z": 0
+        }
+      ]
+    }
+  ]
+}

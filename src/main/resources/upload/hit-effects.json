@@ -1,0 +1,39 @@
+[
+  {
+    "name": "damage-amount",
+    "material": "minecraft:red_dye",
+    "action": [
+      {
+        "type": "translation",
+        "translation": "hit-effect.damage-amount"
+      }
+    ]
+  },
+  {
+    "name": "text-test",
+    "material": "minecraft:blue_dye",
+    "action": [
+      {
+        "type": "text",
+        "text": "hit-effect.damage-amount"
+      }
+    ]
+  },
+  {
+    "name": "bleed",
+    "material": "minecraft:beetroot",
+    "action": [
+      {
+        "type": "particle",
+        "particle": "minecraft:block",
+        "data": "minecraft:redstone_block",
+        "extra": 1,
+        "amount": 5,
+        "spread": 0.2,
+        "x": 0,
+        "y": 0,
+        "z": 0
+      }
+    ]
+  }
+]

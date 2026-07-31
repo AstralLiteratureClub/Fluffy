@@ -1,4 +1,4 @@
-package bet.astral.data.helper;
+package bet.astral.fluffy.helper;
 
 import java.sql.*;
 import java.util.Map;

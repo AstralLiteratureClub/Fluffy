@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class UserManager {
+public class UserManager implements Manager {
 	private final FluffyCombat fluffyCombat;
 	private final Map<UUID, CombatUser> users = new LinkedHashMap<>();
 	private final Set<CombatUser> requireSave = new HashSet<>();

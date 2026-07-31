@@ -1,7 +1,7 @@
 package bet.astral.fluffy.database;
 
-import bet.astral.data.helper.PackedPreparedStatement;
-import bet.astral.data.helper.PackedResultSet;
+import bet.astral.fluffy.helper.PackedPreparedStatement;
+import bet.astral.fluffy.helper.PackedResultSet;
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.statistic.Account;
 import bet.astral.fluffy.statistic.AccountImpl;

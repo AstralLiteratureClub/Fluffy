@@ -1,4 +1,4 @@
-package bet.astral.data.helper;
+package bet.astral.fluffy.helper;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;

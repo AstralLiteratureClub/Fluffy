@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-public class NPCManager {
+public class NPCManager implements Manager {
     public static final NPCManager NONE = new NPCManager();
 
     public UUID spawnNPC(Location location, Player whoToClone){
@@ -55,5 +55,15 @@ public class NPCManager {
 
     public Object getCombatLogNPC(@NotNull UUID uniqueId) {
         return null;
+    }
+
+    @Override
+    public void onDisable() {
+
+    }
+
+    @Override
+    public void onEnable() {
+
     }
 }

@@ -69,6 +69,17 @@ public class Translations {
 	public static final Translation COMBAT_ENTER_VICTIM = new Translation("combat.enter.victim").add(ComponentType.CHAT, text("<red>You're now in combat with <white>%attacker%<red>!"));
 	public static final Translation COMBAT_ENTER_ATTACKER = new Translation("combat.enter.attacker").add(ComponentType.CHAT, text("<red>You're now in combat with <white>%victim%<red>!"));
 
+	public static final Translation HIT_EFFECT_CHOSEN = new Translation("hit-effect.chosen").add(ComponentType.CHAT, text("You chose hit effect: %effect%"));
+	public static final Translation HIT_EFFECT_MENU_TITLE = new Translation("hit-effect.menu.title").add(ComponentType.CHAT, text("Hit Effects"));
+	public static final Translation HIT_EFFECT_MENU_RETURN = new Translation("hit-effect.menu.button.return").add(ComponentType.CHAT, text("<red>Return"));
+	public static final Translation HIT_EFFECT_MENU_CLOSE = new Translation("hit-effect.menu.button.close").add(ComponentType.CHAT, text("<red>Close"));
+
+	public static final Translation HIT_EFFECT_DAMAGE_INDICATOR_NAME = new Translation("hit-effect.effect.damage-indicator.name").add(ComponentType.CHAT, text("<red>Damage indicator"));
+	public static final Translation HIT_EFFECT_DAMAGE_INDICATOR_DESCRIPTION = new Translation("hit-effect.effect.damage-indicator.description").add(ComponentType.CHAT, text("<yellow>Hit effect: <red>-N ❤"));
+	public static final Translation HIT_EFFECT_DAMAGE_INDICATOR = new Translation("hit-effect.effect.damage-indicator").add(ComponentType.CHAT, text("<red>-%damage% ❤"));
+
+	public static final Translation BEEP = new Translation("beep").add(ComponentType.CHAT, text("<red>Beep"));
+
 	public static final Translation REGION_ENTER_IN_COMBAT = new Translation("combat.region.cannot-enter").add(ComponentType.CHAT, text("<red>You are not permitted to enter this region while in combat!"));
 	public static final Translation REGION_ENTER_IN_COMBAT_COMBAT_EXTENDED = new Translation("combat.region.cannot-enter-extended-tag").add(ComponentType.CHAT, text("<red>Your combat tag was extended for trying to attempt to escape!"));
 
