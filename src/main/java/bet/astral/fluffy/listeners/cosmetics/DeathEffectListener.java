@@ -8,6 +8,7 @@ import bet.astral.fluffy.events.damage.death.CombatDeathEvent;
 import bet.astral.fluffy.manager.RegionManager;
 import bet.astral.fluffy.messenger.Placeholders;
 import bet.astral.messenger.v2.placeholder.collection.PlaceholderList;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -24,10 +25,17 @@ public class DeathEffectListener implements Listener {
             return;
         }
 
+        Bukkit.broadcastMessage("!");
+
         EffectManager effectManager = fluffy.getDeathEffectManager();
 
         Effect effect = effectManager.getPlayerEffects().get(event.getDamager().getUniqueId());
+        if (effect == null) {
+            Bukkit.broadcastMessage("Null;");
+            Bukkit.broadcastMessage(event.getDamager().getName());
+        }
         if (effect != null) {
+            Bukkit.broadcastMessage("?");
             PlaceholderList placeholders = new PlaceholderList();
             placeholders.add("total-damage", event.getAttackerDamageDealt());
             placeholders.addAll(Placeholders.combatPlaceholders(event.getVictim(), event.getDamager(), event.getCombatCause(), event.getItemStack()));

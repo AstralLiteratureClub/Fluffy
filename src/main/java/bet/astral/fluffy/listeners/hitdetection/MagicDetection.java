@@ -87,7 +87,7 @@ public class MagicDetection implements Listener {
 		LivingEntity livingEntity = (LivingEntity) source;
 		handleEffects(livingEntity, player, types);
 		if (source instanceof Player attacker) {
-			BeginCombatListener.handle(player, attacker, CombatCause.LINGERING_POTION);
+			BeginCombatListener.handle(player, attacker, null, CombatCause.LINGERING_POTION);
 		}
 	}
 	private static boolean isCombat(List<PotionEffectType> types, List<PotionEffectType> combatPotions){
@@ -141,7 +141,7 @@ public class MagicDetection implements Listener {
 			assert blockCombatUser != null;
 			handleEffects(blockCombatUser.hashCode(), player, types);
 		} else if (source instanceof Player attacker) {
-			BeginCombatListener.handle(player, attacker, CombatCause.SPLASH_POTION);
+			BeginCombatListener.handle(player, attacker, null, CombatCause.SPLASH_POTION);
 			handleEffects(attacker, player, types);
 		}
 	}
@@ -209,7 +209,7 @@ public class MagicDetection implements Listener {
 			BeginCombatListener.handle(victim, blockUser, CombatCause.EFFECT_STATUS);
 		} else if (whoGave instanceof UUID uuid) {
 			OfflinePlayer player = fluffy.getServer().getOfflinePlayer(uuid);
-			BeginCombatListener.handle(victim, player, CombatCause.EFFECT_STATUS);
+			BeginCombatListener.handle(victim, player, null, CombatCause.EFFECT_STATUS);
 		}
 	}
 
@@ -256,7 +256,7 @@ public class MagicDetection implements Listener {
 			handleEffects(livingEntity, player, types);
 			if (source instanceof Player attacker){
 				if (event.getEntity() instanceof Player victim) {
-					BeginCombatListener.handle(victim, attacker, CombatCause.SPLASH_POTION);
+					BeginCombatListener.handle(victim, attacker, null, CombatCause.SPLASH_POTION);
                 }
 			}
 		}

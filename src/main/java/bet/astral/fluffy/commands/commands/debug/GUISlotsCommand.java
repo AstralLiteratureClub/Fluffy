@@ -4,6 +4,7 @@ import bet.astral.cloudplusplus.annotations.Cloud;
 import bet.astral.fluffy.FluffyCommandRegisterer;
 import bet.astral.fluffy.commands.FluffyCommand;
 import bet.astral.guiman.clickable.Clickable;
+import bet.astral.guiman.gui.InventoryGUI;
 import bet.astral.guiman.gui.builders.InventoryGUIBuilder;
 import bet.astral.guiman.utils.ChestRows;
 import io.papermc.paper.datacomponent.DataComponentTypes;
@@ -45,8 +46,8 @@ public class GUISlotsCommand extends FluffyCommand {
         InventoryType type = InventoryType.CHEST;
 
         InventoryGUIBuilder builder = type == InventoryType.CHEST ?
-                new InventoryGUIBuilder(ChestRows.SIX) :
-                new InventoryGUIBuilder(type);
+                InventoryGUI.builder(ChestRows.SIX) :
+                InventoryGUI.builder(type);
         builder.title(Component.text("Gui Slots"));
         builder.messenger(messenger);
 

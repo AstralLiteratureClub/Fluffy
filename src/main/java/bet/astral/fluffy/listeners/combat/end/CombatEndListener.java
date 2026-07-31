@@ -9,6 +9,7 @@ import bet.astral.fluffy.events.CombatTagEndEvent;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 public class CombatEndListener implements Listener {
@@ -20,7 +21,7 @@ public class CombatEndListener implements Listener {
 	public FluffyCombat fluffy() {
 		return fluffy;
 	}
-	@EventHandler
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	private void onCombatEnd(CombatTagEndEvent event){
 		CombatTag tag = event.getCombatTag();
 		CombatUser victim = tag.getVictim();

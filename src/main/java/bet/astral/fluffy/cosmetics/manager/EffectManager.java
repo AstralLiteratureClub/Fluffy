@@ -4,6 +4,7 @@ import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.cosmetics.ConfigurableEffect;
 import bet.astral.fluffy.cosmetics.Effect;
 import bet.astral.fluffy.cosmetics.menu.EffectMenu;
+import bet.astral.messenger.v2.translation.TranslationKey;
 import lombok.Getter;
 
 import java.util.*;
@@ -16,9 +17,9 @@ public class EffectManager {
     private final EffectMenu menu;
     private final String fileName;
 
-    public EffectManager(FluffyCombat fluffy, String fileName) {
+    public EffectManager(FluffyCombat fluffy, String fileName, TranslationKey effectChosenTranslation, TranslationKey menuTitleTranslation, TranslationKey menuCloseTranslation, TranslationKey menuBackTranslation) {
         this.fluffy = fluffy;
-        this.menu = new EffectMenu(fluffy, this);
+        this.menu = new EffectMenu(fluffy, this, effectChosenTranslation, menuTitleTranslation, menuCloseTranslation, menuBackTranslation);
         this.fileName = fileName;
     }
 

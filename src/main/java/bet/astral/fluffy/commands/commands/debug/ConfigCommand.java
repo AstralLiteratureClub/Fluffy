@@ -3,6 +3,7 @@ package bet.astral.fluffy.commands.commands.debug;
 import bet.astral.cloudplusplus.annotations.Cloud;
 import bet.astral.fluffy.FluffyCommandRegisterer;
 import bet.astral.fluffy.commands.FluffyCommand;
+import bet.astral.fluffy.configs.CombatConfig;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -13,6 +14,8 @@ import org.incendo.cloud.description.Description;
 import org.incendo.cloud.paper.PaperCommandManager;
 import org.incendo.cloud.permission.Permission;
 
+import java.lang.reflect.Field;
+
 @Cloud
 public class ConfigCommand extends FluffyCommand {
     public ConfigCommand(FluffyCommandRegisterer registerer, PaperCommandManager.Bootstrapped<CommandSender> commandManager) {
@@ -20,6 +23,30 @@ public class ConfigCommand extends FluffyCommand {
         command("flf-reload-config", Description.EMPTY,
                 b -> b.permission(Permission.of("fluffy.debug.reload-config"))
                         .handler(this::handle)
+        )
+                .register();
+
+        command("flf-see-config", Description.EMPTY,
+                b -> b.permission(Permission.of("fluffy.debug.see-config"))
+                        .handler(context->{
+                            CommandSender sender = context.sender();
+                            CombatConfig config = fluffy().getCombatConfig();
+
+                            Class<CombatConfig> configClass = (Class<CombatConfig>) config.getClass();
+                            for (Field field : configClass.getDeclaredFields()) {
+                                field.setAccessible(true);
+                                try {
+                                    Object obj = field.get(config);
+                                    if (obj == null){
+                                        sender.sendMessage("Name: §e"+ field.getName() + "§f Value: §d"+ null);
+                                    } else {
+                                        sender.sendMessage("Name: §e" + field.getName() + "§f Value: §d" + obj.toString());
+                                    }
+                                } catch (IllegalAccessException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                        })
         )
                 .register();
         /*
@@ -42,7 +69,7 @@ public class ConfigCommand extends FluffyCommand {
             sender.sendMessage(Component.text(e.getMessage()));
         }
 
-        sender.sendMessage(exceptionToComponent(new Exception("Test!")));
+            sender.sendMessage(exceptionToComponent(new Exception("Test!")));
 
         sender.sendMessage("Reloaded configuration!");
     }

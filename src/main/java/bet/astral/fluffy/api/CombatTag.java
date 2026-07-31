@@ -4,7 +4,7 @@ import bet.astral.fluffy.FluffyCombat;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
@@ -19,13 +19,7 @@ import java.util.UUID;
 @Getter
 @Setter
 public class CombatTag {
-	public static final int ticks;
-
-    static {
-		FluffyCombat fluffy = FluffyCombat.getPlugin(FluffyCombat.class);
-		FileConfiguration configuration = fluffy.getConfig();
-		ticks = configuration.getInt("time", 300);
-	}
+	public static int ticks;
 	private final FluffyCombat fluffyCombat;
 	private final CombatUser victim;
 	@NotNull
@@ -45,6 +39,9 @@ public class CombatTag {
 	private double attackerDamageDealt;
 	private boolean isVictimFalling = true;
 	private boolean isAttackerFalling = true;
+
+	private Block lastVictimBlockDamage = null;
+	private Block lastAttackerBlockDamage = null;
 
 	/**
 	 * Creates new instance of the class.

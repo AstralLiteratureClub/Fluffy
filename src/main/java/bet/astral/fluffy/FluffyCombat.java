@@ -14,12 +14,11 @@ import bet.astral.fluffy.manager.*;
 import bet.astral.fluffy.messenger.DeathTranslations;
 import bet.astral.fluffy.messenger.FluffyMessenger;
 import bet.astral.fluffy.messenger.Translations;
+import bet.astral.fluffy.utils.Log4jConsoleStreamer;
 import bet.astral.guiman.GUIMan;
 import bet.astral.messenger.v2.source.LanguageTable;
-import bet.astral.messenger.v2.source.LanguageTableImpl;
 import bet.astral.messenger.v2.source.source.LanguageSource;
 import bet.astral.messenger.v2.source.source.gson.GsonLanguageSource;
-import bet.astral.messenger.v2.translation.TranslationKeyRegistry;
 import bet.astral.messenger.v3.minecraft.paper.PaperMessenger;
 import bet.astral.more4j.tuples.Pair;
 import com.jeff_media.armorequipevent.ArmorEquipEvent;
@@ -64,114 +63,122 @@ import static bet.astral.fluffy.utils.Resource.loadResourceToFile;
 
 @Getter
 public class FluffyCombat extends JavaPlugin implements Listener {
-	public static boolean emergencyStop = false;
-	public static final NamespacedKey PROJECTILE_ITEM_KEY = new NamespacedKey("fluffy", "shooter_tool");
-	@Getter(AccessLevel.NONE)
-	private static final MiniMessage miniMessage = MiniMessage.miniMessage();
-	@Getter(AccessLevel.NONE)
-	private static Map<Chunk, Map<Location, Pair<UUID, Material>>> blockOwners = new HashMap<>();
+    public static boolean emergencyStop = false;
+    public static final NamespacedKey PROJECTILE_ITEM_KEY = new NamespacedKey("fluffy", "shooter_tool");
+    @Getter(AccessLevel.NONE)
+    private static final MiniMessage miniMessage = MiniMessage.miniMessage();
+    @Getter(AccessLevel.NONE)
+    private static Map<Chunk, Map<Location, Pair<UUID, Material>>> blockOwners = new HashMap<>();
 
-	public static Pair<UUID, Material> getBlockData(Block block){
-		if (blockOwners.get(block.getChunk()) == null){
-			return null;
-		}
+    public static Pair<UUID, Material> getBlockData(Block block) {
+        if (blockOwners.get(block.getChunk()) == null) {
+            return null;
+        }
 
-		Pair<UUID, Material> data = blockOwners.get(block.getChunk()).get(block.getLocation());
-		if (data == null){
-			return null;
-		}
-		if (data.getSecond() != block.getType()){
-			return null;
-		}
-		return data;
-	}
-	public static boolean isOwned(Block block){
-		return getBlockData(block) != null;
-	}
-	public static UUID getBlockOwner(Block block){
-		Pair<UUID, Material> blockData = getBlockData(block);
-		if (blockData == null){
-			return null;
-		}
-		if (blockData.getSecond() != block.getType()){
-			return null;
-		}
-		return blockData.getFirst();
-	}
-	public static @Nullable Block findNearestOwnedBlock(Player player, Material... allowedMaterials) {
-		Validate.notNull(player, "Player cannot be null.");
+        Pair<UUID, Material> data = blockOwners.get(block.getChunk()).get(block.getLocation());
+        if (data == null) {
+            return null;
+        }
+        if (data.getSecond() != block.getType()) {
+            return null;
+        }
+        return data;
+    }
 
-		Location playerLocation = player.getLocation();
-		List<Block> surroundingBlocks = getSurroundingBlocks(playerLocation, allowedMaterials);
+    public static boolean isOwned(Block block) {
+        return getBlockData(block) != null;
+    }
 
-		return getNearestOwnedBlock(player, surroundingBlocks);
-	}
+    public static UUID getBlockOwner(Block block) {
+        Pair<UUID, Material> blockData = getBlockData(block);
+        if (blockData == null) {
+            return null;
+        }
+        if (blockData.getSecond() != block.getType()) {
+            return null;
+        }
+        return blockData.getFirst();
+    }
 
-	private static List<Block> getSurroundingBlocks(Location playerLocation, Material... materials) {
-		Set<Material> set = Arrays.stream(materials).collect(Collectors.toSet());;
-		List<Block> surroundingBlocks = new ArrayList<>();
-		int radius = 1; // Adjust as needed
-		for (int x = -radius; x <= radius; x++) {
-			for (int y = -radius; y <= radius; y++) {
-				for (int z = -radius; z <= radius; z++) {
-					Block block = playerLocation.clone().add(x, y, z).getBlock();
-					if (set.contains(block.getType())) {
-						surroundingBlocks.add(block);
-					}
-				}
-			}
-		}
-		return surroundingBlocks;
-	}
+    public static @Nullable Block findNearestOwnedBlock(Player player, Material... allowedMaterials) {
+        Validate.notNull(player, "Player cannot be null.");
 
-	public static @Nullable Block getNearestOwnedBlock(Player player, List<Block> blocks) {
-		Block nearestBlock = null;
-		double shortestDistance = Double.MAX_VALUE;
-		for (Block block : blocks) {
-			if (isOwned(block)) {
-				double distance = block.getLocation().distanceSquared(player.getLocation());
-				if (distance < shortestDistance) {
-					shortestDistance = distance;
-					nearestBlock = block;
-				}
-			}
-		}
-		return nearestBlock;
-	}
-	public static void clearBlockData(Chunk chunk, Location location){
-		if (blockOwners.get(chunk) != null) {
-			blockOwners.get(chunk).remove(location);
-		}
-	}
-	public static void clearIncorrectBlockData(Chunk chunk){
-		List<Block> remove = new ArrayList<>();
-		if (blockOwners.get(chunk) != null) {
-			for (Location location : blockOwners.get(chunk).keySet()) {
-				if (blockOwners.get(chunk).get(location).getSecond()!=location.getBlock().getType()){
-					if (blockOwners.get(chunk).get(location).getSecond()==Material.FIRE && location.getBlock().getType() == Material.SOUL_FIRE){
-						continue;
-					}
-					if (blockOwners.get(chunk).get(location).getSecond()==Material.SOUL_FIRE && location.getBlock().getType() == Material.FIRE){
-						continue;
-					}
-					remove.add(location.getBlock());
-				}
-			}
-		}
-		for (Block block : remove){
-			blockOwners.get(block.getChunk()).remove(block.getLocation());
-		}
-	}
-	public static void setBlockOwner(OfflinePlayer player, Block block){
-		blockOwners.putIfAbsent(block.getChunk(), new HashMap<>());
-		blockOwners.get(block.getChunk()).put(block.getLocation(), Pair.immutable(player.getUniqueId(), block.getType()));
-	}
-	public static void setBlockOwner(OfflinePlayer player, Block block, Material material) {
-		blockOwners.putIfAbsent(block.getChunk(), new HashMap<>());
-		blockOwners.get(block.getChunk()).put(block.getLocation(), Pair.immutable(player.getUniqueId(), material));
-	}
+        Location playerLocation = player.getLocation();
+        List<Block> surroundingBlocks = getSurroundingBlocks(playerLocation, allowedMaterials);
 
-	public static boolean isPaper;
+        return getNearestOwnedBlock(player, surroundingBlocks);
+    }
+
+    private static List<Block> getSurroundingBlocks(Location playerLocation, Material... materials) {
+        Set<Material> set = Arrays.stream(materials).collect(Collectors.toSet());
+        ;
+        List<Block> surroundingBlocks = new ArrayList<>();
+        int radius = 1; // Adjust as needed
+        for (int x = -radius; x <= radius; x++) {
+            for (int y = -radius; y <= radius; y++) {
+                for (int z = -radius; z <= radius; z++) {
+                    Block block = playerLocation.clone().add(x, y, z).getBlock();
+                    if (set.contains(block.getType())) {
+                        surroundingBlocks.add(block);
+                    }
+                }
+            }
+        }
+        return surroundingBlocks;
+    }
+
+    public static @Nullable Block getNearestOwnedBlock(Player player, List<Block> blocks) {
+        Block nearestBlock = null;
+        double shortestDistance = Double.MAX_VALUE;
+        for (Block block : blocks) {
+            if (isOwned(block)) {
+                double distance = block.getLocation().distanceSquared(player.getLocation());
+                if (distance < shortestDistance) {
+                    shortestDistance = distance;
+                    nearestBlock = block;
+                }
+            }
+        }
+        return nearestBlock;
+    }
+
+    public static void clearBlockData(Chunk chunk, Location location) {
+        if (blockOwners.get(chunk) != null) {
+            blockOwners.get(chunk).remove(location);
+        }
+    }
+
+    public static void clearIncorrectBlockData(Chunk chunk) {
+        List<Block> remove = new ArrayList<>();
+        if (blockOwners.get(chunk) != null) {
+            for (Location location : blockOwners.get(chunk).keySet()) {
+                if (blockOwners.get(chunk).get(location).getSecond() != location.getBlock().getType()) {
+                    if (blockOwners.get(chunk).get(location).getSecond() == Material.FIRE && location.getBlock().getType() == Material.SOUL_FIRE) {
+                        continue;
+                    }
+                    if (blockOwners.get(chunk).get(location).getSecond() == Material.SOUL_FIRE && location.getBlock().getType() == Material.FIRE) {
+                        continue;
+                    }
+                    remove.add(location.getBlock());
+                }
+            }
+        }
+        for (Block block : remove) {
+            blockOwners.get(block.getChunk()).remove(block.getLocation());
+        }
+    }
+
+    public static void setBlockOwner(OfflinePlayer player, Block block) {
+        blockOwners.putIfAbsent(block.getChunk(), new HashMap<>());
+        blockOwners.get(block.getChunk()).put(block.getLocation(), Pair.immutable(player.getUniqueId(), block.getType()));
+    }
+
+    public static void setBlockOwner(OfflinePlayer player, Block block, Material material) {
+        blockOwners.putIfAbsent(block.getChunk(), new HashMap<>());
+        blockOwners.get(block.getChunk()).put(block.getLocation(), Pair.immutable(player.getUniqueId(), material));
+    }
+
+    public static boolean isPaper;
 
     static {
         try {
@@ -183,82 +190,82 @@ public class FluffyCombat extends JavaPlugin implements Listener {
     }
 
     public static boolean isStopping = false;
-	public static boolean debug = false;
-	private FluffyMessenger messenger;
-	private CombatManager combatManager;
-	private UserManager userManager;
-	private BlockUserManager blockUserManager;
-	private final HookManager hookManager = new HookManager(this);
-	private CooldownManager cooldownManager;
-	private CombatLogManager combatLogManager;
-	private StatisticManager statisticManager;
-	@Setter
-	private RegionManager regionManager = RegionManager.NONE;
-	@Setter
-	private NPCManager npcManager = NPCManager.NONE;
-	private CombatConfig combatConfig;
-	private AnchorDetection anchorDetection;
-	private BedDetection bedDetection;
-	private CrystalDetection crystalDetection;
-	private TNTDetection tntDetection;
-	private MagicDetection magicDetection;
-	private LiquidOwnerListener lavaDetection;
-	private FireDetection fireDetection;
-	private FileConfiguration configuration;
-	private BootstrapHandler handler;
-	private StatisticsDatabase statisticsDatabase;
-	private ICombatLogDatabase combatLogDatabase;
-	private EffectManager deathEffectManager = new EffectManager(this, "death-effects.json");
-	private EffectManager hitEffectManager = new EffectManager(this, "hit-effects.json");
+    public static boolean debug = false;
+    private FluffyMessenger messenger;
+    private CombatManager combatManager;
+    private UserManager userManager;
+    private BlockUserManager blockUserManager;
+    private final HookManager hookManager = new HookManager(this);
+    private CooldownManager cooldownManager;
+    private CombatLogManager combatLogManager;
+    private StatisticManager statisticManager;
+    @Setter
+    private RegionManager regionManager = RegionManager.NONE;
+    @Setter
+    private NPCManager npcManager = NPCManager.NONE;
+    private CombatConfig combatConfig;
+    private AnchorDetection anchorDetection;
+    private BedDetection bedDetection;
+    private CrystalDetection crystalDetection;
+    private TNTDetection tntDetection;
+    private MagicDetection magicDetection;
+    private LiquidOwnerListener lavaDetection;
+    private FireDetection fireDetection;
+    private FileConfiguration configuration;
+    private BootstrapHandler handler;
+    private StatisticsDatabase statisticsDatabase;
+    private ICombatLogDatabase combatLogDatabase;
+    private EffectManager deathEffectManager = new EffectManager(this, "death-effects.json", Translations.HIT_EFFECT_CHOSEN, Translations.HIT_EFFECT_MENU_TITLE, Translations.HIT_EFFECT_MENU_CLOSE, Translations.HIT_EFFECT_MENU_RETURN);
+    private EffectManager hitEffectManager = new EffectManager(this, "hit-effects.json", Translations.HIT_EFFECT_CHOSEN, Translations.HIT_EFFECT_MENU_TITLE, Translations.HIT_EFFECT_MENU_CLOSE, Translations.HIT_EFFECT_MENU_RETURN);
+    private Log4jConsoleStreamer consoleStreamer;
 
+    public FluffyCombat(@NotNull BootstrapHandler handler, FluffyMessenger messenger) {
+        this.handler = handler;
+        this.messenger = messenger;
+    }
 
-	public FluffyCombat(@NotNull BootstrapHandler handler, FluffyMessenger messenger) {
-		this.handler = handler;
-		this.messenger = messenger;
-	}
+    @Override
+    public void onLoad() {
+        configuration = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "config.yml"));
+        combatConfig = new CombatConfig(this);
 
-	@Override
-	public void onLoad() {
-		configuration = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "config.yml"));
-		combatConfig = new CombatConfig(this);
+        hookManager.onLoad();
+    }
 
-		hookManager.onLoad();
-	}
+    @Override
+    public void onEnable() {
+        PaperMessenger.init(this);
+        GUIMan.init(this);
+        handler.init();
+        reloadConfig();
+        debug = getConfig().getBoolean("debug");
+        combatLogDatabase = new SQLiteCombatLogDatabase(this);
+        statisticsDatabase = new StatisticsDatabase(this);
+        combatLogDatabase.onEnable();
+        statisticsDatabase.onEnable();
 
-	@Override
-	public void onEnable() {
-		PaperMessenger.init(this);
-		GUIMan.init(this);
-		handler.init();
-		reloadConfig();
-		debug = getConfig().getBoolean("debug");
-		combatLogDatabase = new SQLiteCombatLogDatabase(this);
-		statisticsDatabase = new StatisticsDatabase(this);
-		combatLogDatabase.onEnable();
-		statisticsDatabase.onEnable();
+        statisticManager = new StatisticManager(this);
+        statisticManager.onEnable();
 
-		statisticManager = new StatisticManager(this);
-		statisticManager.onEnable();
+        combatManager = new CombatManager(this);
+        userManager = new UserManager(this);
+        blockUserManager = new BlockUserManager(this);
+        cooldownManager = new CooldownManager(this);
+        combatLogManager = new CombatLogManager();
+        combatManager.onEnable();
+        userManager.onEnable();
+        getComponentLogger().info("Starting hook manager...");
+        hookManager.onEnable();
+        getComponentLogger().info("Hook manager loaded!");
 
-		combatManager = new CombatManager(this);
-		userManager = new UserManager(this);
-		blockUserManager = new BlockUserManager(this);
-		cooldownManager = new CooldownManager(this);
-		combatLogManager = new CombatLogManager();
-		combatManager.onEnable();
-		userManager.onEnable();
-		getComponentLogger().info("Starting hook manager...");
-		hookManager.onEnable();
-		getComponentLogger().info("Hook manager loaded!");
-
-		registerDefaultListeners();
-		if (!getServer().getPluginManager().isPluginEnabled(this)) {
-			FluffyCombat.emergencyStop = true;
-			return;
-		}
-		registerListeners(this);
-		registerListeners(cooldownManager);
-		registerListeners(statisticManager);
+        registerDefaultListeners();
+        if (!getServer().getPluginManager().isPluginEnabled(this)) {
+            FluffyCombat.emergencyStop = true;
+            return;
+        }
+        registerListeners(this);
+        registerListeners(cooldownManager);
+        registerListeners(statisticManager);
 		/*
 		registerListeners(new LiquidOwnerListener(this));
 		registerListeners(new BeginCombatListener(this));
@@ -275,103 +282,111 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 		registerListeners(new RegionWallListener(this));
 		registerListeners(new DeathListener(this));
 		 */
-		if (npcManager instanceof Listener listener) {
-			registerListeners(listener);
-		}
+        if (npcManager instanceof Listener listener) {
+            registerListeners(listener);
+        }
 
-		ArmorEquipEvent.registerListener(this);
+        ArmorEquipEvent.registerListener(this);
 
-		anchorDetection = new AnchorDetection(this);
-		crystalDetection = new CrystalDetection(this);
-		bedDetection = new BedDetection(this);
-		tntDetection = new TNTDetection(this, crystalDetection);
-		magicDetection = new MagicDetection(this);
-		fireDetection = new FireDetection(this);
-		lavaDetection = new LiquidOwnerListener(this);
-		registerListeners(
-				anchorDetection,
-				bedDetection,
-				crystalDetection,
-				fireDetection,
-				tntDetection,
-				magicDetection,
-				lavaDetection
-		);
+        anchorDetection = new AnchorDetection(this);
+        crystalDetection = new CrystalDetection(this);
+        bedDetection = new BedDetection(this);
+        tntDetection = new TNTDetection(this, crystalDetection);
+        magicDetection = new MagicDetection(this);
+        fireDetection = new FireDetection(this);
+        lavaDetection = new LiquidOwnerListener(this);
+        registerListeners(
+                anchorDetection,
+                bedDetection,
+                crystalDetection,
+                fireDetection,
+                tntDetection,
+                magicDetection,
+                lavaDetection
+        );
 
-		//statisticDatabase = new CombinedStatisticDatabase(this);
+        //statisticDatabase = new CombinedStatisticDatabase(this);
 
-		registerListeners(this);
+        registerListeners(this);
 
-		getServer().getScheduler().runTaskTimerAsynchronously(this, () -> {
-			for (Player player : Bukkit.getOnlinePlayers()) {
-				CombatUser user = userManager.getUser(player.getUniqueId());
-				if (user==null) {
-					continue;
-				}
-				if (user.getLastFireDamage() != null && player.getFireTicks() == 0) {
-					user.setLastFireDamage(null);
-				}
-			}
-		}, 1, 1);
+        getServer().getScheduler().runTaskTimerAsynchronously(this, () -> {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                CombatUser user = userManager.getUser(player.getUniqueId());
+                if (user == null) {
+                    continue;
+                }
+                if (user.getLastFireDamage() != null && player.getFireTicks() == 0) {
+                    user.setLastFireDamage(null);
+                }
+            }
+        }, 1, 1);
 
-		getLogger().info("Fluffy Combat Management plugin has loaded!");
-	}
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void onChunkLoad(ChunkLoadEvent event) {
-		clearIncorrectBlockData(event.getChunk());
-	}
+        // Initialize and attach the handler to the server's logger
+        consoleStreamer = new Log4jConsoleStreamer(this);
 
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	private void blockBreak(BlockBreakEvent event){
-		FluffyCombat.clearBlockData(event.getBlock().getChunk(), event.getPlayer().getLocation());
-	}
+        getLogger().info("Fluffy Combat Management plugin has loaded!");
+    }
 
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void bucketFill(PlayerBucketFillEvent event){
-		clearBlockData(event.getBlock().getChunk(), event.getBlock().getLocation());
-	}
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onChunkLoad(ChunkLoadEvent event) {
+        clearIncorrectBlockData(event.getChunk());
+    }
 
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void blockFade(BlockFadeEvent event){
-		clearBlockData(event.getBlock().getChunk(), event.getBlock().getLocation());
-	}
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    private void blockBreak(BlockBreakEvent event) {
+        FluffyCombat.clearBlockData(event.getBlock().getChunk(), event.getPlayer().getLocation());
+    }
 
-	@Override
-	public void onDisable() {
-		emergencyStop = true;
-		isStopping = true;
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void bucketFill(PlayerBucketFillEvent event) {
+        clearBlockData(event.getBlock().getChunk(), event.getBlock().getLocation());
+    }
 
-		disableManagers();
-	}
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void blockFade(BlockFadeEvent event) {
+        clearBlockData(event.getBlock().getChunk(), event.getBlock().getLocation());
+    }
 
-	private void disableManagers() {
-		Class<?> clazz = this.getClass();
+    @Override
+    public void onDisable() {
+        emergencyStop = true;
+        isStopping = true;
 
-		for (Field field : clazz.getDeclaredFields()) {
-			field.setAccessible(true);
+        disableManagers();
+
+        if (consoleStreamer != null) {
+            consoleStreamer.unregister();
+        }
+    }
+
+    private void disableManagers() {
+        Class<?> clazz = this.getClass();
+
+        for (Field field : clazz.getDeclaredFields()) {
+            field.setAccessible(true);
             try {
                 if (!field.getDeclaringClass().isAssignableFrom(Manager.class)) {
-					return;
+                    return;
                 }
 
-				Manager obj = (Manager) field.get(this);
-				disableIfNotNull(obj);
+                Manager obj = (Manager) field.get(this);
+                disableIfNotNull(obj);
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
         }
-	}
+    }
 
-	void disableIfNotNull(Object obj) {
-		if (obj == null) {
-			return;
-		}
+    void disableIfNotNull(Object obj) {
+        if (obj == null) {
+            return;
+        }
 
-		Class<?> clazz = obj.getClass();
+        Class<?> clazz = obj.getClass();
         try {
             Method method = clazz.getDeclaredMethod("onDisable");
-			method.setAccessible(true);
-			method.invoke(clazz);
+            method.setAccessible(true);
+            method.invoke(clazz);
         } catch (NoSuchMethodException e) {
             getComponentLogger().error("Couldn't find onDisable() on class {}", clazz.getName(), e);
         } catch (InvocationTargetException e) {
@@ -381,181 +396,185 @@ public class FluffyCombat extends JavaPlugin implements Listener {
         }
     }
 
-	void registerDefaultListeners() {
-		ClassGraph classGraph = new ClassGraph().acceptPackages("bet.astral.fluffy.listeners").enableAllInfo();
-		ScanResult result = classGraph.scan();
-		ClassInfoList classInfo = result.getClassesImplementing(Listener.class.getName());
+    void registerDefaultListeners() {
+        ClassGraph classGraph = new ClassGraph().acceptPackages("bet.astral.fluffy.listeners").enableAllInfo();
+        ScanResult result = classGraph.scan();
+        ClassInfoList classInfo = result.getClassesImplementing(Listener.class.getName());
 
-		try {
-			List<String> classes = classInfo.getNames();
-			for (String clazzName : classes) {
-				Class<?> clazz = null;
-				try {
-					clazz = Class.forName(clazzName);
-					if (clazz.isInterface()) {
-						continue;
-					}
-					Listener listener = null;
-					if (isFluffyConstructorListener(clazz)) {
-						Constructor<?> constructor = clazz.getConstructor(this.getClass());
-						constructor.setAccessible(true);
-						listener = (Listener) constructor.newInstance(this);
-					} else if (isEmptyConstructorListener(clazz)) {
-						Constructor<?> constructor = clazz.getConstructor();
-						constructor.setAccessible(true);
-						listener = (Listener) constructor.newInstance();
-					} else {
-						continue;
-					}
-
-					registerListeners(listener);
-
-				} catch (ClassNotFoundException e) {
-					throw new RuntimeException("Couldn't find class " + clazzName + " when trying to register listeners", e);
-				} catch (InvocationTargetException e) {
-					throw new RuntimeException("Couldn't invoke constructor of " + clazzName + " when trying to register listeners", e);
-				} catch (InstantiationException e) {
-					throw new RuntimeException("Couldn't couldn't create a new instance of class " + clazzName + " when trying to register listeners", e);
-				} catch (IllegalAccessException e) {
-					throw new RuntimeException("Couldn't access constructor in class " + clazzName + " when trying to register listeners", e);
-				} catch (NoSuchMethodException e) {
-					throw new RuntimeException("Couldn't find constructor in class " + clazzName + " when trying to register listeners", e);
-				}
-			}
-		} catch (RuntimeException e) {
-			getComponentLogger().error("Couldn't register listeners when trying to initialize fluffy! Shutting down the plugin.", e);
-			getServer().getPluginManager().disablePlugin(this);
-		}
-	}
-
-	boolean isFluffyConstructorListener(Class<?> clazz) {
         try {
-            Constructor<?> constructor = clazz.getDeclaredConstructor(FluffyCombat.class);
-			return true;
-        } catch (NoSuchMethodException e) {
-			return false;
+            List<String> classes = classInfo.getNames();
+            for (String clazzName : classes) {
+                Class<?> clazz = null;
+                try {
+                    clazz = Class.forName(clazzName);
+                    if (clazz.isInterface()) {
+                        continue;
+                    }
+                    Listener listener = null;
+                    if (isFluffyConstructorListener(clazz)) {
+                        Constructor<?> constructor = clazz.getConstructor(this.getClass());
+                        constructor.setAccessible(true);
+                        listener = (Listener) constructor.newInstance(this);
+                    } else if (isEmptyConstructorListener(clazz)) {
+                        Constructor<?> constructor = clazz.getConstructor();
+                        constructor.setAccessible(true);
+                        listener = (Listener) constructor.newInstance();
+                    } else {
+                        continue;
+                    }
+
+                    registerListeners(listener);
+
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException("Couldn't find class " + clazzName + " when trying to register listeners", e);
+                } catch (InvocationTargetException e) {
+                    throw new RuntimeException("Couldn't invoke constructor of " + clazzName + " when trying to register listeners", e);
+                } catch (InstantiationException e) {
+                    throw new RuntimeException("Couldn't couldn't create a new instance of class " + clazzName + " when trying to register listeners", e);
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException("Couldn't access constructor in class " + clazzName + " when trying to register listeners", e);
+                } catch (NoSuchMethodException e) {
+                    throw new RuntimeException("Couldn't find constructor in class " + clazzName + " when trying to register listeners", e);
+                }
+            }
+        } catch (RuntimeException e) {
+            getComponentLogger().error("Couldn't register listeners when trying to initialize fluffy! Shutting down the plugin.", e);
+            getServer().getPluginManager().disablePlugin(this);
         }
     }
 
-	boolean isEmptyConstructorListener(Class<?> clazz) {
-		try {
-			Constructor<?> constructor = clazz.getDeclaredConstructor();
-			return true;
-		} catch (NoSuchMethodException e) {
-			return false;
-		}
-	}
+    boolean isFluffyConstructorListener(Class<?> clazz) {
+        try {
+            Constructor<?> constructor = clazz.getDeclaredConstructor(FluffyCombat.class);
+            return true;
+        } catch (NoSuchMethodException e) {
+            return false;
+        }
+    }
 
-	public void registerListeners(Listener @NotNull ... listener){
-		for (Listener list : listener) {
-			if (list == null){
-				continue;
-			}
-			getServer().getPluginManager().registerEvents(list, this);
-		}
-	}
+    boolean isEmptyConstructorListener(Class<?> clazz) {
+        try {
+            Constructor<?> constructor = clazz.getDeclaredConstructor();
+            return true;
+        } catch (NoSuchMethodException e) {
+            return false;
+        }
+    }
 
-	@Override
-	public @NotNull FileConfiguration getConfig(){
-		return configuration;
-	}
+    public void registerListeners(Listener @NotNull ... listener) {
+        for (Listener list : listener) {
+            if (list == null) {
+                continue;
+            }
+            getServer().getPluginManager().registerEvents(list, this);
+        }
+    }
 
-	@Override
-	public void reloadConfig() {
-		uploadUploads();
+    @Override
+    public @NotNull FileConfiguration getConfig() {
+        return configuration;
+    }
 
-		super.reloadConfig();
-		// Reload the plugin config
-		combatConfig.reload(getConfig());
-		// Clear registry to allow new registry of effects
-		hitEffectManager.clearRegistry();
-		deathEffectManager.clearRegistry();
-		// Parse hit effects
-		new EffectParser(this, hitEffectManager).parse(new File(getDataFolder(), "hit-effects.json"));
-		new EffectParser(this, deathEffectManager).parse(new File(getDataFolder(), "death-effects.json"));
+    @Override
+    public void reloadConfig() {
+        uploadUploads();
 
-		// Clear all languages loaded.
-		messenger.getLanguages().clear();
+        super.reloadConfig();
+        // Reload the plugin config
+        combatConfig.reload(getConfig());
+        // Clear registry to allow new registry of effects
+        hitEffectManager.clearRegistry();
+        deathEffectManager.clearRegistry();
+        // Parse hit effects
+        new EffectParser(this, hitEffectManager).parse(new File(getDataFolder(), hitEffectManager.getFileName()));
+        new EffectParser(this, deathEffectManager).parse(new File(getDataFolder(), deathEffectManager.getFileName()));
 
-		// Register new US language source
+        // Clear all languages loaded.
+        messenger.getLanguages().clear();
 
-		registerGsonLanguageSource("/messages/en_us.json");
+        // Register new US language source
 
-		// Load all core translations
-		messenger.loadTranslations(Translations.class);
-		messenger.loadTranslations(DeathTranslations.class);
+        registerGsonLanguageSource("/messages/en_us.json");
 
-		// Load translations from hit effects
-		registerEffectTranslations(hitEffectManager);
-		registerEffectTranslations(deathEffectManager);
-	}
+        // Load all core translations
+        messenger.loadTranslations(Translations.class);
+        messenger.loadTranslations(DeathTranslations.class);
 
-	void registerGsonLanguageSource(String path) {
-		TranslationKeyRegistry registry = TranslationKeyRegistry.create();
-		LanguageSource languageSource = new GsonLanguageSource(messenger, Locale.US, new File(getDataFolder(), path), MiniMessage.miniMessage());
-		LanguageTable languageTable = new LanguageTableImpl(registry, languageSource, languageSource.getLocale());
-		messenger.registerLanguageTable(languageTable.getLocale(), languageTable);
-	}
+        // Load translations from hit effects
+        registerEffectTranslations(hitEffectManager);
+        registerEffectTranslations(deathEffectManager);
+    }
 
-	void registerEffectTranslations(EffectManager effectManager) {
-		registerGsonLanguageSource(effectManager.getFileName());
+    void registerGsonLanguageSource(String path) {
+        LanguageSource languageSource = new GsonLanguageSource(messenger, Locale.US, new File(getDataFolder(), path), MiniMessage.miniMessage());
+        LanguageTable table = messenger.getLanguageTable(languageSource.getLocale());
+        if (table == null) {
+            table = LanguageTable.of(languageSource);
+            messenger.registerLanguageTable(languageSource.getLocale(), table);
+            return;
+        }
+        table.addAdditionalLanguageSource(languageSource);
+    }
 
-		effectManager.loadTranslations();
-	}
+    void registerEffectTranslations(EffectManager effectManager) {
+        registerGsonLanguageSource(effectManager.getFileName());
 
-	private void uploadUploads(){
-		String[] files = new String[]{
-				"config|yml",
-				"deaths|yml",
-				"deaths-npc|yml",
-				"statistics|json",
-				"hit-effects|json",
-				"death-effects|json",
-		};
-		for (String name : files){
-			name = name.replace("dm/", "discord-messages/");
+        effectManager.loadTranslations();
+    }
 
-			String[] split = name.split("\\|");
-			String fileName = split[0];
-			String ending = split[1];
-			File fileTemp = loadResourceAsTemp("/upload/"+fileName, ending);
-			File file = loadResourceToFile("/upload/"+fileName, ending, new File(getDataFolder(), fileName+"."+ending), true);
-			if (ending.matches("(?i)yml") || ending.matches("(?i)yaml")){
-				loadConfig(getConfig(fileTemp), getConfig(file), file);
-			}
-		}
-	}
+    private void uploadUploads() {
+        String[] files = new String[]{
+                "config|yml",
+                "deaths|yml",
+                "deaths-npc|yml",
+                "statistics|json",
+                "hit-effects|json",
+                "death-effects|json",
+        };
+        for (String name : files) {
+            name = name.replace("dm/", "discord-messages/");
 
-	private void loadConfig(FileConfiguration tempConfig, FileConfiguration config, File file){
-		Set<String> keys = tempConfig.getKeys(false);
-		for (String key : keys){
-			addDefaults(key, tempConfig, config);
-		}
-		try {
-			config.save(file);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
+            String[] split = name.split("\\|");
+            String fileName = split[0];
+            String ending = split[1];
+            File fileTemp = loadResourceAsTemp("/upload/" + fileName, ending);
+            File file = loadResourceToFile("/upload/" + fileName, ending, new File(getDataFolder(), fileName + "." + ending), true);
+            if (ending.matches("(?i)yml") || ending.matches("(?i)yaml")) {
+                loadConfig(getConfig(fileTemp), getConfig(file), file);
+            }
+        }
+    }
 
-	private void addDefaults(String key, Configuration tempConfig, Configuration config) {
-		List<String> comment = tempConfig.getComments(key);
-		if (!comment.isEmpty() && config.getInlineComments(key).isEmpty()) {
-			config.setComments(key, comment);
-		}
-		comment = tempConfig.getInlineComments(key);
-		if (!comment.isEmpty() && config.getInlineComments(key).isEmpty()) {
-			config.setInlineComments(key, comment);
-		}
-		Object value = tempConfig.get(key); // Retrieve the value from the tempConfig
-		if (value instanceof ConfigurationSection section) {
-			for (String k : section.getKeys(false)) {
-				addDefaults(key + "." + k, tempConfig, config); // Append current key
-			}
-		}
-	}
+    private void loadConfig(FileConfiguration tempConfig, FileConfiguration config, File file) {
+        Set<String> keys = tempConfig.getKeys(false);
+        for (String key : keys) {
+            addDefaults(key, tempConfig, config);
+        }
+        try {
+            config.save(file);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-	private FileConfiguration getConfig(File file){
-		return YamlConfiguration.loadConfiguration(file);
-	}
+    private void addDefaults(String key, Configuration tempConfig, Configuration config) {
+        List<String> comment = tempConfig.getComments(key);
+        if (!comment.isEmpty() && config.getInlineComments(key).isEmpty()) {
+            config.setComments(key, comment);
+        }
+        comment = tempConfig.getInlineComments(key);
+        if (!comment.isEmpty() && config.getInlineComments(key).isEmpty()) {
+            config.setInlineComments(key, comment);
+        }
+        Object value = tempConfig.get(key); // Retrieve the value from the tempConfig
+        if (value instanceof ConfigurationSection section) {
+            for (String k : section.getKeys(false)) {
+                addDefaults(key + "." + k, tempConfig, config); // Append current key
+            }
+        }
+    }
+
+    private FileConfiguration getConfig(File file) {
+        return YamlConfiguration.loadConfiguration(file);
+    }
 }

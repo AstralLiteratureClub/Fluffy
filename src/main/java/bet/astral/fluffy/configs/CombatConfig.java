@@ -1,7 +1,8 @@
 package bet.astral.fluffy.configs;
 
-import lombok.Getter;
 import bet.astral.fluffy.FluffyCombat;
+import bet.astral.fluffy.api.CombatTag;
+import lombok.Getter;
 import net.kyori.adventure.util.TriState;
 import org.apache.commons.lang3.EnumUtils;
 import org.bukkit.NamespacedKey;
@@ -17,6 +18,8 @@ import java.util.List;
 @Getter
 public class CombatConfig {
 	private final FluffyCombat fluffy;
+
+	private int ticks;
 
 	private final List<PotionEffectType> potionsToBeginCombat = new LinkedList<>();
 	private boolean isPotionStartCombat;
@@ -86,6 +89,8 @@ public class CombatConfig {
 	}
 
 	public void reload(@NotNull FileConfiguration configuration){
+		ticks = CombatTag.ticks = configuration.getInt("time");
+
 		isCustomCooldowns = configuration.getBoolean("cooldowns.enabled", true);
 		isResetCooldownsOnDeath = configuration.getBoolean("cooldowns.reset-on-combat-end", true);
 

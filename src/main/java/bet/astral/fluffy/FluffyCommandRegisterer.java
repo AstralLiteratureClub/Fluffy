@@ -53,7 +53,7 @@ public class FluffyCommandRegisterer implements BootstrapCommandRegisterer<Comma
 
 	@Override
 	public boolean isDebug() {
-		return false;
+		return true;
 	}
 
 	@Override
