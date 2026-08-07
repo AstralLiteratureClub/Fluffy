@@ -1,5 +1,6 @@
 package bet.astral.fluffy.configs;
 
+import bet.astral.aura.api.color.VanillaGlowColor;
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.CombatTag;
 import lombok.Getter;
@@ -60,9 +61,9 @@ public class CombatConfig {
 	private boolean isCombatGlowLatest;
 	private boolean isCombatGlowAllTagged;
 	private boolean isCombatGlowCombatLogRejoin;
-	private Object combatGlowLatest;
-	private Object combatGlowAllTagged;
-	private Object combatGlowTagRejoin;
+	private VanillaGlowColor combatGlowLatest;
+	private VanillaGlowColor combatGlowAllTagged;
+	private VanillaGlowColor combatGlowTagRejoin;
 
 	private ElytraMode elytraMode;
 	private boolean isElytraBoostAllowed;
@@ -122,9 +123,9 @@ public class CombatConfig {
 		isCombatGlowLatest = configuration.getBoolean("glowing.latest.enabled");
 		isCombatGlowAllTagged = configuration.getBoolean("glowing.regular.enabled");
 		isCombatGlowCombatLogRejoin = configuration.getBoolean("glowing.combat-log.enabled");
-//		combatGlowLatest = EnumUtils.getEnumIgnoreCase(ChatColor.class, configuration.getString("glowing.latest.color"), ChatColor.RED);
-//		combatGlowAllTagged = EnumUtils.getEnumIgnoreCase(ChatColor.class, configuration.getString("glowing.regular.color"), ChatColor.GOLD);
-//		combatGlowTagRejoin = EnumUtils.getEnumIgnoreCase(ChatColor.class, configuration.getString("glowing.combat-log.color"), ChatColor.BLUE);
+		combatGlowLatest = EnumUtils.getEnumIgnoreCase(VanillaGlowColor.class, configuration.getString("glowing.latest.color"), VanillaGlowColor.RED);
+		combatGlowAllTagged = EnumUtils.getEnumIgnoreCase(VanillaGlowColor.class, configuration.getString("glowing.regular.color"), VanillaGlowColor.GOLD);
+		combatGlowTagRejoin = EnumUtils.getEnumIgnoreCase(VanillaGlowColor.class, configuration.getString("glowing.combat-log.color"), VanillaGlowColor.BLUE);
 		combatGlowLatest = null;//ShineColor.RED;
 		combatGlowAllTagged = null;//ShineColor.GRAY;
 		combatGlowTagRejoin = null;//ShineColor.GOLD;

@@ -3,7 +3,6 @@ package bet.astral.fluffy.listeners;
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.*;
 import bet.astral.fluffy.database.ICombatLogDatabase;
-import bet.astral.fluffy.events.CombatEnterEvent;
 import bet.astral.fluffy.events.damage.death.CombatDeathEvent;
 import bet.astral.fluffy.manager.CombatManager;
 import bet.astral.fluffy.statistic.*;
@@ -12,13 +11,11 @@ import bet.astral.messenger.v2.translation.TranslationKey;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
-import org.bukkit.damage.DamageSource;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityResurrectEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -68,27 +65,20 @@ public class DeathListener implements Listener {
         }
     }
 
-    @EventHandler
-    private void onCombatBegin(CombatEnterEvent event) {
-        Bukkit.broadcastMessage("Entered combat!");
-    }
-
     @EventHandler(priority = EventPriority.LOWEST)
     private void onDeath(@NotNull PlayerDeathEvent event) {
         EntityDamageEvent entityDamageEvent = event.getEntity().getLastDamageCause();
         if (entityDamageEvent == null) {
             return;
         }
-        System.out.println(entityDamageEvent.getEventName());
-        if (fluffy.getNpcManager().isNPC(event.getPlayer()) && !fluffy.getNpcManager().isFluffyNPC(event.getPlayer())) {
+        fluffy.printDebug("Damage Event: " + entityDamageEvent.getEventName());
+        if (fluffy.getNpcManager().isNPC(event.getPlayer())) {
+            fluffy.printDebug("Ignoring combat death as victim is an npc...");
             return;
         }
 
-        DamageSource damageSource = event.getDamageSource();
 
         final Player player = event.getPlayer();
-        Entity attacker = (entityDamageEvent instanceof EntityDamageByEntityEvent entityDamageByEntityEven ? entityDamageByEntityEven.getDamager() : null);
-        final EntityDamageEvent.DamageCause cause = entityDamageEvent.getCause();
         final CombatManager combatManager = fluffy.getCombatManager();
         final CombatTag tag = combatManager.getLatest(player);
 
@@ -97,7 +87,9 @@ public class DeathListener implements Listener {
         boolean isBlock = false;
         Block lastBlockDamage = null;
 
+        fluffy.printDebug("Done setting default variables.");
         if (tag != null) {
+            fluffy.printDebug("Combat tag is not null");
             isVictim = tag.getVictim().getUniqueId().equals(player.getUniqueId());
             weapon = isVictim ? tag.getAttackerWeapon() : tag.getVictimWeapon();
             isBlock = isVictim ? tag.getAttacker() instanceof BlockCombatUser : tag.getVictim() instanceof BlockCombatUser;
@@ -116,12 +108,15 @@ public class DeathListener implements Listener {
                     lastBlockDamage != null ? lastBlockDamage.getState() : null,
                     weapon
             );
+            fluffy.printDebug("Calling combat death event");
             fluffy.getServer().getPluginManager().callEvent(combatDeathEvent);
         } else {
             weapon = null;
         }
+        fluffy.printDebug("Updating victim account");
         Account victimAcc = fluffy.getStatisticManager().get(player);
         if (fluffy.getNpcManager().isNPC(player)) {
+            fluffy.printDebug("Victim is an NPC");
             OfflinePlayer owner = fluffy.getNpcManager().getOwnerFromNPC(player);
             victimAcc = fluffy.getStatisticManager().get(owner.getUniqueId());
             if (victimAcc == null) {
@@ -129,27 +124,36 @@ public class DeathListener implements Listener {
                 fluffy.getStatisticManager().load(owner);
             }
         }
-        Account attackerAcc = tag != null ? !isBlock ? isVictim ? tag.getAttacker().getStatisticsAccount() : tag.getVictim().getStatisticsAccount() : null : null;
-
+        fluffy.printDebug("Starting to update victim account");
         incrementStreak(player, victimAcc, Statistics.STREAK_DEATHS, Statistics.STREAK_DEATHS_HIGHEST);
         victimAcc.increment(Statistics.DEATHS_GLOBAL);
         victimAcc.reset(StatisticType.KILL_STREAKS);
 //		victimAcc.reset(Statistics.STREAK_COMBAT_LOGS);
+        victimAcc.save();
 
         PlaceholderMap placeholders = new PlaceholderMap();
 
         TranslationKey deathMessage = null;
 
 
-        Bukkit.broadcastMessage("3!");
         if (tag != null) {
-            if (attackerAcc != null && !attackerAcc.getId().equals(player.getUniqueId())) {
-                attackerAcc.increment(Statistics.KILLS_GLOBAL);
-                OfflinePlayer attackerPlayer = Bukkit.getOfflinePlayer(tag.getAttacker().getUniqueId());
-                incrementStreak(attackerPlayer, attackerAcc, Statistics.STREAK_KILLS, Statistics.STREAK_KILLS_HIGHEST);
-                attackerAcc.reset(StatisticType.DEATH_STREAKS);
-                attackerAcc.reset(Statistics.STREAK_DEATHS_TOTEM);
-                attackerAcc.reset(Statistics.STREAK_COMBAT_LOGS);
+            fluffy.printDebug("Starting attacker account incrementation");
+            Account attackerAcc = tag != null ? !isBlock ? isVictim ? tag.getAttacker().getStatisticsAccount() : tag.getVictim().getStatisticsAccount() : null : null;
+            fluffy.printDebug("Attack account: " + (attackerAcc != null ? attackerAcc.getId() : "NULL"));
+            fluffy.printDebug("Attack account class: " + attackerAcc);
+            if (attackerAcc != null) {
+                fluffy.printDebug("Checking...!");
+                if (!FluffyCombat.debug && attackerAcc.getId().equals(player.getUniqueId())) {
+                } else {
+                    fluffy.printDebug("Trying to manage stats of the attacker!");
+                    attackerAcc.increment(Statistics.KILLS_GLOBAL);
+                    OfflinePlayer attackerPlayer = Bukkit.getOfflinePlayer(tag.getAttacker().getUniqueId());
+                    incrementStreak(attackerPlayer, attackerAcc, Statistics.STREAK_KILLS, Statistics.STREAK_KILLS_HIGHEST);
+                    attackerAcc.reset(StatisticType.DEATH_STREAKS);
+                    attackerAcc.reset(Statistics.STREAK_DEATHS_TOTEM);
+                    attackerAcc.reset(Statistics.STREAK_COMBAT_LOGS);
+                    attackerAcc.save();
+                }
             }
 
             final CombatUser victimUser = isVictim ? tag.getVictim() : tag.getAttacker();
@@ -157,34 +161,22 @@ public class DeathListener implements Listener {
             final CombatCause lastCombatCause = isVictim ? tag.getVictimCombatCause() : tag.getAttackerCombatCause();
 
 
+            fluffy.printDebug("Starting NPC management");
             if (fluffy.getNpcManager().isFluffyNPC(player)) {
                 UUID owner = fluffy.getNpcManager().getUniqueId(player);
                 if (owner != null) {
+                    fluffy.printDebug("NPC found to have an owner");
                     ICombatLogDatabase combatLogDB = fluffy.getCombatLogDatabase();
                     Objects.requireNonNull(combatLogDB.getLog(player.getUniqueId())).thenAccept((log) -> {
                         if (log != null) {
                             combatLogDB.save(owner);
                             if (attackerAcc != null) {
+                                fluffy.printDebug("Updated combat logs");
                                 combatLogDB.update(owner, attackerAcc.getId());
                             }
                         }
                     });
                 }
-            }
-        }
-        if (fluffy.getNpcManager().isFluffyNPC(player)) {
-            UUID owner = fluffy.getNpcManager().getUniqueId(player);
-            if (owner != null) {
-
-                ICombatLogDatabase combatLogDB = fluffy.getCombatLogDatabase();
-                Objects.requireNonNull(combatLogDB.getLog(player.getUniqueId())).thenAccept((log) -> {
-                    if (log != null) {
-                        combatLogDB.save(owner);
-                        if (attackerAcc != null) {
-                            combatLogDB.update(owner, null);
-                        }
-                    }
-                });
             }
         }
 
@@ -199,28 +191,24 @@ public class DeathListener implements Listener {
             victimAcc.save();
         }
 
-        if (attackerAcc != null) {
-            attackerAcc.save();
-        }
-
         // Delete all the tags last to allow tags to work properly.
 
         // Cancel all combat tags of victim
-
-        if (combatManager.hasTags(event.getPlayer())) {
-            if (combatManager.hasTags(player)) {
-                List<CombatTag> tags = combatManager.getTags(player);
-                tags.forEach(cyclingTag -> {
-                    // Set the tag ticks to -1 as it's instantly removed from the player
-                    cyclingTag.setAttackerTicksLeft(-1);
-                    cyclingTag.setVictimTicksLeft(-1);
-                    if (cyclingTag.getAttacker().getUniqueId().equals(player.getUniqueId())) {
-                        cyclingTag.setDeadAttacker(true);
-                    } else {
-                        cyclingTag.setDeadVictim(true);
-                    }
-                });
-            }
+        fluffy.printDebug("Start deletion of the combat tag!");
+        if (combatManager.hasTags(player)) {
+            fluffy.printDebug("Found combat tags");
+            List<CombatTag> tags = combatManager.getTags(player);
+            tags.forEach(cyclingTag -> {
+                fluffy.printDebug("Deleting combat tag");
+                // Set the tag ticks to -1 as it's instantly removed from the player
+                cyclingTag.setAttackerTicksLeft(-1);
+                cyclingTag.setVictimTicksLeft(-1);
+                if (cyclingTag.getAttacker().getUniqueId().equals(player.getUniqueId())) {
+                    cyclingTag.setDeadAttacker(true);
+                } else {
+                    cyclingTag.setDeadVictim(true);
+                }
+            });
         }
-     }
+    }
 }

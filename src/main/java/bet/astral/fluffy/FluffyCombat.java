@@ -1,5 +1,6 @@
 package bet.astral.fluffy;
 
+import bet.astral.aura.AuraPlugin;
 import bet.astral.cloudplusplus.minecraft.paper.bootstrap.BootstrapHandler;
 import bet.astral.fluffy.api.CombatUser;
 import bet.astral.fluffy.configs.CombatConfig;
@@ -236,6 +237,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
     public void onEnable() {
         PaperMessenger.init(this);
         GUIMan.init(this);
+        AuraPlugin.init(this);
         handler.init();
         reloadConfig();
         debug = getConfig().getBoolean("debug");
@@ -576,5 +578,9 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 
     private FileConfiguration getConfig(File file) {
         return YamlConfiguration.loadConfiguration(file);
+    }
+
+    public void printDebug(String message) {
+        getSLF4JLogger().info("DEBUG INFO - {}", message);
     }
 }

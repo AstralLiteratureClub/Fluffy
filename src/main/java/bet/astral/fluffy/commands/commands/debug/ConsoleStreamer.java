@@ -16,8 +16,8 @@ public class ConsoleStreamer extends FluffyCommand {
     public ConsoleStreamer(FluffyCommandRegisterer registerer, PaperCommandManager.Bootstrapped<CommandSender> commandManager) {
         super(registerer, commandManager);
         if (registerer.isDebug()) {
-            command("flf-console-streamer", Translations.COMMAND_BLOCK_OWNER_DESCRIPTION,
-                    b -> b.permission(Permission.of("fluffy.debug.console-streamer"))
+            command(debug, "console-stream", Translations.COMMAND_BLOCK_OWNER_DESCRIPTION,
+                    b -> b.permission(Permission.of("fluffy.debug.console-stream"))
                             .senderType(Player.class)
                             .handler(this::handle)).register();
         }

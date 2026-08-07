@@ -1,4 +1,4 @@
-package bet.astral.fluffy.commands.commands;
+package bet.astral.fluffy.commands.commands.debug;
 
 import bet.astral.cloudplusplus.annotations.Cloud;
 import bet.astral.fluffy.FluffyCommandRegisterer;
@@ -20,8 +20,8 @@ import org.incendo.cloud.paper.PaperCommandManager;
 public class TagCommand extends FluffyCommand {
 	public TagCommand(FluffyCommandRegisterer registerer, PaperCommandManager.Bootstrapped<CommandSender> commandManager) {
 		super(registerer, commandManager);
-		command("tag", Translations.COMMAND_TAG_DESCRIPTION, b -> b.senderType(Player.class)
-				.permission("fluffy.tag")
+		command(debug, "tag", Translations.COMMAND_TAG_DESCRIPTION, b -> b.senderType(Player.class)
+				.permission("fluffy.debug.tag")
 				.optional(PlayerParser.playerComponent().name("target").description(description(Translations.COMMAND_TAG_WHO_DESCRIPTION)))
 				.handler(this::handle)).register();
 	}

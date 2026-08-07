@@ -88,6 +88,12 @@ public class Translations {
 	public static final Translation REGION_ENTER_IN_COMBAT = new Translation("combat.region.cannot-enter").add(ComponentType.CHAT, text("<red>You are not permitted to enter this region while in combat!"));
 	public static final Translation REGION_ENTER_IN_COMBAT_COMBAT_EXTENDED = new Translation("combat.region.cannot-enter-extended-tag").add(ComponentType.CHAT, text("<red>Your combat tag was extended for trying to attempt to escape!"));
 
+	public static final Translation SETTING_ACTION_BAR_PAGE = new Translation("setting.action-bar.page").add(ComponentType.CHAT, text("Action Bar Settings"));
+	public static final Translation SETTING_ACTION_BAR_ENABLED = new Translation("setting.action-bar.enabled").add(ComponentType.CHAT, text("Action Bar Enabled"));
+	public static final Translation SETTING_ACTION_BAR_TYPE = new Translation("setting.action-bar.type").add(ComponentType.CHAT, text("Action Bar Type: %design%"));
+	public static final Translation SETTING_ACTION_BAR_HEALTH_MODE = new Translation("setting.action-bar.health-design").add(ComponentType.CHAT, text("Health Design: %design%"));
+	public static final Translation SETTING_ACTION_BAR_TIMER_MODE = new Translation("setting.action-bar.timer-design").add(ComponentType.CHAT, text("Timer Design: %design%"));
+
 	public static Collection<bet.astral.messenger.v2.translation.Translation> getTranslations(){
 		return translations.values();
 	}

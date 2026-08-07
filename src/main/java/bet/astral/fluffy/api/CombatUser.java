@@ -1,6 +1,8 @@
 package bet.astral.fluffy.api;
 
+import bet.astral.aura.api.color.VanillaGlowColor;
 import bet.astral.fluffy.FluffyCombat;
+import bet.astral.fluffy.api.setting.Setting;
 import bet.astral.fluffy.statistic.Account;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,6 +32,8 @@ public class CombatUser {
 	 */
 
 	private Account statisticsAccount = null;
+	@Setter(value = NONE)
+	private Map<UUID, Setting<?>> settings = new LinkedHashMap<>();
 
 	/*
 	 * Combat helpers
@@ -68,11 +72,11 @@ public class CombatUser {
 
 	// Custom Glowing color support
 	@Getter(NONE)
-	private Object latestGlowColor = null;
+	private VanillaGlowColor latestGlowColor = null;
 	@Getter(NONE)
-	private Object taggedGlowColor = null;
+	private VanillaGlowColor taggedGlowColor = null;
 	@Getter(NONE)
-	private Object rejoinedGlowColor = null;
+	private VanillaGlowColor rejoinedGlowColor = null;
 
 	/**
 	 * Generates new user lol
@@ -134,15 +138,45 @@ public class CombatUser {
 		data.put(key, value);
 	}
 
-	public Optional<Object> getLatestGlowColor() {
+	public Optional<VanillaGlowColor> getLatestGlowColor() {
 		return Optional.ofNullable(latestGlowColor);
 	}
 
-	public Optional<Object> getTaggedGlowColor() {
+	public Optional<VanillaGlowColor> getTaggedGlowColor() {
 		return Optional.ofNullable(taggedGlowColor);
 	}
 
-	public Optional<Object> getRejoinedGlowColor() {
+	public Optional<VanillaGlowColor> getRejoinedGlowColor() {
 		return Optional.ofNullable(rejoinedGlowColor);
+	}
+
+	public CombatUser setShowGlowingLatest(boolean showGlowingLatest) {
+		this.showGlowingLatest = showGlowingLatest;
+		return this;
+	}
+
+	public CombatUser setShowGlowingTagged(boolean showGlowingTagged) {
+		this.showGlowingTagged = showGlowingTagged;
+		return this;
+	}
+
+	public CombatUser setShowGlowingTagReLogged(boolean showGlowingTagReLogged) {
+		this.showGlowingTagReLogged = showGlowingTagReLogged;
+		return this;
+	}
+
+	public <T> CombatUser setSetting(Setting<T> setting, T value) {
+		if (this.settings.get(setting.getUniqueId()) == null) {
+			this.settings.put(setting.getUniqueId(), setting.clone());
+		}
+		((Setting<T>) this.settings.get(setting.getUniqueId())).setValue(value);
+		return this;
+	}
+
+	public <T> Setting<T> getSetting(Setting<T> setting) {
+		if (settings.get(setting.getUniqueId()) == null) {
+			setSetting(setting, setting.getValue());
+		}
+		return (Setting<T>) settings.get(setting.getUniqueId());
 	}
 }

@@ -15,7 +15,7 @@ import org.incendo.cloud.permission.Permission;
 public class DeathEffectsCommand extends FluffyCommand {
     public DeathEffectsCommand(FluffyCommandRegisterer registerer, PaperCommandManager.Bootstrapped<CommandSender> commandManager) {
         super(registerer, commandManager);
-        command("deatheffects", Translations.COMMAND_BLOCK_OWNER_DESCRIPTION,
+        command(root, "death-effects", Translations.COMMAND_BLOCK_OWNER_DESCRIPTION,
                 b -> b.permission(Permission.of("fluffy.death-effects"))
                         .senderType(Player.class)
                         .handler(this::handle)).register();

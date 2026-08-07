@@ -1,4 +1,4 @@
-package bet.astral.fluffy.commands.commands;
+package bet.astral.fluffy.commands.commands.admin;
 
 import bet.astral.cloudplusplus.annotations.Cloud;
 import bet.astral.fluffy.FluffyCommandRegisterer;
@@ -21,7 +21,7 @@ import static bet.astral.fluffy.FluffyCombat.emergencyStop;
 public class EmergencyStopCommand extends FluffyCommand {
     public EmergencyStopCommand(FluffyCommandRegisterer registerer, PaperCommandManager.Bootstrapped<CommandSender> commandManager) {
         super(registerer, commandManager);
-        command("fluffy-emergency-stop", Translations.COMMAND_BLOCK_OWNER_DESCRIPTION,
+        command(root, "emergency-stop", Translations.COMMAND_BLOCK_OWNER_DESCRIPTION,
                 b -> b.permission(Permission.of("fluffy.emergency-stop"))
                         .senderType(ConsoleCommandSender.class)
                         .handler(this::handle)).register();

@@ -1,5 +1,6 @@
 package bet.astral.fluffy.listeners.combat.end;
 
+import bet.astral.aura.api.Aura;
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.BlockCombatUser;
 import bet.astral.fluffy.api.CombatTag;
@@ -47,15 +48,8 @@ public class CombatEndListener implements Listener {
 			OfflinePlayer attackerOP = attacker.getPlayer();
 			OfflinePlayer victimOP = victim.getPlayer();
 			if (victimOP instanceof Player victimP && attackerOP instanceof Player attackerP) {
-				/*
-				Shine glowingEntities = fluffy.getShine();
-				try {
-					glowingEntities.removeGlowing(attackerP, victimP);
-					glowingEntities.removeGlowing(victimP, attackerP);
-				} catch (ReflectiveOperationException e) {
-					throw new RuntimeException(e);
-				}
-				 */
+				Aura.get().unsetGlowing(attackerP, victimP);
+				Aura.get().unsetGlowing(victimP, attackerP);
 			}
 		}
 	}

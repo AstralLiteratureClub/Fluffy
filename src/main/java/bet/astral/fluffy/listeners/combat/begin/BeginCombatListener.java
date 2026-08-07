@@ -5,7 +5,7 @@ import bet.astral.fluffy.api.BlockCombatUser;
 import bet.astral.fluffy.api.CombatCause;
 import bet.astral.fluffy.api.CombatTag;
 import bet.astral.fluffy.api.CombatUser;
-import bet.astral.fluffy.events.*;
+import bet.astral.fluffy.events.CombatEnterEvent;
 import bet.astral.fluffy.listeners.hitdetection.DetectionHelper;
 import bet.astral.fluffy.manager.BlockUserManager;
 import bet.astral.fluffy.manager.CombatManager;
@@ -22,7 +22,9 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.*;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.projectiles.BlockProjectileSource;
 import org.bukkit.projectiles.ProjectileSource;
@@ -33,7 +35,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-import static bet.astral.fluffy.FluffyCombat.*;
+import static bet.astral.fluffy.FluffyCombat.PROJECTILE_ITEM_KEY;
 import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.*;
 import static org.bukkit.persistence.PersistentDataType.BYTE_ARRAY;
 
@@ -88,9 +90,11 @@ public class BeginCombatListener implements Listener {
 		if (victim.getUniqueId() == attacker.getUniqueId() && !FluffyCombat.debug) {
 			return;
 		}
+		/*
 		if (victim.isDead()){
 			return;
 		}
+		 */
 
 		if (cannotEnterCombat(victim)){
 			return;
@@ -152,6 +156,7 @@ public class BeginCombatListener implements Listener {
 			CombatUser user = tag.getUser(victim);
 			user.setLastFireDamage(attacker.getUniqueId());
 		}
+
 	}
 
 	public static void handle(Player victim, Block attacker, CombatCause combatCause) {

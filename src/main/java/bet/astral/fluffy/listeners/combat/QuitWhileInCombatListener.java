@@ -1,5 +1,7 @@
 package bet.astral.fluffy.listeners.combat;
 
+import bet.astral.aura.api.Aura;
+import bet.astral.aura.api.color.VanillaGlowColor;
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.BlockCombatUser;
 import bet.astral.fluffy.api.CombatTag;
@@ -81,6 +83,14 @@ public class QuitWhileInCombatListener implements Listener {
 								npcManager.clearNPC(npc);
 							}
 
+						}
+
+						if (fluffy.getCombatConfig().isCombatGlowCombatLogRejoin()) {
+							for (Player p : Bukkit.getOnlinePlayers()){
+								if (fluffy.getUserManager().getUser(p).isShowGlowingTagReLogged()) {
+									Aura.get().setGlowing(p, player, fluffy.getUserManager().getUser(p).getRejoinedGlowColor().orElse(VanillaGlowColor.WHITE));
+								}
+							}
 						}
 
 						messenger.broadcast(broadCastMessage, placeholders);

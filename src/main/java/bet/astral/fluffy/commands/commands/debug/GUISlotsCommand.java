@@ -25,7 +25,7 @@ import org.incendo.cloud.permission.Permission;
 public class GUISlotsCommand extends FluffyCommand {
     public GUISlotsCommand(FluffyCommandRegisterer registerer, PaperCommandManager.Bootstrapped<CommandSender> commandManager) {
         super(registerer, commandManager);
-        command("flf-gui-slots", Description.EMPTY,
+        command(debug, "gui-slots", Description.EMPTY,
                 b -> b.permission(Permission.of("fluffy.debug.slots"))
                         //.optional(EnumParser.enumComponent(InventoryType.class).name("type").defaultValue(DefaultValue.constant(InventoryType.CHEST)))
                         .senderType(Player.class)

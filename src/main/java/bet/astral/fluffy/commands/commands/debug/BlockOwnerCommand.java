@@ -1,4 +1,4 @@
-package bet.astral.fluffy.commands.commands;
+package bet.astral.fluffy.commands.commands.debug;
 
 import bet.astral.cloudplusplus.annotations.Cloud;
 import bet.astral.fluffy.FluffyCommandRegisterer;
@@ -25,8 +25,8 @@ import java.util.UUID;
 public class BlockOwnerCommand extends FluffyCommand {
 	public BlockOwnerCommand(FluffyCommandRegisterer registerer, PaperCommandManager.Bootstrapped<CommandSender> commandManager) {
 		super(registerer, commandManager);
-		command("block-owner", Translations.COMMAND_BLOCK_OWNER_DESCRIPTION,
-				b -> b.permission(Permission.of("fluffy.block-owner"))
+		command(debug, "block-owner", Translations.COMMAND_BLOCK_OWNER_DESCRIPTION,
+				b -> b.permission(Permission.of("fluffy.debug.block-owner"))
 						//.optional(LocationParser.locationComponent().name("location"))
 						//		.description(description(Translations.COMMAND_BLOCK_OWNER_LOCATION_DESCRIPTION)))
 						.handler(this::handle)).register();

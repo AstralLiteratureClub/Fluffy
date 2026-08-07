@@ -1,13 +1,15 @@
 package bet.astral.fluffy.manager;
 
-import bet.astral.fluffy.events.CombatTagEndEvent;
-import bet.astral.fluffy.configs.CombatConfig;
-import bet.astral.fluffy.events.player.PlayerCombatEndEvent;
+import bet.astral.aura.api.Aura;
+import bet.astral.aura.api.color.VanillaGlowColor;
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.BlockCombatTag;
 import bet.astral.fluffy.api.BlockCombatUser;
 import bet.astral.fluffy.api.CombatTag;
 import bet.astral.fluffy.api.CombatUser;
+import bet.astral.fluffy.configs.CombatConfig;
+import bet.astral.fluffy.events.CombatTagEndEvent;
+import bet.astral.fluffy.events.player.PlayerCombatEndEvent;
 import bet.astral.fluffy.events.player.PlayerCombatFullEndEvent;
 import bet.astral.fluffy.messenger.Translations;
 import bet.astral.more4j.tuples.Quartet;
@@ -301,20 +303,25 @@ public final class CombatManager implements Manager {
             return;
         }
 
-//		final Shine shine = fluffy.getShine();
         final boolean isLatest = fluffy.getCombatManager().isLatest(whoSees, tag);
         final boolean isVictim = tag.getVictim().getUniqueId().equals(whoSees.getUniqueId());
         final CombatUser attacker = isVictim ? tag.getAttacker() : tag.getVictim();
         final CombatUser victim = isVictim ? tag.getVictim() : tag.getAttacker();
-        if (attacker.getUniqueId().equals(ignore.getUniqueId())) {
+        if (attacker.getUniqueId().equals(ignore.getUniqueId()) && !FluffyCombat.debug) {
             return;
         }
+
+        boolean enabled = false;
+
         if (tag instanceof BlockCombatTag) {
             Block block = ((BlockCombatUser) tag.getAttacker()).getBlock();
-            Object shineColor = victim.getTaggedGlowColor().orElse(combatConfig.getCombatGlowAllTagged());
+            VanillaGlowColor shineColor = victim.getTaggedGlowColor().orElse(combatConfig.getCombatGlowAllTagged());
             if (isLatest && combatConfig.isCombatGlowLatest()) {
                 shineColor = victim.getLatestGlowColor().orElse(combatConfig.getCombatGlowLatest());
             }
+
+
+//            Aura.get().setGlowing(whoSees, block, shineColor);
 			/*
 			try {
 				shine.setGlowing(whoSees, block, shineColor);
@@ -326,46 +333,37 @@ public final class CombatManager implements Manager {
         } else {
             OfflinePlayer attackerPlayer = attacker.getPlayer();
             if (attackerPlayer instanceof Player attackerOnline) {
-                Object color = victim.getTaggedGlowColor().orElse(combatConfig.getCombatGlowAllTagged());
+                VanillaGlowColor color = null;
                 boolean isRejoin = attacker.getRejoinTimer() > 0;
                 if (isRejoin && combatConfig.isCombatGlowCombatLogRejoin()) {
                     color = victim.getRejoinedGlowColor().orElse(combatConfig.getCombatGlowTagRejoin());
+                    enabled = victim.isShowGlowingTagReLogged();
                 } else if (isLatest && combatConfig.isCombatGlowLatest()) {
                     color = victim.getLatestGlowColor().orElse(combatConfig.getCombatGlowLatest());
+                    enabled = victim.isShowGlowingLatest();
                 }
-				/*
-				try {
-					shine.setGlowing(whoSees, attackerOnline, color);
-				} catch (ReflectiveOperationException e) {
-					throw new RuntimeException(e);
-				}
 
-				 */
+                if (!enabled) {
+                    color = victim.getTaggedGlowColor().orElse(combatConfig.getCombatGlowAllTagged());
+                    enabled = victim.isShowGlowingTagged();
+                }
+
+                if (enabled && color != null) {
+                    Aura.get().setGlowing(whoSees, attackerOnline, color);
+                } else {
+                    Aura.get().unsetGlowing(whoSees, attackerOnline);
+                }
             }
         }
     }
 
     public static void removeGlow(@NotNull FluffyCombat fluffyCombat, Player whoSees, Entity entity) {
-		/*
-		Shine shine = fluffyCombat.getShine();
-		try {
-			shine.removeGlowing(whoSees, entity);
-		} catch (ReflectiveOperationException e) {
-			throw new RuntimeException(e);
-		}
-
-		 */
+        Aura.get().unsetGlowing(whoSees, entity);
     }
 
     public static void removeGlow(@NotNull FluffyCombat fluffyCombat, Player whoSees, Block block) {
 		/*
-		Shine shine = fluffyCombat.getShine();
-		try {
-			shine.removeGlowing(whoSees, block);
-		} catch (ReflectiveOperationException e) {
-			throw new RuntimeException(e);
-		}
-
+        Aura.get().unsetGlowing(whoSees, block);
 		 */
     }
 

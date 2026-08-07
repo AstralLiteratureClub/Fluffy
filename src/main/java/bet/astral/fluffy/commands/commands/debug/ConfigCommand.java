@@ -20,13 +20,15 @@ import java.lang.reflect.Field;
 public class ConfigCommand extends FluffyCommand {
     public ConfigCommand(FluffyCommandRegisterer registerer, PaperCommandManager.Bootstrapped<CommandSender> commandManager) {
         super(registerer, commandManager);
-        command("flf-reload-config", Description.EMPTY,
+        RegistrableCommand<? extends CommandSender> configRoot = command(root, "config", Description.EMPTY, b->b);
+        configRoot.register();
+        command(configRoot, "reload", Description.EMPTY,
                 b -> b.permission(Permission.of("fluffy.debug.reload-config"))
                         .handler(this::handle)
         )
                 .register();
 
-        command("flf-see-config", Description.EMPTY,
+        command(configRoot, "view", Description.EMPTY,
                 b -> b.permission(Permission.of("fluffy.debug.see-config"))
                         .handler(context->{
                             CommandSender sender = context.sender();

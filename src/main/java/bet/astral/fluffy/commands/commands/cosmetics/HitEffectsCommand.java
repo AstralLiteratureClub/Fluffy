@@ -15,7 +15,7 @@ import org.incendo.cloud.permission.Permission;
 public class HitEffectsCommand extends FluffyCommand {
     public HitEffectsCommand(FluffyCommandRegisterer registerer, PaperCommandManager.Bootstrapped<CommandSender> commandManager) {
         super(registerer, commandManager);
-        command("hiteffects", Translations.COMMAND_BLOCK_OWNER_DESCRIPTION,
+        command(root, "hit-effects", Translations.COMMAND_BLOCK_OWNER_DESCRIPTION,
                 b -> b.permission(Permission.of("fluffy.hit-effects"))
                         .senderType(Player.class)
                         .handler(this::handle)).register();

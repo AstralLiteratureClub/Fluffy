@@ -1,4 +1,4 @@
-package bet.astral.fluffy.commands.commands;
+package bet.astral.fluffy.commands.commands.debug;
 
 import bet.astral.cloudplusplus.annotations.Cloud;
 import bet.astral.fluffy.FluffyCommandRegisterer;
@@ -15,8 +15,8 @@ import org.incendo.cloud.permission.Permission;
 public class PluginHooksCommand extends FluffyCommand {
     public PluginHooksCommand(FluffyCommandRegisterer registerer, PaperCommandManager.Bootstrapped<CommandSender> commandManager) {
         super(registerer, commandManager);
-        command("plugin-hooks", Translations.COMMAND_BLOCK_OWNER_DESCRIPTION,
-                b -> b.permission(Permission.of("fluffy.plugin-hooks"))
+        command(debug, "plugin-hooks", Translations.COMMAND_BLOCK_OWNER_DESCRIPTION,
+                b -> b.permission(Permission.of("fluffy.debug.plugin-hooks"))
                         .handler(this::handle)).register();
     }
 
