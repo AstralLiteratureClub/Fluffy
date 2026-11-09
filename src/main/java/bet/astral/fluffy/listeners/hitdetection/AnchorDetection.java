@@ -4,7 +4,8 @@ import bet.astral.fluffy.api.CombatCause;
 import bet.astral.fluffy.api.CombatTag;
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.events.damage.CombatDamageUsingRespawnAnchorEvent;
-import bet.astral.fluffy.listeners.combat.begin.BeginCombatListener;
+import bet.astral.fluffy.listeners.IgnoreRegistration;
+import bet.astral.fluffy.listeners.combat.BeginCombatListener;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -24,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
+@IgnoreRegistration
 public class AnchorDetection implements Listener {
 	public final Map<Location, AnchorTag> detectionMap = new HashMap<>();
 	private final FluffyCombat fluffyCombat;

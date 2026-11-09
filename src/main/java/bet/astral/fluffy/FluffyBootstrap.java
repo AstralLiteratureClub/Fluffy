@@ -41,6 +41,9 @@ public class FluffyBootstrap implements PluginBootstrap {
 				file.createNewFile();
 			}
 			JsonObject serverTranslations = Translations.GSON.fromJson(new JsonReader(new FileReader(file)), JsonObject.class);
+			if (serverTranslations == null) {
+				serverTranslations = new JsonObject();
+			}
 			JsonObject newTranslations = Translations.getDefaults();
 			JsonObject updatedTranslations = updateJsonWithNewKeys(serverTranslations, newTranslations);
 			File en_us = uploadFile(folder, "messages/en_us.json", Translations.GSON.toJson(updatedTranslations));

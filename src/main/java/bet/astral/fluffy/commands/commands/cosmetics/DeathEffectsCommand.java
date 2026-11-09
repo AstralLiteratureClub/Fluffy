@@ -15,10 +15,12 @@ import org.incendo.cloud.permission.Permission;
 public class DeathEffectsCommand extends FluffyCommand {
     public DeathEffectsCommand(FluffyCommandRegisterer registerer, PaperCommandManager.Bootstrapped<CommandSender> commandManager) {
         super(registerer, commandManager);
+        registerer.getSlf4jLogger().error("LOGGING !!!");
         command(root, "death-effects", Translations.COMMAND_BLOCK_OWNER_DESCRIPTION,
                 b -> b.permission(Permission.of("fluffy.death-effects"))
                         .senderType(Player.class)
                         .handler(this::handle)).register();
+        registerer.getSlf4jLogger().error("LOGGING !!!");
     }
 
     private void handle(@NonNull CommandContext<? extends Player> handler){

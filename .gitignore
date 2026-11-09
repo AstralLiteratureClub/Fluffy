@@ -44,3 +44,6 @@ build
 /run/
 /run
 *.json
+/libs/
+*.zip
+*.7z

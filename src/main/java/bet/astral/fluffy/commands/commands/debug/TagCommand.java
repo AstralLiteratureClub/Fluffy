@@ -55,8 +55,8 @@ public class TagCommand extends FluffyCommand {
 							message(player, Translations.COMMAND_TAG_INFO_BLOCK,
 									Placeholder.of("who", blockCombatUser.getBlock().getType().getKey().toString()),
 									Placeholder.of("x", blockCombatUser.getLocation().getX()),
-									Placeholder.of("y", blockCombatUser.getLocation().getZ()),
-									Placeholder.of("z", blockCombatUser.getLocation().getY()),
+									Placeholder.of("y", blockCombatUser.getLocation().getY()),
+									Placeholder.of("z", blockCombatUser.getLocation().getZ()),
 									Placeholder.of("world", blockCombatUser.getLocation().getWorld().getName()),
 									Placeholder.of("ticks", ticks),
 									Placeholder.of("seconds", seconds)

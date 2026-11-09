@@ -1,4 +1,4 @@
-package bet.astral.fluffy.listeners.combat.begin;
+package bet.astral.fluffy.listeners.combat;
 
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.BlockCombatUser;
@@ -127,7 +127,7 @@ public class BeginCombatListener implements Listener {
 		// Set damage dealt
 		tag.setDamageDealt(attacker, tag.getDamageDealt(attacker) + damageDealt);
 
-		if (victim.getUniqueId().equals(tag.getVictim().getUniqueId())) {
+		if (victim.getUniqueId() == (tag.getVictim().getUniqueId())) {
 			tag.setVictimCombatCause(combatCause);
 		} else {
 			tag.setAttackerCombatCause(combatCause);

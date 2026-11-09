@@ -3,7 +3,8 @@ package bet.astral.fluffy.listeners.hitdetection;
 import bet.astral.fluffy.api.CombatCause;
 import bet.astral.fluffy.api.CombatTag;
 import bet.astral.fluffy.events.damage.CombatDamageUsingTNTEvent;
-import bet.astral.fluffy.listeners.combat.begin.BeginCombatListener;
+import bet.astral.fluffy.listeners.IgnoreRegistration;
+import bet.astral.fluffy.listeners.combat.BeginCombatListener;
 import bet.astral.fluffy.FluffyCombat;
 import bet.astral.more4j.tuples.Pair;
 import com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent;
@@ -27,7 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-
+@IgnoreRegistration
 public class TNTDetection implements Listener {
     public static final NamespacedKey FLUFFY_TNT_PRIMER_ENTITY = new NamespacedKey("fluffy", "tnt_primer_entity");
     public static final NamespacedKey FLUFFY_TNT_PRIMER_BLOCK = new NamespacedKey("fluffy", "tnt_primer_block");
