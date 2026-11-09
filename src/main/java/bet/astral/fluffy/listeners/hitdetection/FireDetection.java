@@ -1,5 +1,6 @@
 package bet.astral.fluffy.listeners.hitdetection;
 
+import bet.astral.fluffy.listeners.IgnoreRegistration;
 import com.destroystokyo.paper.event.block.BlockDestroyEvent;
 import lombok.Getter;
 import bet.astral.fluffy.FluffyCombat;
@@ -19,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
+@IgnoreRegistration
 @Getter
 public class FireDetection implements Listener {
 	public static Material[] SOUL_FIRE_BLOCKS = {Material.SOUL_SOIL, Material.SOUL_SAND};

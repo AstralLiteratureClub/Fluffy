@@ -4,7 +4,8 @@ import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.CombatCause;
 import bet.astral.fluffy.api.CombatTag;
 import bet.astral.fluffy.events.damage.CombatDamageUsingEnderCrystalEvent;
-import bet.astral.fluffy.listeners.combat.begin.BeginCombatListener;
+import bet.astral.fluffy.listeners.IgnoreRegistration;
+import bet.astral.fluffy.listeners.combat.BeginCombatListener;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -17,7 +18,7 @@ import org.bukkit.projectiles.BlockProjectileSource;
 
 import java.util.HashMap;
 import java.util.Map;
-
+@IgnoreRegistration
 public class CrystalDetection implements Listener {
 
 	public final Map<EnderCrystal, CrystalTag> detectionMap = new HashMap<>();

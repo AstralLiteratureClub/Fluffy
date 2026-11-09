@@ -50,7 +50,7 @@ public class BlockOwnerCommand extends FluffyCommand {
 			PlaceholderList placeholders = new PlaceholderList();
 			placeholders.add("x", location.getX());
 			placeholders.add("y", location.getY());
-			placeholders.add("z", location.getX());
+			placeholders.add("z", location.getZ());
 			placeholders.add("world", location.getWorld().getName());
 			if (blockInfo == null){
 				messenger.message(player, Translations.COMMAND_BLOCK_OWNER_NO_DATA, placeholders);

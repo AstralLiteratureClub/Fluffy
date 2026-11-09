@@ -71,8 +71,6 @@ public class ConfigCommand extends FluffyCommand {
             sender.sendMessage(Component.text(e.getMessage()));
         }
 
-            sender.sendMessage(exceptionToComponent(new Exception("Test!")));
-
         sender.sendMessage("Reloaded configuration!");
     }
 
@@ -88,21 +86,21 @@ public class ConfigCommand extends FluffyCommand {
         String exceptionName = throwable.getClass().getName();
         String headerText = exceptionName + (message != null ? ": " + message : "");
 
-        builder.append(Component.text(headerText, NamedTextColor.RED, TextDecoration.BOLD));
-        builder.append(Component.newline());
+        builder = builder.append(Component.text(headerText, NamedTextColor.RED, TextDecoration.BOLD));
+        builder = builder.append(Component.newline());
 
         // 2. Append the stack trace elements
         for (StackTraceElement element : throwable.getStackTrace()) {
-            builder.append(Component.text("    at ", NamedTextColor.GRAY));
-            builder.append(Component.text(element.toString(), NamedTextColor.DARK_GRAY));
-            builder.append(Component.newline());
+            builder = builder.append(Component.text("    at ", NamedTextColor.GRAY));
+            builder = builder.append(Component.text(element.toString(), NamedTextColor.DARK_GRAY));
+            builder = builder.append(Component.newline());
         }
 
         // 3. Recursively append the cause if it exists
         Throwable cause = throwable.getCause();
         if (cause != null && cause != throwable) {
-            builder.append(Component.text("Caused by: ", NamedTextColor.GOLD, TextDecoration.BOLD));
-            builder.append(exceptionToComponent(cause));
+            builder = builder.append(Component.text("Caused by: ", NamedTextColor.GOLD, TextDecoration.BOLD));
+            builder = builder.append(exceptionToComponent(cause));
         }
 
         return builder;

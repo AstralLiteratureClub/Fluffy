@@ -507,6 +507,9 @@ public final class CombatManager implements Manager {
             tags.remove(toId(playerAttacker, playerVictim));
             tags.remove(toId(playerVictim, playerAttacker));
             tags.put(toId(playerVictim, playerAttacker), tag);
+
+            updateLatest(playerVictim, tag);
+            updateLatest(playerAttacker, tag);
             return tag;
         } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
             throw new RuntimeException(e);
@@ -536,10 +539,15 @@ public final class CombatManager implements Manager {
             BlockCombatTag tag = blockCombatTagConstructor.newInstance(main, combatUserVictim, block);
             tags.remove(toId(playerVictim, block));
             tags.put(toId(playerVictim, block), tag);
+            updateLatest(playerVictim, tag);
             return tag;
         } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void updateLatest(OfflinePlayer p, CombatTag tag) {
+        latest.put(p.getUniqueId(), tag);
     }
 
 

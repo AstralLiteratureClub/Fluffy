@@ -9,6 +9,7 @@ import bet.astral.fluffy.cosmetics.parser.EffectParser;
 import bet.astral.fluffy.database.ICombatLogDatabase;
 import bet.astral.fluffy.database.SQLiteCombatLogDatabase;
 import bet.astral.fluffy.database.StatisticsDatabase;
+import bet.astral.fluffy.listeners.IgnoreRegistration;
 import bet.astral.fluffy.listeners.block.LiquidOwnerListener;
 import bet.astral.fluffy.listeners.hitdetection.*;
 import bet.astral.fluffy.manager.*;
@@ -227,8 +228,7 @@ public class FluffyCombat extends JavaPlugin implements Listener {
 
     @Override
     public void onLoad() {
-        configuration = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "config.yml"));
-        combatConfig = new CombatConfig(this);
+        reloadConfig();
 
         hookManager.onLoad();
     }
@@ -367,14 +367,14 @@ public class FluffyCombat extends JavaPlugin implements Listener {
         for (Field field : clazz.getDeclaredFields()) {
             field.setAccessible(true);
             try {
-                if (!field.getDeclaringClass().isAssignableFrom(Manager.class)) {
-                    return;
+                if (!field.getType().isAssignableFrom(Manager.class)) {
+                    continue;
                 }
 
                 Manager obj = (Manager) field.get(this);
                 disableIfNotNull(obj);
             } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
+                getComponentLogger().error("Found an exception while trying to disable a manager.", e);
             }
         }
     }
@@ -409,6 +409,9 @@ public class FluffyCombat extends JavaPlugin implements Listener {
                 Class<?> clazz = null;
                 try {
                     clazz = Class.forName(clazzName);
+                    if (clazz.isAnnotationPresent(IgnoreRegistration.class)) {
+                        continue;
+                    }
                     if (clazz.isInterface()) {
                         continue;
                     }
@@ -482,14 +485,23 @@ public class FluffyCombat extends JavaPlugin implements Listener {
         uploadUploads();
 
         super.reloadConfig();
+
+        // Reload configuration
+        configuration = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "config.yml"));
+
         // Reload the plugin config
         combatConfig.reload(getConfig());
         // Clear registry to allow new registry of effects
-        hitEffectManager.clearRegistry();
-        deathEffectManager.clearRegistry();
-        // Parse hit effects
-        new EffectParser(this, hitEffectManager).parse(new File(getDataFolder(), hitEffectManager.getFileName()));
-        new EffectParser(this, deathEffectManager).parse(new File(getDataFolder(), deathEffectManager.getFileName()));
+        if (hitEffectManager != null) {
+            hitEffectManager.clearRegistry();
+            // Parse hit effects
+            new EffectParser(this, hitEffectManager).parse(new File(getDataFolder(), hitEffectManager.getFileName()));
+        }
+        if (deathEffectManager != null) {
+            deathEffectManager.clearRegistry();
+            // Parse hit effects
+            new EffectParser(this, deathEffectManager).parse(new File(getDataFolder(), deathEffectManager.getFileName()));
+        }
 
         // Clear all languages loaded.
         messenger.getLanguages().clear();
@@ -560,6 +572,17 @@ public class FluffyCombat extends JavaPlugin implements Listener {
     }
 
     private void addDefaults(String key, Configuration tempConfig, Configuration config) {
+        Object value = tempConfig.get(key);
+
+        if (value instanceof ConfigurationSection section) {
+            for (String k : section.getKeys(false)) {
+                addDefaults(key + "." + k, tempConfig, config);
+            }
+        } else if (!config.contains(key)) {
+            config.set(key, value); // create the key/value FIRST
+        }
+
+        // now attach comments, since the path exists
         List<String> comment = tempConfig.getComments(key);
         if (!comment.isEmpty() && config.getInlineComments(key).isEmpty()) {
             config.setComments(key, comment);
@@ -568,12 +591,6 @@ public class FluffyCombat extends JavaPlugin implements Listener {
         if (!comment.isEmpty() && config.getInlineComments(key).isEmpty()) {
             config.setInlineComments(key, comment);
         }
-        Object value = tempConfig.get(key); // Retrieve the value from the tempConfig
-        if (value instanceof ConfigurationSection section) {
-            for (String k : section.getKeys(false)) {
-                addDefaults(key + "." + k, tempConfig, config); // Append current key
-            }
-        }
     }
 
     private FileConfiguration getConfig(File file) {
@@ -581,6 +598,8 @@ public class FluffyCombat extends JavaPlugin implements Listener {
     }
 
     public void printDebug(String message) {
-        getSLF4JLogger().info("DEBUG INFO - {}", message);
+        if (debug) {
+            getSLF4JLogger().info("DEBUG INFO - {}", message);
+        }
     }
 }

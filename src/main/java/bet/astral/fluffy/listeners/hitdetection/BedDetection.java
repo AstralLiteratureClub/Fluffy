@@ -4,7 +4,8 @@ import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.CombatCause;
 import bet.astral.fluffy.api.CombatTag;
 import bet.astral.fluffy.events.damage.CombatDamageUsingBedEvent;
-import bet.astral.fluffy.listeners.combat.begin.BeginCombatListener;
+import bet.astral.fluffy.listeners.IgnoreRegistration;
+import bet.astral.fluffy.listeners.combat.BeginCombatListener;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -22,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
+@IgnoreRegistration
 public class BedDetection implements Listener {
 	private final FluffyCombat fluffy;
 	public final Map<Location, BedTag> detectionMap = new HashMap<>();

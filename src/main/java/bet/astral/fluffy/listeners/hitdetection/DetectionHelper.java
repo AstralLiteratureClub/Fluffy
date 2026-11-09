@@ -1,5 +1,6 @@
 package bet.astral.fluffy.listeners.hitdetection;
 
+import bet.astral.fluffy.listeners.IgnoreRegistration;
 import bet.astral.more4j.tuples.Pair;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Chunk;
@@ -22,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
+@IgnoreRegistration
 public final class DetectionHelper implements Listener {
     public static Material[] FIRE_BLOCKS = {Material.SOUL_FIRE, Material.FIRE, Material.FIRE};
     private static final Map<Chunk, Map<Location, Pair<UUID, Material>>> blockOwners = new HashMap<>();

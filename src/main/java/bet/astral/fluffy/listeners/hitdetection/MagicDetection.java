@@ -4,7 +4,8 @@ import bet.astral.fluffy.FluffyCombat;
 import bet.astral.fluffy.api.BlockCombatUser;
 import bet.astral.fluffy.api.CombatCause;
 import bet.astral.fluffy.configs.CombatConfig;
-import bet.astral.fluffy.listeners.combat.begin.BeginCombatListener;
+import bet.astral.fluffy.listeners.IgnoreRegistration;
+import bet.astral.fluffy.listeners.combat.BeginCombatListener;
 import bet.astral.fluffy.manager.BlockUserManager;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -26,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-
+@IgnoreRegistration
 public class MagicDetection implements Listener {
 	private final FluffyCombat fluffy;
 	protected final Map<PotionEffectType, Map<UUID, Object>> whoGave = new HashMap<>();

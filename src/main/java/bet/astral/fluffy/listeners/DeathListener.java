@@ -146,13 +146,23 @@ public class DeathListener implements Listener {
                 if (!FluffyCombat.debug && attackerAcc.getId().equals(player.getUniqueId())) {
                 } else {
                     fluffy.printDebug("Trying to manage stats of the attacker!");
+                    debugPrintStats(attackerAcc, Statistics.KILLS_GLOBAL, Statistics.STREAK_KILLS, Statistics.STREAK_KILLS_HIGHEST);
+
+                    fluffy.printDebug("Incrementing kills");
                     attackerAcc.increment(Statistics.KILLS_GLOBAL);
+                    fluffy.printDebug("Getting offline player");
                     OfflinePlayer attackerPlayer = Bukkit.getOfflinePlayer(tag.getAttacker().getUniqueId());
+                    fluffy.printDebug("Incrementing kill streaks");
                     incrementStreak(attackerPlayer, attackerAcc, Statistics.STREAK_KILLS, Statistics.STREAK_KILLS_HIGHEST);
+                    fluffy.printDebug("Resetting stats");
                     attackerAcc.reset(StatisticType.DEATH_STREAKS);
                     attackerAcc.reset(Statistics.STREAK_DEATHS_TOTEM);
                     attackerAcc.reset(Statistics.STREAK_COMBAT_LOGS);
+                    fluffy.printDebug("Trying to save attacker...!");
                     attackerAcc.save();
+
+                    fluffy.printDebug("Re-Checking stats!");
+                    debugPrintStats(attackerAcc, Statistics.KILLS_GLOBAL, Statistics.STREAK_KILLS, Statistics.STREAK_KILLS_HIGHEST);
                 }
             }
 
@@ -209,6 +219,12 @@ public class DeathListener implements Listener {
                     cyclingTag.setDeadVictim(true);
                 }
             });
+        }
+    }
+
+    private void debugPrintStats(Account account, Statistic... stats) {
+        for (Statistic statistic : stats) {
+            fluffy.printDebug(statistic.getName() + " - " + account.getStatistic(statistic));
         }
     }
 }
